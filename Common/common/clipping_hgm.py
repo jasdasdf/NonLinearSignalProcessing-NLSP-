@@ -8,6 +8,7 @@ class ClippingHammersteinGroupModel(object):
             self.__amplificationfactor = 1.0
         else:
             self.__amplificationfactor = amplificationfactor
+
         self.__clipping = []
         self.__ffts = []
         self.__filterspec = []

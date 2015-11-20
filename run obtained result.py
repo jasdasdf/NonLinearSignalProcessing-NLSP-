@@ -12,10 +12,12 @@ import head_specific
 degree = 18
 length = 2**degree
 samplingrate = 48000
+prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
 sweep_start_frequency, sweep_stop_frequency, sweep_duration = head_specific.get_sweep_properties(sumpf.modules.SilenceGenerator(length=length, samplingrate=samplingrate).GetSignal())
-print sweep_start_frequency, sweep_stop_frequency, sweep_duration
-print sweep_start_frequency, sweep_stop_frequency, sweep_duration
+#print sweep_start_frequency, sweep_stop_frequency, sweep_duration
+#print sweep_start_frequency, sweep_stop_frequency, sweep_duration
 
+# load the audio file and split the excitation and the response signal
 load = sumpf.modules.SignalFile(filename=common.get_filename("Visaton BF45", "Sweep%i" % degree, 1),format=sumpf.modules.SignalFile.WAV_FLOAT)
 split_excitation = sumpf.modules.SplitSignal(channels=[0])
 sumpf.connect(load.GetSignal, split_excitation.SetInput)
@@ -62,7 +64,10 @@ sumpf.connect(resample5_measured.GetOutput, merge_measuered.AddInput)
 fft_measured = sumpf.modules.FourierTransform()
 sumpf.connect(merge_measuered.GetOutput, fft_measured.SetSignal)
 
-model = common.hammerstein(split_excitation.GetOutput())
+lp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=20000,transform=False,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
+
+#model = common.hammerstein(split_excitation.GetOutput())
+model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(), thresholds_list=[(-10.0,10.0),(-10.0,10.0)],filters=(lp,lp),amplificationfactor=1.0)
 sumpf.connect(split_excitation.GetOutput, model.SetInput)
 fft_model = sumpf.modules.FourierTransform()
 sumpf.connect(model.GetOutput, fft_model.SetSignal)
@@ -100,28 +105,24 @@ sumpf.connect(resample5_simulated.GetOutput, merge_simulated.AddInput)
 fft_simulated = sumpf.modules.FourierTransform()
 sumpf.connect(merge_simulated.GetOutput, fft_simulated.SetSignal)
 
-hp1 = sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2, ripple=1.0).GetCoefficients()
-lp = sumpf.modules.FilterGenerator.BUTTERWORTH(order=2).GetCoefficients()
-hp2 = sumpf.modules.FilterGenerator.BUTTERWORTH(order=2).GetCoefficients()
-
 thresholds1 = [ -0.2,0.2]
 thresholds2 = [ -0.7,0.7]
 
-prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
-hp1 = sumpf.modules.FilterWithCoefficients(coefficients=hp1, frequency=140.0, transform=True, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-lp = sumpf.modules.FilterWithCoefficients(coefficients=lp, frequency=200.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-hp2 = sumpf.modules.FilterWithCoefficients(coefficients=hp2, frequency=200.0, transform=True, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-
+lowpass1 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=140.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+lowpass2 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=1500.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+lowpass3 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=3000.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=3.0),frequency=140.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
 
 model.SetParameters(thresholds_list=(thresholds1, thresholds2),
-                        filters=(hp1*lp,hp1*hp2))
+                        filters=(highpass*lowpass1*lowpass2,highpass*highpass*lowpass3))
 
 split_fundamental_measured = sumpf.modules.SplitSpectrum(channels=[0])
 split_fundamental_simulated = sumpf.modules.SplitSpectrum(channels=[0])
 sumpf.connect(fft_measured.GetSpectrum, split_fundamental_measured.SetInput)
 sumpf.connect(fft_simulated.GetSpectrum, split_fundamental_simulated.SetInput)
-#merge_output = sumpf.modules.MergeSpectrums(spectrums=[fft_measured.GetSpectrum(),fft_simulated.GetSpectrum()]).GetOutput()
+merge_output_harmonics = sumpf.modules.MergeSpectrums(spectrums=[fft_measured.GetSpectrum(),fft_simulated.GetSpectrum()]).GetOutput()
 merge_output = sumpf.modules.MergeSpectrums(spectrums=[split_fundamental_simulated.GetOutput(),split_fundamental_measured.GetOutput()]).GetOutput()
 common.plot.log()
 common.plot.plot(merge_output)
+#common.plot.plot(merge_output_harmonics)
 

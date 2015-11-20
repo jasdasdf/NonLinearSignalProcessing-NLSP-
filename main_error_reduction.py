@@ -2,12 +2,12 @@ import math
 import time
 import os.path
 import subprocess
+import functools
 import scipy.optimize
 import numpy
 import sumpf
 import common
 import head_specific
-from desktopmagic.screengrab_win32 import (getDisplayRects, saveScreenToBmp, saveRectToBmp, getScreenAsImage, getRectAsImage, getDisplaysAsImages)
 
 
 degree = 18
@@ -101,14 +101,27 @@ sumpf.connect(resample5_simulated.GetOutput, merge_simulated.AddInput)
 fft_simulated = sumpf.modules.FourierTransform()
 sumpf.connect(merge_simulated.GetOutput, fft_simulated.SetSignal)
 
+def get_thresholds(branches, start_value, decay, asymmetry):
+    thresholds_list = []
+    for i in range(branches):
+        minimum = -start_value * math.e**-abs(i * decay)
+        maximum = (start_value + asymmetry) * math.e**-abs(i * decay)
+        thresholds_list.append((minimum, maximum))
+    return thresholds_list
+
+reduced_threshold = functools.partial(get_thresholds,3,1)
+
+
 def errorfunction(parameters):
     # parse the parameters
-    thresholds1    = parameters[0:2]
-    numerator11    = parameters[2:5]
     denominator11  = [1.0]
     denominator12  = [1.0]
     denominator21  = [1.0]
     denominator22  = [1.0]
+    denominator31  = [1.0]
+    denominator32  = [1.0]
+    thresholds1    = parameters[0:2]
+    numerator11    = parameters[2:5]
     denominator11.extend(parameters[5:7])
     numerator12    = parameters[7:10]
     denominator12.extend(parameters[10:12])
@@ -117,32 +130,43 @@ def errorfunction(parameters):
     denominator21.extend(parameters[17:19])
     numerator22    = parameters[19:22]
     denominator22.extend(parameters[22:24])
+    thresholds3    = parameters[24:26]
+    numerator31    = parameters[26:29]
+    denominator31.extend(parameters[29:31])
+    numerator32    = parameters[31:34]
+    denominator32.extend(parameters[34:36])
 
     # print some debug information
     print "thresholds:        ", (thresholds1, thresholds2)
     print "filter1 parameter: ", (numerator11,denominator11,numerator12,denominator12)
     print "filter2 parameter: ", (numerator21,denominator21,numerator22,denominator22)
+    print "filter3 parameter: ", (numerator31,denominator31,numerator32,denominator32)
 
     # compute the filters
     prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
-    filter1 = sumpf.modules.FilterWithCoefficients(coefficients=[(numerator11, denominator11), (numerator12, denominator12)],frequency=1.0/(2.0*math.pi), transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-    filter2 = sumpf.modules.FilterWithCoefficients(coefficients=[(numerator21, denominator21), (numerator22, denominator22)],frequency=1.0/(2.0*math.pi), transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-    filter3 = 
-    filter4 =
+    spectrum11 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator11, denominator=denominator11), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
+    spectrum12 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator12, denominator=denominator12), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
+    spectrum21 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator21, denominator=denominator21), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
+    spectrum22 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator22, denominator=denominator22), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
+    spectrum31 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator31, denominator=denominator31), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
+    spectrum32 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator32, denominator=denominator32), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
+    filter1 = spectrum11 * spectrum12
+    filter2 = spectrum21 * spectrum22
+    filter3 = spectrum31 * spectrum32
+
     # update the model
-    model.SetParameters(thresholds_list=(thresholds1, thresholds2),
-                        filters=(filter1,filter2))
+    model.SetParameters(thresholds_list=(thresholds1, thresholds2, thresholds3),
+                        filters=(filter1,filter2,filter3))
 
     # compute an error value
     difference = fft_measured.GetSpectrum() - fft_simulated.GetSpectrum()
     positive = difference * difference
     magnitude = numpy.array(positive.GetMagnitude())
-    cropped = magnitude[:, int(round(200.0/positive.GetResolution())):int(round(5000.0/positive.GetResolution()))]
+    cropped = magnitude[:, int(round(100.0/positive.GetResolution())):int(round(4000.0/positive.GetResolution()))]
     error = numpy.sum(cropped)
     print "error:             ", error
     print
     return error
-
 
 
 
@@ -154,20 +178,21 @@ def norm_coeff(filter_coefficients,cutoff_frequency):
     normalized = numpy.divide(result, result[1][0])
     return list(normalized[0]), list(normalized[1][1:])
 
-thresholds1 = [-0.2,0.2]
-numerator11, denominator11 = [ 2.02016467,  3.45383741, -0.0045483 ], [-196.07832435820882, -361.87548246847717]
-numerator12, denominator12 = [ 2.02016467,  3.45383741, -0.0045483 ], [-196.07832435820882, -361.87548246847717]
-thresholds2 = [-0.5,0.5]
-numerator21, denominator21 = [ 37.13605964,   4.8003011 ,  -0.0437737 ], [815.16126868499975, 1159.5476657350441]
-numerator22, denominator22 = [ 37.13605964,   4.8003011 ,  -0.0437737 ], [815.16126868499975, 1159.547665745044]
+numerator11, denominator11 = ( 2.02016467,  3.45383741, -0.0045483 ), (-196.07832435820882, -361.87548246847717)
+numerator12, denominator12 = ( 2.02016467,  3.45383741, -0.0045483 ), (-196.07832435820882, -361.87548246847717)
+numerator21, denominator21 = ( 37.13605964,   4.8003011 ,  -0.0437737 ), (815.16126868499975, 1159.5476657350441)
+numerator22, denominator22 = ( 37.13605964,   4.8003011 ,  -0.0437737 ), (815.16126868499975, 1159.547665745044)
+numerator31, denominator31 = ( 37.13605964,   4.8003011 ,  -0.0437737 ), (815.16126868499975, 1159.5476657350441)
+numerator32, denominator32 = ( 37.13605964,   4.8003011 ,  -0.0437737 ), (815.16126868499975, 1159.547665745044)
 
 turns = 0
 
-method = 'L-BFGS-B'
+method = 'CG'
 result = scipy.optimize.minimize(errorfunction,
-                                 (thresholds1+numerator11+denominator11+numerator12+denominator12+
-                                  thresholds2+numerator21+denominator21+numerator22+denominator22),
-                                 method= method)
+                                 (reduced_threshold(1,2)[0]+numerator11+denominator11+numerator12+denominator12+
+                                  reduced_threshold(1,2)[1]+numerator21+denominator21+numerator22+denominator22+
+                                  reduced_threshold(1,2)[2]+numerator31+denominator31+numerator32+denominator32),
+                                  method= method)
 print result
 
 split_fundamental_measured = sumpf.modules.SplitSpectrum(channels=[0])
@@ -175,7 +200,5 @@ split_fundamental_simulated = sumpf.modules.SplitSpectrum(channels=[0])
 sumpf.connect(fft_measured.GetSpectrum, split_fundamental_measured.SetInput)
 sumpf.connect(fft_simulated.GetSpectrum, split_fundamental_simulated.SetInput)
 merge_output = sumpf.modules.MergeSpectrums(spectrums=[fft_measured.GetSpectrum(),fft_simulated.GetSpectrum()]).GetOutput()
-merge_outputh = sumpf.modules.MergeSpectrums(spectrums=[split_fundamental_simulated.GetOutput(),split_fundamental_measured.GetOutput()]).GetOutput()
 common.plot.log()
 common.plot.plot(merge_output)
-common.plot.plot(merge_outputh)

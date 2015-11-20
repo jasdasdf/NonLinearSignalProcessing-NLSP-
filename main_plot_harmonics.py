@@ -63,6 +63,7 @@ def hammerstein(excitation):
     model = common.ClippingHammersteinGroupModel(signal=excitation,thresholds_list=[(-0.2,0.2), (-0.5,0.5)],filters=(highpass*lowpass1*lowpass2, highpass*highpass*lowpass3), amplificationfactor=1)
     return model
 
+
 def plot(data):
     if isinstance(data[0], sumpf.Spectrum):
         outputs = sumpf.modules.MergeSpectrums(spectrums=data).GetOutput()

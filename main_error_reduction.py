@@ -11,9 +11,12 @@ import head_specific
 
 ################################ Inputs #########################
 Speaker = "Visaton BF45"
-Signal  = 18
-printoutput = False
-thresholds_decay = 1
+Signal = 18
+plotoutput = False
+inital_threshold_decay = 1            # Value to be optimized by alg
+initial_threshold_assymetry = 1       # Value to be optimized by alg
+branches = 4
+start_value = 2                       # Threshold start value
 
 #################################################################
 
@@ -25,7 +28,7 @@ def get_thresholds(branches, start_value, asymmetry, decay):
         thresholds_list.append([minimum, maximum])
     return thresholds_list
 
-threshold = functools.partial(get_thresholds,4,1,1) # braches, start value, asymmetry
+threshold = functools.partial(get_thresholds,branches,start_value) # braches, start value, asymmetry
 
 def get_filename(speaker, smd, repetition):
     """
@@ -52,22 +55,33 @@ def Initial_parameters(length, samplingrate):
     lowpass2 = sumpf.modules.FilterGenerator(lowpass_filter,frequency=300.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
     lowpass3 = sumpf.modules.FilterGenerator(lowpass_filter,frequency=200.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
     highpass = sumpf.modules.FilterGenerator(highpass_filter,frequency=140.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    thresholds_list = threshold(thresholds_decay)
-    amplificationfactor = 1
-    return lowpass1,lowpass2,lowpass3,highpass,thresholds_list,amplificationfactor,lowpass_filter,highpass_filter
+    initial_thresholds_list = threshold(initial_threshold_assymetry,inital_threshold_decay)
+    initial_amplificationfactor = 1
+    return lowpass1,lowpass2,lowpass3,highpass,initial_thresholds_list,initial_amplificationfactor,lowpass_filter,highpass_filter
 
+def map_value(value, initial_guess, limits):
+	minimum, maximum = limits
+	difference = (maximum - minimum)
+#	return difference / (1.0 + math.exp(-((value - initial_guess) / difference))) + minimum
+	return difference * 0.5 * (math.sin(value) + 1.0) + minimum
 
-degree = 18
-length = 2**degree
+def unmap_value(value, initial_guess, limits):
+	minimum, maximum = limits
+	difference = maximum - minimum
+#	return -math.log(difference / (value - minimum) - 1.0) * difference + initial_guess
+	return math.asin(2.0 * (value - minimum) / difference - 1.0)
+
+# Get the properties of the recorded excitation and response
+length = 2**Signal
 samplingrate = 48000
 sweep_start_frequency, sweep_stop_frequency, sweep_duration = head_specific.get_sweep_properties(sumpf.modules.SilenceGenerator(length=length, samplingrate=samplingrate).GetSignal())
 print "Input sweep prop: startfreq-%f, stopfreq-%f, duration-%f" %(sweep_start_frequency, sweep_stop_frequency, sweep_duration)
-
-load = sumpf.modules.SignalFile(filename=common.get_filename(Speaker, "Sweep%i" % degree, 1),format=sumpf.modules.SignalFile.WAV_FLOAT)
+load = sumpf.modules.SignalFile(filename=common.get_filename(Speaker, "Sweep%i" % Signal, 1),format=sumpf.modules.SignalFile.WAV_FLOAT)
 split_excitation = sumpf.modules.SplitSignal(channels=[0])
 sumpf.connect(load.GetSignal, split_excitation.SetInput)
 split_response = sumpf.modules.SplitSignal(channels=[1])
 
+# Model for extracting the harmonics of the recorded signal
 sumpf.connect(load.GetSignal, split_response.SetInput)
 fft_excitation = sumpf.modules.FourierTransform()
 sumpf.connect(split_excitation.GetOutput, fft_excitation.SetSignal)
@@ -111,8 +125,18 @@ sumpf.connect(merge_measuered.GetOutput, tf_measured_withharmonics.SetSignal)
 tf_measured_fundamental = sumpf.modules.SplitSpectrum(channels=[0])
 sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.SetInput)
 
-lowpass1,lowpass2,lowpass3,highpass,thresholds_list,amplificationfactor,lowpass_coeff,highpass_coeff = Initial_parameters(length,samplingrate)
-model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(),thresholds_list=thresholds_list,filters=(highpass,lowpass1,lowpass2,lowpass3),amplificationfactor=amplificationfactor)
+# Get the Initial parameters of the model
+lowpass1,lowpass2,lowpass3,highpass,initial_thresholds_list,initial_amplificationfactor,lowpass_filter,highpass_filter = Initial_parameters(length,samplingrate)
+
+# print some initial debug information
+print "Initial threshold decay       ", inital_threshold_decay
+print "Initial threshold assymetry   ", initial_threshold_assymetry
+print "Initial thresholds:           ", (initial_thresholds_list)
+print "Initial hp coefficients:      ", (highpass_filter.GetCoefficients())
+print "Initial lp coefficients:      ", (lowpass_filter.GetCoefficients())
+
+# model for extracting the harmonics of simulated signal
+model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(),thresholds_list=initial_thresholds_list,filters=(highpass,lowpass1,lowpass2,lowpass3),amplificationfactor=initial_amplificationfactor)
 sumpf.connect(split_excitation.GetOutput, model.SetInput)
 fft_model = sumpf.modules.FourierTransform()
 sumpf.connect(model.GetOutput, fft_model.SetSignal)
@@ -152,7 +176,7 @@ sumpf.connect(merge_simulated.GetOutput, tf_simulated_withharmonics.SetSignal)
 tf_simulated_fundamental = sumpf.modules.SplitSpectrum(channels=[0])
 sumpf.connect(tf_simulated_withharmonics.GetSpectrum, tf_simulated_fundamental.SetInput)
 
-if printoutput == True:
+if plotoutput == True:
     merge_ipandop_harmonics = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_withharmonics.GetSpectrum(),tf_simulated_withharmonics.GetSpectrum()]).GetOutput()
     merge_ipandop_fundamental = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_fundamental.GetOutput(),tf_simulated_fundamental.GetOutput()]).GetOutput()
     common.plot.log()
@@ -161,17 +185,26 @@ if printoutput == True:
 
 def errorfunction(parameters):
     # parse the parameters
-    thresholds_decay    = parameters[0]
-    numeratorhp    = parameters[1:4]
-    denominatorhp  = parameters[4:7]
-    numeratorlp    = parameters[7:10]
-    denominatorlp  = parameters[10:13]
-    thresholds_list = threshold(thresholds_decay)
+    threshold_decay    = parameters[0]
+    threshold_assymetry= parameters[1]
+    numeratorhp    = parameters[2:5]
+    denominatorhp  = parameters[5:8]
+    numeratorlp    = parameters[8:11]
+    denominatorlp  = parameters[11:14]
+
+    # limit the parameters
+    threshold_assymetry = map_value(threshold_assymetry,0,[-1,1])
+    threshold_decay = map_value(threshold_decay,0,[0,1])
+
+    # calculate the exact values
+    thresholds_list = threshold(threshold_assymetry, threshold_decay)
 
     # print some debug information
-    print "thresholds:   ", (thresholds_list)
-    print "hp parameter: ", (numeratorhp,denominatorhp)
-    print "lp parameter: ", (numeratorlp,denominatorlp)
+    print "threshold decay    ", threshold_decay
+    print "threshold assymetry", threshold_assymetry
+    print "thresholds:        ", (thresholds_list)
+    print "hp parameter:      ", (numeratorhp,denominatorhp)
+    print "lp parameter:      ", (numeratorlp,denominatorlp)
 
     # compute the filters
     prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
@@ -183,7 +216,7 @@ def errorfunction(parameters):
     # update the model
     model.SetParameters(thresholds_list=thresholds_list,
                         filters=(highpass,lowpass1,lowpass2,lowpass3))
-    if printoutput == True:
+    if plotoutput == True:
         merge_ipandop_harmonics = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_withharmonics.GetSpectrum(),tf_simulated_withharmonics.GetSpectrum()]).GetOutput()
         merge_ipandop_fundamental = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_fundamental.GetOutput(),tf_simulated_fundamental.GetOutput()]).GetOutput()
         common.plot.log()
@@ -209,24 +242,25 @@ def norm_coeff(filter_coefficients,cutoff_frequency):
     normalized = numpy.divide(result, result[1][0])
     return list(normalized[0]), list(normalized[1][1:])
 
+lowpass1,lowpass2,lowpass3,highpass,initial_thresholds_list,initial_amplificationfactor,lowpass_filter,highpass_filter
 
-numeratorhp, denominatorhp = (highpass_coeff.GetCoefficients()[0][0]+[0]*3)[:3], highpass_coeff.GetCoefficients()[0][1]
-numeratorlp, denominatorlp = (lowpass_coeff.GetCoefficients()[0][0]+[0]*3)[:3], lowpass_coeff.GetCoefficients()[0][1]
-thresholds1 = list(thresholds_list[0])
-thresholds2 = list(thresholds_list[1])
-thresholds3 = list(thresholds_list[2])
-thresholds4 = list(thresholds_list[3])
-threshold_decay = [0.5]
+numeratorhp, denominatorhp = (highpass_filter.GetCoefficients()[0][0]+[0]*3)[:3], highpass_filter.GetCoefficients()[0][1]
+numeratorlp, denominatorlp = (lowpass_filter.GetCoefficients()[0][0]+[0]*3)[:3], lowpass_filter.GetCoefficients()[0][1]
+threshold_decay = [inital_threshold_decay]
+threshold_assymetry = [initial_threshold_assymetry]
 
-print threshold(threshold_decay[0])
+# print some debug information
+print "Parameter Vector for optimizing (decay,assymetry,hp,lp):", (threshold_decay+threshold_assymetry+numeratorhp+denominatorhp+numeratorlp+denominatorlp)
 
+# Optimize the parameters by reducing the error function
 # method = 'Powell'
 method = 'L-BFGS-B'
 result = scipy.optimize.minimize(errorfunction,
-                                (threshold_decay+numeratorhp+denominatorhp+numeratorlp+denominatorlp),
+                                (threshold_decay+threshold_assymetry+numeratorhp+denominatorhp+numeratorlp+denominatorlp),
                                  method= method)
-print result
 
+# print result and plot output
+print result
 merge_ipandop_harmonics = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_withharmonics.GetSpectrum(),tf_simulated_withharmonics.GetSpectrum()]).GetOutput()
 merge_ipandop_fundamental = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_fundamental.GetOutput(),tf_simulated_fundamental.GetOutput()]).GetOutput()
 common.plot.log()

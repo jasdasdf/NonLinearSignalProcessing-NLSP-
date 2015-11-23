@@ -52,6 +52,17 @@ def Initial_parameters(length, samplingrate):
     amplificationfactor = 1
     return lowpass1,lowpass2,lowpass3,highpass,thresholds_list,amplificationfactor
 
+def map_value(value, initial_guess, limits):
+	minimum, maximum = limits
+	difference = (maximum - minimum)
+#	return difference / (1.0 + math.exp(-((value - initial_guess) / difference))) + minimum
+	return difference * 0.5 * (math.sin(value) + 1.0) + minimum
+
+def unmap_value(value, initial_guess, limits):
+	minimum, maximum = limits
+	difference = maximum - minimum
+#	return -math.log(difference / (value - minimum) - 1.0) * difference + initial_guess
+	return math.asin(2.0 * (value - minimum) / difference - 1.0)
 
 degree = 18
 length = 2**degree

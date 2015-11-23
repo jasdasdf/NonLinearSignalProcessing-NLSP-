@@ -49,15 +49,15 @@ def get_filename(speaker, smd, repetition):
 
 def Initial_parameters(length, samplingrate):
     prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
-    lowpass_filter = sumpf.modules.FilterGenerator.BUTTERWORTH(order=2)
-    highpass_filter = sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=3.0)
-    lowpass1 = sumpf.modules.FilterGenerator(highpass_filter,frequency=140.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    lowpass2 = sumpf.modules.FilterGenerator(lowpass_filter,frequency=300.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    lowpass3 = sumpf.modules.FilterGenerator(lowpass_filter,frequency=200.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    highpass = sumpf.modules.FilterGenerator(highpass_filter,frequency=140.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    butterworth_filter = sumpf.modules.FilterGenerator.BUTTERWORTH(order=2)
+    chebyshev1_filter = sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=3.0)
+    highpass1 = sumpf.modules.FilterGenerator(chebyshev1_filter,frequency=140.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    highpass2 = sumpf.modules.FilterGenerator(butterworth_filter,frequency=140.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    lowpass1 = sumpf.modules.FilterGenerator(chebyshev1_filter,frequency=300.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    lowpass2 = sumpf.modules.FilterGenerator(butterworth_filter,frequency=200.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
     initial_thresholds_list = threshold(initial_threshold_assymetry,inital_threshold_decay)
     initial_amplificationfactor = 1
-    return lowpass1,lowpass2,lowpass3,highpass,initial_thresholds_list,initial_amplificationfactor,lowpass_filter,highpass_filter
+    return highpass1,highpass2,lowpass1,lowpass2,initial_thresholds_list,initial_amplificationfactor,butterworth_filter,chebyshev1_filter
 
 def map_value(value, initial_guess, limits):
 	minimum, maximum = limits
@@ -126,17 +126,17 @@ tf_measured_fundamental = sumpf.modules.SplitSpectrum(channels=[0])
 sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.SetInput)
 
 # Get the Initial parameters of the model
-lowpass1,lowpass2,lowpass3,highpass,initial_thresholds_list,initial_amplificationfactor,lowpass_filter,highpass_filter = Initial_parameters(length,samplingrate)
+highpass1,highpass2,lowpass1,lowpass2,initial_thresholds_list,initial_amplificationfactor,butterworth_filter,chebyshev1_filter = Initial_parameters(length,samplingrate)
 
 # print some initial debug information
 print "Initial threshold decay       ", inital_threshold_decay
 print "Initial threshold assymetry   ", initial_threshold_assymetry
 print "Initial thresholds:           ", (initial_thresholds_list)
-print "Initial hp coefficients:      ", (highpass_filter.GetCoefficients())
-print "Initial lp coefficients:      ", (lowpass_filter.GetCoefficients())
+print "Initial Butterworth coefficients:      ", (butterworth_filter.GetCoefficients())
+print "Initial Chebyshev1 coefficients :      ", (chebyshev1_filter.GetCoefficients())
 
 # model for extracting the harmonics of simulated signal
-model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(),thresholds_list=initial_thresholds_list,filters=(highpass,lowpass1,lowpass2,lowpass3),amplificationfactor=initial_amplificationfactor)
+model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(),thresholds_list=initial_thresholds_list,filters=(highpass1,lowpass1,lowpass2,highpass2),amplificationfactor=initial_amplificationfactor)
 sumpf.connect(split_excitation.GetOutput, model.SetInput)
 fft_model = sumpf.modules.FourierTransform()
 sumpf.connect(model.GetOutput, fft_model.SetSignal)
@@ -187,10 +187,14 @@ def errorfunction(parameters):
     # parse the parameters
     threshold_decay    = parameters[0]
     threshold_assymetry= parameters[1]
-    numeratorhp    = parameters[2:5]
-    denominatorhp  = parameters[5:8]
-    numeratorlp    = parameters[8:11]
-    denominatorlp  = parameters[11:14]
+    numeratorbw1    = parameters[2:5]
+    denominatorbw1  = parameters[5:8]
+    numeratorbw2    = parameters[8:11]
+    denominatorbw2  = parameters[11:14]
+    numeratorcb1    = parameters[14:17]
+    denominatorcb1  = parameters[17:20]
+    numeratorcb2    = parameters[20:23]
+    denominatorcb2  = parameters[23:26]
 
     # limit the parameters
     threshold_assymetry = map_value(threshold_assymetry,0,[-1,1])
@@ -200,22 +204,24 @@ def errorfunction(parameters):
     thresholds_list = threshold(threshold_assymetry, threshold_decay)
 
     # print some debug information
-    print "threshold decay    ", threshold_decay
-    print "threshold assymetry", threshold_assymetry
-    print "thresholds:        ", (thresholds_list)
-    print "hp parameter:      ", (numeratorhp,denominatorhp)
-    print "lp parameter:      ", (numeratorlp,denominatorlp)
+    print "threshold decay     ", threshold_decay
+    print "threshold assymetry ", threshold_assymetry
+    print "thresholds:         ", (thresholds_list)
+    print "bw1 parameter:      ", (numeratorbw1,denominatorbw1)
+    print "bw2 parameter:      ", (numeratorbw2,denominatorbw2)
+    print "cb1 parameter:      ", (numeratorcb1,denominatorcb1)
+    print "cb2 parameter:      ", (numeratorcb2,denominatorcb2)
 
     # compute the filters
     prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
-    lowpass1 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorlp,denominator=denominatorlp),frequency=200.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    lowpass2 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorlp,denominator=denominatorlp),frequency=180.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    lowpass3 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorlp,denominator=denominatorlp),frequency=3000.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorhp,denominator=denominatorhp),frequency=100.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    highpass1 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb1,denominator=denominatorcb1),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    highpass2 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw1,denominator=denominatorbw1),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    lowpass1 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb2,denominator=denominatorcb2),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    lowpass2 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw2,denominator=denominatorbw2),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
 
     # update the model
     model.SetParameters(thresholds_list=thresholds_list,
-                        filters=(highpass,lowpass1,lowpass2,lowpass3))
+                        filters=(highpass1,lowpass1,lowpass2,highpass2))
     if plotoutput == True:
         merge_ipandop_harmonics = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_withharmonics.GetSpectrum(),tf_simulated_withharmonics.GetSpectrum()]).GetOutput()
         merge_ipandop_fundamental = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_fundamental.GetOutput(),tf_simulated_fundamental.GetOutput()]).GetOutput()
@@ -242,21 +248,22 @@ def norm_coeff(filter_coefficients,cutoff_frequency):
     normalized = numpy.divide(result, result[1][0])
     return list(normalized[0]), list(normalized[1][1:])
 
-lowpass1,lowpass2,lowpass3,highpass,initial_thresholds_list,initial_amplificationfactor,lowpass_filter,highpass_filter
-
-numeratorhp, denominatorhp = (highpass_filter.GetCoefficients()[0][0]+[0]*3)[:3], highpass_filter.GetCoefficients()[0][1]
-numeratorlp, denominatorlp = (lowpass_filter.GetCoefficients()[0][0]+[0]*3)[:3], lowpass_filter.GetCoefficients()[0][1]
+numeratorbw, denominatorbw = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
+numeratorcb, denominatorcb = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
 threshold_decay = [inital_threshold_decay]
 threshold_assymetry = [initial_threshold_assymetry]
 
 # print some debug information
-print "Parameter Vector for optimizing (decay,assymetry,hp,lp):", (threshold_decay+threshold_assymetry+numeratorhp+denominatorhp+numeratorlp+denominatorlp)
+print "Parameter Vector for optimizing (decay,assymetry,bw,bw,cb,cb):", (threshold_decay+threshold_assymetry+numeratorbw+denominatorbw+numeratorbw+denominatorbw
+                                                                   +numeratorcb+denominatorcb+numeratorcb+denominatorcb)
 
 # Optimize the parameters by reducing the error function
 method = 'Powell'
 # method = 'L-BFGS-B'
 result = scipy.optimize.minimize(errorfunction,
-                                (threshold_decay+threshold_assymetry+numeratorhp+denominatorhp+numeratorlp+denominatorlp),
+                                (threshold_decay+threshold_assymetry
+                                 +numeratorbw+denominatorbw+numeratorbw+denominatorbw
+                                 +numeratorcb+denominatorcb+numeratorcb+denominatorcb),
                                  method= method)
 
 # print result and plot output

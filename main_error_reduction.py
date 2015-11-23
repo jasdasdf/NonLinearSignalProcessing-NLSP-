@@ -224,7 +224,7 @@ def errorfunction(parameters):
         common.plot.plot(merge_ipandop_harmonics)
 
     # compute an error value
-    difference = tf_measured_fundamental.GetOutput() - tf_simulated_fundamental.GetOutput()
+    difference = tf_measured_withharmonics.GetSpectrum() - tf_simulated_withharmonics.GetSpectrum()
     positive = difference * difference
     magnitude = numpy.array(positive.GetMagnitude())
     cropped = magnitude[:, int(round(200.0/positive.GetResolution())):int(round(4000.0/positive.GetResolution()))]
@@ -253,8 +253,8 @@ threshold_assymetry = [initial_threshold_assymetry]
 print "Parameter Vector for optimizing (decay,assymetry,hp,lp):", (threshold_decay+threshold_assymetry+numeratorhp+denominatorhp+numeratorlp+denominatorlp)
 
 # Optimize the parameters by reducing the error function
-# method = 'Powell'
-method = 'L-BFGS-B'
+method = 'Powell'
+# method = 'L-BFGS-B'
 result = scipy.optimize.minimize(errorfunction,
                                 (threshold_decay+threshold_assymetry+numeratorhp+denominatorhp+numeratorlp+denominatorlp),
                                  method= method)

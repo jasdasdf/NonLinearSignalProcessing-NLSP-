@@ -9,15 +9,61 @@ import sumpf
 import common
 import head_specific
 
+################################ Inputs #########################
+Speaker = "Visaton BF45"
+Signal  = 18
+printoutput = False
+thresholds_decay = 1
+
+#################################################################
+
+def get_thresholds(branches, start_value, asymmetry, decay):
+    thresholds_list = []
+    for i in range(branches):
+        minimum = -start_value * math.e**-abs(i * decay)
+        maximum = (start_value + asymmetry) * math.e**-abs(i * decay)
+        thresholds_list.append([minimum, maximum])
+    return thresholds_list
+
+threshold = functools.partial(get_thresholds,4,1,1) # braches, start value, asymmetry
+
+def get_filename(speaker, smd, repetition):
+    """
+    available speakers: "Visaton BF45", "70s"
+    """
+    path = "O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/Measurements/%s/output/%s_SMD%i_Index%i_TimeSignal"
+    smds = {"Noise120s": 4,
+            "Sweep16": 5,
+            "Sweep18": 6,
+            "Sweep20": 7,
+            "Noise18": 8,
+            "Noise20": 9,
+            "Music1": 10,
+            "Speech1": 11,
+            "Speech2": 12,
+            "Speech3": 13}
+    return path % (speaker, speaker, smds[smd], repetition)
+
+def Initial_parameters(length, samplingrate):
+    prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
+    lowpass_filter = sumpf.modules.FilterGenerator.BUTTERWORTH(order=2)
+    highpass_filter = sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=3.0)
+    lowpass1 = sumpf.modules.FilterGenerator(highpass_filter,frequency=140.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    lowpass2 = sumpf.modules.FilterGenerator(lowpass_filter,frequency=300.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    lowpass3 = sumpf.modules.FilterGenerator(lowpass_filter,frequency=200.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    highpass = sumpf.modules.FilterGenerator(highpass_filter,frequency=140.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    thresholds_list = threshold(thresholds_decay)
+    amplificationfactor = 1
+    return lowpass1,lowpass2,lowpass3,highpass,thresholds_list,amplificationfactor,lowpass_filter,highpass_filter
+
 
 degree = 18
 length = 2**degree
 samplingrate = 48000
 sweep_start_frequency, sweep_stop_frequency, sweep_duration = head_specific.get_sweep_properties(sumpf.modules.SilenceGenerator(length=length, samplingrate=samplingrate).GetSignal())
-print sweep_start_frequency, sweep_stop_frequency, sweep_duration
-print sweep_start_frequency, sweep_stop_frequency, sweep_duration
+print "Input sweep prop: startfreq-%f, stopfreq-%f, duration-%f" %(sweep_start_frequency, sweep_stop_frequency, sweep_duration)
 
-load = sumpf.modules.SignalFile(filename=common.get_filename("Visaton BF45", "Sweep%i" % degree, 1),format=sumpf.modules.SignalFile.WAV_FLOAT)
+load = sumpf.modules.SignalFile(filename=common.get_filename(Speaker, "Sweep%i" % degree, 1),format=sumpf.modules.SignalFile.WAV_FLOAT)
 split_excitation = sumpf.modules.SplitSignal(channels=[0])
 sumpf.connect(load.GetSignal, split_excitation.SetInput)
 split_response = sumpf.modules.SplitSignal(channels=[1])
@@ -60,10 +106,13 @@ sumpf.connect(resample2_measured.GetOutput, merge_measuered.AddInput)
 sumpf.connect(resample3_measured.GetOutput, merge_measuered.AddInput)
 sumpf.connect(resample4_measured.GetOutput, merge_measuered.AddInput)
 sumpf.connect(resample5_measured.GetOutput, merge_measuered.AddInput)
-fft_measured = sumpf.modules.FourierTransform()
-sumpf.connect(merge_measuered.GetOutput, fft_measured.SetSignal)
+tf_measured_withharmonics = sumpf.modules.FourierTransform()
+sumpf.connect(merge_measuered.GetOutput, tf_measured_withharmonics.SetSignal)
+tf_measured_fundamental = sumpf.modules.SplitSpectrum(channels=[0])
+sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.SetInput)
 
-model = common.hammerstein(split_excitation.GetOutput())
+lowpass1,lowpass2,lowpass3,highpass,thresholds_list,amplificationfactor,lowpass_coeff,highpass_coeff = Initial_parameters(length,samplingrate)
+model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(),thresholds_list=thresholds_list,filters=(highpass,lowpass1,lowpass2,lowpass3),amplificationfactor=amplificationfactor)
 sumpf.connect(split_excitation.GetOutput, model.SetInput)
 fft_model = sumpf.modules.FourierTransform()
 sumpf.connect(model.GetOutput, fft_model.SetSignal)
@@ -98,76 +147,58 @@ sumpf.connect(resample2_simulated.GetOutput, merge_simulated.AddInput)
 sumpf.connect(resample3_simulated.GetOutput, merge_simulated.AddInput)
 sumpf.connect(resample4_simulated.GetOutput, merge_simulated.AddInput)
 sumpf.connect(resample5_simulated.GetOutput, merge_simulated.AddInput)
-fft_simulated = sumpf.modules.FourierTransform()
-sumpf.connect(merge_simulated.GetOutput, fft_simulated.SetSignal)
+tf_simulated_withharmonics = sumpf.modules.FourierTransform()
+sumpf.connect(merge_simulated.GetOutput, tf_simulated_withharmonics.SetSignal)
+tf_simulated_fundamental = sumpf.modules.SplitSpectrum(channels=[0])
+sumpf.connect(tf_simulated_withharmonics.GetSpectrum, tf_simulated_fundamental.SetInput)
 
-def get_thresholds(branches, start_value, decay, asymmetry):
-    thresholds_list = []
-    for i in range(branches):
-        minimum = -start_value * math.e**-abs(i * decay)
-        maximum = (start_value + asymmetry) * math.e**-abs(i * decay)
-        thresholds_list.append((minimum, maximum))
-    return thresholds_list
-
-reduced_threshold = functools.partial(get_thresholds,3,1)
-
+if printoutput == True:
+    merge_ipandop_harmonics = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_withharmonics.GetSpectrum(),tf_simulated_withharmonics.GetSpectrum()]).GetOutput()
+    merge_ipandop_fundamental = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_fundamental.GetOutput(),tf_simulated_fundamental.GetOutput()]).GetOutput()
+    common.plot.log()
+    common.plot.plot(merge_ipandop_fundamental)
+    common.plot.plot(merge_ipandop_harmonics)
 
 def errorfunction(parameters):
     # parse the parameters
-    denominator11  = [1.0]
-    denominator12  = [1.0]
-    denominator21  = [1.0]
-    denominator22  = [1.0]
-    denominator31  = [1.0]
-    denominator32  = [1.0]
-    thresholds1    = parameters[0:2]
-    numerator11    = parameters[2:5]
-    denominator11.extend(parameters[5:7])
-    numerator12    = parameters[7:10]
-    denominator12.extend(parameters[10:12])
-    thresholds2    = parameters[12:14]
-    numerator21    = parameters[14:17]
-    denominator21.extend(parameters[17:19])
-    numerator22    = parameters[19:22]
-    denominator22.extend(parameters[22:24])
-    thresholds3    = parameters[24:26]
-    numerator31    = parameters[26:29]
-    denominator31.extend(parameters[29:31])
-    numerator32    = parameters[31:34]
-    denominator32.extend(parameters[34:36])
+    thresholds_decay    = parameters[0]
+    numeratorhp    = parameters[1:4]
+    denominatorhp  = parameters[4:7]
+    numeratorlp    = parameters[7:10]
+    denominatorlp  = parameters[10:13]
+    thresholds_list = threshold(thresholds_decay)
 
     # print some debug information
-    print "thresholds:        ", (thresholds1, thresholds2)
-    print "filter1 parameter: ", (numerator11,denominator11,numerator12,denominator12)
-    print "filter2 parameter: ", (numerator21,denominator21,numerator22,denominator22)
-    print "filter3 parameter: ", (numerator31,denominator31,numerator32,denominator32)
+    print "thresholds:   ", (thresholds_list)
+    print "hp parameter: ", (numeratorhp,denominatorhp)
+    print "lp parameter: ", (numeratorlp,denominatorlp)
 
     # compute the filters
     prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
-    spectrum11 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator11, denominator=denominator11), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-    spectrum12 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator12, denominator=denominator12), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-    spectrum21 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator21, denominator=denominator21), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-    spectrum22 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator22, denominator=denominator22), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-    spectrum31 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator31, denominator=denominator31), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-    spectrum32 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numerator32, denominator=denominator32), frequency=1.0, transform=False, resolution=prp.GetResolution(), length=prp.GetSpectrumLength()).GetSpectrum()
-    filter1 = spectrum11 * spectrum12
-    filter2 = spectrum21 * spectrum22
-    filter3 = spectrum31 * spectrum32
+    lowpass1 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorlp,denominator=denominatorlp),frequency=200.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    lowpass2 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorlp,denominator=denominatorlp),frequency=180.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    lowpass3 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorlp,denominator=denominatorlp),frequency=3000.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorhp,denominator=denominatorhp),frequency=100.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
 
     # update the model
-    model.SetParameters(thresholds_list=(thresholds1, thresholds2, thresholds3),
-                        filters=(filter1,filter2,filter3))
+    model.SetParameters(thresholds_list=thresholds_list,
+                        filters=(highpass,lowpass1,lowpass2,lowpass3))
+    if printoutput == True:
+        merge_ipandop_harmonics = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_withharmonics.GetSpectrum(),tf_simulated_withharmonics.GetSpectrum()]).GetOutput()
+        merge_ipandop_fundamental = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_fundamental.GetOutput(),tf_simulated_fundamental.GetOutput()]).GetOutput()
+        common.plot.log()
+        common.plot.plot(merge_ipandop_fundamental)
+        common.plot.plot(merge_ipandop_harmonics)
 
     # compute an error value
-    difference = fft_measured.GetSpectrum() - fft_simulated.GetSpectrum()
+    difference = tf_measured_fundamental.GetOutput() - tf_simulated_fundamental.GetOutput()
     positive = difference * difference
     magnitude = numpy.array(positive.GetMagnitude())
-    cropped = magnitude[:, int(round(100.0/positive.GetResolution())):int(round(4000.0/positive.GetResolution()))]
+    cropped = magnitude[:, int(round(200.0/positive.GetResolution())):int(round(4000.0/positive.GetResolution()))]
     error = numpy.sum(cropped)
-    print "error:             ", error
+    print "error:        ", error
     print
     return error
-
 
 
 def norm_coeff(filter_coefficients,cutoff_frequency):
@@ -178,27 +209,26 @@ def norm_coeff(filter_coefficients,cutoff_frequency):
     normalized = numpy.divide(result, result[1][0])
     return list(normalized[0]), list(normalized[1][1:])
 
-numerator11, denominator11 = ( 2.02016467,  3.45383741, -0.0045483 ), (-196.07832435820882, -361.87548246847717)
-numerator12, denominator12 = ( 2.02016467,  3.45383741, -0.0045483 ), (-196.07832435820882, -361.87548246847717)
-numerator21, denominator21 = ( 37.13605964,   4.8003011 ,  -0.0437737 ), (815.16126868499975, 1159.5476657350441)
-numerator22, denominator22 = ( 37.13605964,   4.8003011 ,  -0.0437737 ), (815.16126868499975, 1159.547665745044)
-numerator31, denominator31 = ( 37.13605964,   4.8003011 ,  -0.0437737 ), (815.16126868499975, 1159.5476657350441)
-numerator32, denominator32 = ( 37.13605964,   4.8003011 ,  -0.0437737 ), (815.16126868499975, 1159.547665745044)
 
-turns = 0
+numeratorhp, denominatorhp = (highpass_coeff.GetCoefficients()[0][0]+[0]*3)[:3], highpass_coeff.GetCoefficients()[0][1]
+numeratorlp, denominatorlp = (lowpass_coeff.GetCoefficients()[0][0]+[0]*3)[:3], lowpass_coeff.GetCoefficients()[0][1]
+thresholds1 = list(thresholds_list[0])
+thresholds2 = list(thresholds_list[1])
+thresholds3 = list(thresholds_list[2])
+thresholds4 = list(thresholds_list[3])
+threshold_decay = [0.5]
 
-method = 'CG'
+print threshold(threshold_decay[0])
+
+# method = 'Powell'
+method = 'L-BFGS-B'
 result = scipy.optimize.minimize(errorfunction,
-                                 (reduced_threshold(1,2)[0]+numerator11+denominator11+numerator12+denominator12+
-                                  reduced_threshold(1,2)[1]+numerator21+denominator21+numerator22+denominator22+
-                                  reduced_threshold(1,2)[2]+numerator31+denominator31+numerator32+denominator32),
-                                  method= method)
+                                (threshold_decay+numeratorhp+denominatorhp+numeratorlp+denominatorlp),
+                                 method= method)
 print result
 
-split_fundamental_measured = sumpf.modules.SplitSpectrum(channels=[0])
-split_fundamental_simulated = sumpf.modules.SplitSpectrum(channels=[0])
-sumpf.connect(fft_measured.GetSpectrum, split_fundamental_measured.SetInput)
-sumpf.connect(fft_simulated.GetSpectrum, split_fundamental_simulated.SetInput)
-merge_output = sumpf.modules.MergeSpectrums(spectrums=[fft_measured.GetSpectrum(),fft_simulated.GetSpectrum()]).GetOutput()
+merge_ipandop_harmonics = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_withharmonics.GetSpectrum(),tf_simulated_withharmonics.GetSpectrum()]).GetOutput()
+merge_ipandop_fundamental = sumpf.modules.MergeSpectrums(spectrums=[tf_measured_fundamental.GetOutput(),tf_simulated_fundamental.GetOutput()]).GetOutput()
 common.plot.log()
-common.plot.plot(merge_output)
+common.plot.plot(merge_ipandop_fundamental)
+common.plot.plot(merge_ipandop_harmonics)

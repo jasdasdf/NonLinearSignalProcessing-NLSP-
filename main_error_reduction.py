@@ -3,6 +3,7 @@ import time
 import os.path
 import subprocess
 import functools
+import matplotlib.pyplot as plt
 import scipy.optimize
 import numpy
 import sumpf
@@ -20,7 +21,7 @@ branches = 7
 start_value = 2.0                       # Threshold start value
 assymetry_limits = [-1,1]
 decay_limits = [-1,1]
-output_filename = "%s_%d_%d.txt" %(Speaker,Signal,branches)
+output_filename = "%s_%d_%d(exp).txt" %(Speaker,Signal,branches)
 output_file = os.path.join(Dir,output_filename)
 #################################################################
 
@@ -283,10 +284,9 @@ def errorfunction(parameters):
     positive = difference * difference
     magnitude = numpy.array(positive.GetMagnitude())
     cropped = magnitude[:, int(round(50.0/positive.GetResolution())):int(round(1000.0/positive.GetResolution()))]
-    error = numpy.sum(cropped)
-    print "error:        ", error
-    print
-    return error
+    exp = numpy.exp(cropped)
+    errorexp = numpy.sum(exp)
+    print "error:        ", errorexp
 
 
 

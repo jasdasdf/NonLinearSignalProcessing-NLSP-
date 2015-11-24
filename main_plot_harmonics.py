@@ -52,17 +52,21 @@ def highpass_secondorder(numerator):
     return numerator
 
 def hammerstein(excitation):
-    prp = sumpf.modules.ChannelDataProperties(signal_length=len(excitation), samplingrate=excitation.GetSamplingRate())
+     prp = sumpf.modules.ChannelDataProperties(signal_length=len(excitation), samplingrate=excitation.GetSamplingRate())
 
-    lowpass1 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=140.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    lowpass2 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=1500.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    lowpass3 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=3000.0,transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+     lowpass1 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=140.0,transform=False,
+                                              length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+     lowpass2 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=1500.0,transform=False,
+                                              length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+     lowpass3 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=3000.0,transform=False,
+                                              length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+     highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=3.0),frequency=140.0,transform=True,
+                                              length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+     model = common.ClippingHammersteinGroupModel(signal=excitation,thresholds_list=[(-1.5,1.5),(-0.2,0.2),(-1.5,1.5),(-1.5,1.5)],
+                                                  filters=(highpass*lowpass1*lowpass2, highpass*highpass*lowpass3),
+                                                  amplificationfactor=1)
 
-    highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=3.0),frequency=140.0,transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-
-    model = common.ClippingHammersteinGroupModel(signal=excitation,thresholds_list=[(-0.2,0.2), (-0.5,0.5)],filters=(highpass*lowpass1*lowpass2, highpass*highpass*lowpass3), amplificationfactor=1)
-    return model
-
+     return model
 
 def plot(data):
     if isinstance(data[0], sumpf.Spectrum):

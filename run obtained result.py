@@ -14,11 +14,11 @@ import head_specific
 Dir = "C:/Users/diplomand.8/Desktop/output_logs/"
 Speaker = "Visaton BF45"
 Signal = 18
-branches = 4
+branches = 10
 method = 'Nelder-Mead'
-start_value = 1.0
+start_value = 0.5
 plotoutput = True
-output_filename = "%s_%d_%d_%s_%d.txt" %(Speaker,Signal,branches,method,start_value)
+output_filename = "%s_%d_%d_%s_%f.txt" %(Speaker,Signal,branches,method,start_value)
 filter_combinations = "filter1hp,filter6*filter6,filter2hp,filter7*filter7,filter3hp,filter8*filter8,filter4hp,filter9*filter9,filter5hp,filter10*filter10"
 
 #################################################################
@@ -29,28 +29,51 @@ def Read_log():
     print output_filename
     log_file = os.path.join(Dir,filename)
     filter_spec = []
-    filter_coeff = []
+    filter_order = []
+    lp_coeff = []
+    hp_coeff = []
     threshold_decay = []
     threshold_assymetry = []
+    coefficients = []
     for i,line in enumerate(reversed(open(log_file).readlines())):
         if i < branches:
-            filter_coeff.append(line.split())
+            if "highpass" in line:
+                filter_order.append('hp')
+                hp_coeff.append(line.split())
+            else:
+                filter_order.append('lp')
+                lp_coeff.append(line.split())
         elif i == branches+1:
             threshold_decay.append(line.split())
         elif i == branches:
             threshold_assymetry.append(line.split())
-    coefficients = []
-    for j in range(0,branches):
-        coefficients.append([float(i) for i in (filter_coeff[j][0][:-1].split(','))])
-        filter_spec.append(sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=coefficients[j][:3],denominator=coefficients[j][3:]),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum())
+    lowpass_order = 0
+    highpass_order = 0
+    for j in range(0,len(filter_order)):
+        if filter_order[j] == 'lp':
+            coefficients.append([float(i) for i in (lp_coeff[lowpass_order][0][:-1].split(','))])
+            lowpass_order += 1
+        else:
+            coefficients.append([float(i) for i in (hp_coeff[highpass_order][0][:-10].split(','))])
+            highpass_order += 1
     threshold_decay = [float(i) for i in threshold_decay[0]]
     threshold_assymetry = [float(i) for i in threshold_assymetry[0]]
     threshold = functools.partial(get_thresholds,branches,start_value)                      # braches, start value, asymmetry
     thresholds_list = threshold(threshold_assymetry[0],threshold_decay[0])
     amplificationfactor = 1
+    filter_order = list(reversed(filter_order))
+    coefficients = list(reversed(coefficients))
+    for o,c in zip(filter_order,coefficients):
+        if o == 'lp':
+            transform = False
+        else:
+            transform = True
+        print o,c
+        filter_getspec = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=c[:3],denominator=c[3:]),transform=transform,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+        filter_spec.append(filter_getspec)
     # print model parameters
     print "thresholds list:     " ,thresholds_list
-    print "filter coefficients: " ,coefficients
+    print "filterbank length:   " ,len(filter_spec)
     return thresholds_list,filter_spec,amplificationfactor
 
 def get_filename(speaker, smd, repetition):
@@ -131,7 +154,7 @@ sumpf.connect(merge_measuered.GetOutput, tf_measured_withharmonics.SetSignal)
 tf_measured_fundamental = sumpf.modules.SplitSpectrum(channels=[0])
 sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.SetInput)
 
-# Get the Initial parameters of the model
+# Get the parameters of the model
 thresholds_list,filter_spec,amplificationfactor = Read_log()
 
 # model for extracting the harmonics of simulated signal

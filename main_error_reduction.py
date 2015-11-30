@@ -17,9 +17,9 @@ Speaker = "Visaton BF45"                                                        
 Signal = 18                                                                          # Length of signal samples 2**Signal
 plotoutput = False                                                                    # True if to plot tf in every iteration
 branches = 10                                                                        # Number of branches in the model
-start_value = 1.0                                                                    # Threshold start value
+start_value = 0.5                                                                    # Threshold start value
 method = 'Nelder-Mead'                                                               # Nelder-Mead,Powell,L-BFGS-B
-output_filename = "%s_%d_%d_%s_%d.txt" %(Speaker,Signal,branches,method,start_value) # Output log file
+output_filename = "%s_%d_%d_%s_%f.txt" %(Speaker,Signal,branches,method,start_value) # Output log file
 
 #################################################################
 
@@ -167,18 +167,23 @@ def errorfunction(parameters):
     f.write(str(threshold_assymetry)+'\n')
     f.writelines(["%f," % float(item)  for item in numeratorcb1])
     f.writelines(["%f," % float(item)  for item in denominatorcb1])
+    f.write('highpass,')
     f.write('\n')
     f.writelines(["%f," % float(item)  for item in numeratorcb2])
     f.writelines(["%f," % float(item)  for item in denominatorcb2])
+    f.write('highpass,')
     f.write('\n')
     f.writelines(["%f," % float(item)  for item in numeratorcb3])
     f.writelines(["%f," % float(item)  for item in denominatorcb3])
+    f.write('highpass,')
     f.write('\n')
     f.writelines(["%f," % float(item)  for item in numeratorcb4])
     f.writelines(["%f," % float(item)  for item in denominatorcb4])
+    f.write('highpass,')
     f.write('\n')
     f.writelines(["%f," % float(item)  for item in numeratorcb5])
     f.writelines(["%f," % float(item)  for item in denominatorcb5])
+    f.write('highpass,')
     f.write('\n')
     f.writelines(["%f," % float(item)  for item in numeratorbw1])
     f.writelines(["%f," % float(item)  for item in denominatorbw1])
@@ -205,8 +210,9 @@ def errorfunction(parameters):
     exp = numpy.exp(cropped)
     errorexp = numpy.sum(exp)
     error = numpy.sum(cropped)
-    print "errorexp:        ", errorexp
+    print "\nerrorexp:        ", errorexp
     print "error   :        ", error
+    print
     return errorexp
 
 

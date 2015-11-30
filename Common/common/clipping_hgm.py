@@ -18,7 +18,8 @@ class ClippingHammersteinGroupModel(object):
         self.__inputstage = sumpf.modules.AmplifySignal(factor=self.__amplificationfactor)
         self.__inputstage.SetInput(input=signal)
         for spectrum,threshold in zip(filters,thresholds_list):
-            c = common.ClipSignal(thresholds=threshold)
+            # c = common.ClipSignal(thresholds=threshold)
+            c = sumpf.modules.ClipSignal(thresholds=threshold)
             t = sumpf.modules.FourierTransform()
             f = sumpf.modules.MultiplySpectrums(spectrum2=spectrum)
             i = sumpf.modules.InverseFourierTransform()

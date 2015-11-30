@@ -19,7 +19,6 @@ method = 'Nelder-Mead'
 start_value = 0.5
 plotoutput = True
 output_filename = "%s_%d_%d_%s_%f.txt" %(Speaker,Signal,branches,method,start_value)
-filter_combinations = "filter1hp,filter6*filter6,filter2hp,filter7*filter7,filter3hp,filter8*filter8,filter4hp,filter9*filter9,filter5hp,filter10*filter10"
 
 #################################################################
 
@@ -72,8 +71,15 @@ def Read_log():
         filter_getspec = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=c[:3],denominator=c[3:]),transform=transform,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
         filter_spec.append(filter_getspec)
     # print model parameters
+    print "threshold decay:     " ,threshold_decay
+    print "threshold assymetry: " ,threshold_assymetry
     print "thresholds list:     " ,thresholds_list
     print "filterbank length:   " ,len(filter_spec)
+    filter_spec = [filter_spec[0],filter_spec[5]*filter_spec[5],
+                   filter_spec[1],filter_spec[6]*filter_spec[6],
+                   filter_spec[2],filter_spec[7]*filter_spec[7],
+                   filter_spec[3],filter_spec[8]*filter_spec[8],
+                   filter_spec[4],filter_spec[9]*filter_spec[9]]
     return thresholds_list,filter_spec,amplificationfactor
 
 def get_filename(speaker, smd, repetition):

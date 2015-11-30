@@ -14,10 +14,10 @@ import head_specific
 
 Dir = "C:/Users/diplomand.8/Desktop/output_logs/"                                    # Output directory for logs
 Speaker = "Visaton BF45"                                                             # Speaker used
-Signal = 18                                                                          # Length of signal samples 2**Signal
-plotoutput = False                                                                    # True if to plot tf in every iteration
-branches = 10                                                                        # Number of branches in the model
-start_value = 0.5                                                                    # Threshold start value
+Signal = 16                                                                          # Length of signal samples 2**Signal
+plotoutput = False                                                                   # True if to plot tf in every iteration
+branches = 5                                                                         # Number of branches in the model
+start_value = 0.8                                                                    # Threshold start value
 method = 'Nelder-Mead'                                                               # Nelder-Mead,Powell,L-BFGS-B
 output_filename = "%s_%d_%d_%s_%f.txt" %(Speaker,Signal,branches,method,start_value) # Output log file
 
@@ -26,9 +26,9 @@ output_filename = "%s_%d_%d_%s_%f.txt" %(Speaker,Signal,branches,method,start_va
 initial_amplification_factor = 1                                                     # amplification factor of the model
 chebyshev_ripple = 3.0                                                               # ripple for chebyshev filter
 inital_threshold_decay = 0                                                           # Initial decay value which will be optimized by the algorithm
-initial_threshold_assymetry = 0                                                      # Initial threshold assymetry value which will be optimized by the algorithm
-assymetry_limits = [-1,1]                                                            # Assymetry value limits
-decay_limits = [-1,1]
+initial_threshold_assymetry = -0.5                                                   # Initial threshold assymetry value which will be optimized by the algorithm
+assymetry_limits = [-1,0]                                                            # Assymetry value limits
+decay_limits = [0,1]
 output_file = os.path.join(Dir,output_filename)
 
 #################################################################
@@ -37,7 +37,7 @@ def get_thresholds(branches, start_value, asymmetry, decay):
     thresholds_list = []
     for i in range(branches):
         minimum = -start_value * math.e**-abs(i * decay)
-        maximum = (start_value + asymmetry) * math.e**-abs(i * decay)
+        maximum = (start_value + asymmetry**i) * math.e**-abs(i * decay)
         thresholds_list.append([minimum, maximum])
     return thresholds_list
 
@@ -94,20 +94,10 @@ def errorfunction(parameters):
     denominatorbw2  = parameters[11:14]
     numeratorbw3    = parameters[14:17]
     denominatorbw3  = parameters[17:20]
-    numeratorbw4    = parameters[20:23]
-    denominatorbw4  = parameters[23:26]
-    numeratorbw5    = parameters[26:29]
-    denominatorbw5  = parameters[29:32]
-    numeratorcb1    = parameters[32:35]
-    denominatorcb1  = parameters[35:38]
-    numeratorcb2    = parameters[38:41]
-    denominatorcb2  = parameters[41:44]
-    numeratorcb3    = parameters[44:47]
-    denominatorcb3  = parameters[47:50]
-    numeratorcb4    = parameters[50:53]
-    denominatorcb4  = parameters[53:56]
-    numeratorcb5    = parameters[56:59]
-    denominatorcb5  = parameters[59:62]
+    numeratorcb1    = parameters[20:23]
+    denominatorcb1  = parameters[23:26]
+    numeratorcb2    = parameters[26:29]
+    denominatorcb2  = parameters[29:32]
 
     # limit the parameters
     threshold_assymetry = map_value(threshold_assymetry,0,assymetry_limits)
@@ -118,20 +108,15 @@ def errorfunction(parameters):
 
     # compute the filters
     prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
-    filter1hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb1,denominator=denominatorcb1),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter2hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb2,denominator=denominatorcb2),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter3hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb3,denominator=denominatorcb3),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter4hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb4,denominator=denominatorcb4),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter5hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb5,denominator=denominatorcb5),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter6 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw1,denominator=denominatorbw1),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter7 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw2,denominator=denominatorbw2),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter8 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw3,denominator=denominatorbw3),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter9 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw4,denominator=denominatorbw4),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter10 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw5,denominator=denominatorbw5),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter1 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb1,denominator=denominatorcb1),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter2 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb2,denominator=denominatorcb2),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter3 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw1,denominator=denominatorbw1),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter4 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw2,denominator=denominatorbw2),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter5 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw3,denominator=denominatorbw3),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
 
     # update the model
     model.SetParameters(thresholds_list=thresholds_list,
-                        filters=(filter1hp,filter6*filter6,filter2hp,filter7*filter7,filter3hp,filter8*filter8,filter4hp,filter9*filter9,filter5hp,filter10*filter10))
+                        filters=(filter1*filter3,filter2*filter4,filter3,filter4,filter5))
 
     # print model parameters
     print "Speaker and input   ", Speaker,Signal,branches
@@ -140,16 +125,11 @@ def errorfunction(parameters):
     print "thresholds:         ", thresholds_list
     print "filter1 parameter:  ", numeratorcb1,denominatorcb1
     print "filter2 parameter:  ", numeratorcb2,denominatorcb2
-    print "filter3 parameter:  ", numeratorcb3,denominatorcb3
-    print "filter4 parameter:  ", numeratorcb4,denominatorcb4
-    print "filter5 parameter:  ", numeratorcb5,denominatorcb5
-    print "filter6 parameter:  ", numeratorbw1,denominatorbw1
-    print "filter7 parameter:  ", numeratorbw2,denominatorbw2
-    print "filter8 parameter:  ", numeratorbw3,denominatorbw3
-    print "filter9 parameter:  ", numeratorbw4,denominatorbw4
-    print "filter10 parameter:  ", numeratorbw5,denominatorbw5
+    print "filter3 parameter:  ", numeratorbw1,denominatorbw1
+    print "filter4 parameter:  ", numeratorbw2,denominatorbw2
+    print "filter5 parameter:  ", numeratorbw3,denominatorbw3
     print "output file:        ", output_filename
-    print "filter combinations filter1hp,filter6*filter6,filter2hp,filter7*filter7,filter3hp,filter8*filter8,filter4hp,filter9*filter9,filter5hp,filter10*filter10",
+    print "filter combinations filter1*filter3,filter2*filter4,filter3,filter4,filter5",
 
 
     # plot the spectrum
@@ -173,18 +153,6 @@ def errorfunction(parameters):
     f.writelines(["%f," % float(item)  for item in denominatorcb2])
     f.write('highpass,')
     f.write('\n')
-    f.writelines(["%f," % float(item)  for item in numeratorcb3])
-    f.writelines(["%f," % float(item)  for item in denominatorcb3])
-    f.write('highpass,')
-    f.write('\n')
-    f.writelines(["%f," % float(item)  for item in numeratorcb4])
-    f.writelines(["%f," % float(item)  for item in denominatorcb4])
-    f.write('highpass,')
-    f.write('\n')
-    f.writelines(["%f," % float(item)  for item in numeratorcb5])
-    f.writelines(["%f," % float(item)  for item in denominatorcb5])
-    f.write('highpass,')
-    f.write('\n')
     f.writelines(["%f," % float(item)  for item in numeratorbw1])
     f.writelines(["%f," % float(item)  for item in denominatorbw1])
     f.write('\n')
@@ -193,12 +161,6 @@ def errorfunction(parameters):
     f.write('\n')
     f.writelines(["%f," % float(item)  for item in numeratorbw3])
     f.writelines(["%f," % float(item)  for item in denominatorbw3])
-    f.write('\n')
-    f.writelines(["%f," % float(item)  for item in numeratorbw4])
-    f.writelines(["%f," % float(item)  for item in denominatorbw4])
-    f.write('\n')
-    f.writelines(["%f," % float(item)  for item in numeratorbw5])
-    f.writelines(["%f," % float(item)  for item in denominatorbw5])
     f.write('\n')
     f.close()
 
@@ -342,21 +304,16 @@ if plotoutput == True:
 numeratorbw1, denominatorbw1 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
 numeratorbw2, denominatorbw2 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
 numeratorbw3, denominatorbw3 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
-numeratorbw4, denominatorbw4 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
-numeratorbw5, denominatorbw5 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
 numeratorcb1, denominatorcb1 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
 numeratorcb2, denominatorcb2 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
-numeratorcb3, denominatorcb3 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
-numeratorcb4, denominatorcb4 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
-numeratorcb5, denominatorcb5 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
 threshold_decay = [inital_threshold_decay]
 threshold_assymetry = [initial_threshold_assymetry]
 
 # Optimize the parameters by reducing the error function
 result = scipy.optimize.minimize(errorfunction,
                                 (threshold_decay+threshold_assymetry
-                                 +numeratorbw1+denominatorbw1+numeratorbw2+denominatorbw2+numeratorbw3+denominatorbw3+numeratorbw4+denominatorbw4+numeratorbw5+denominatorbw5
-                                 +numeratorcb1+denominatorcb1+numeratorcb2+denominatorcb2+numeratorcb3+denominatorcb3+numeratorcb4+denominatorcb4+numeratorcb5+denominatorcb5),
+                                 +numeratorbw1+denominatorbw1+numeratorbw2+denominatorbw2+numeratorbw3+denominatorbw3
+                                 +numeratorcb1+denominatorcb1+numeratorcb2+denominatorcb2),
                                  method= method)
 
 

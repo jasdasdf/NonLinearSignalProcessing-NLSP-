@@ -65,7 +65,7 @@ def plot(data, legend=True, show=True):
 				pyplot.plot(x_data, d.GetChannels()[i], label=d.GetLabels()[i])
 	if legend:
 		pyplot.legend(loc="best", fontsize="x-large")
-	axis.set_xlabel("Frequenz [Hz]", fontsize="x-large")
+	axis.set_xlabel("Frequeny [Hz]", fontsize="x-large")
 #	axis.set_ylabel("Impedanz [dB rel. 1 Pa*s/m^3]", fontsize="x-large")
 #	axis.set_ylabel("Z / Z0 [dB rel. 1 N*s/m^3]", fontsize="x-large")
 #	axis.set_ylabel("Kalibrationsfaktor [dB rel. 1 Pa*s/m^3]", fontsize="x-large")

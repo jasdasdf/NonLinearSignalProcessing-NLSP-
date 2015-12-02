@@ -6,9 +6,8 @@ from helper import get_transfer_function, get_impulse_response, \
                    append_zeros, get_corner_frequencies
 from spectrogram import Spectrogram, get_spectrogram
 
-from clipping_hgm import ClippingHammersteinGroupModel
+from clipping_hgm import ClippingHammersteinGroupModel, ClippingHammersteinGroupModelWithCascadedLinearity
 
 from clip_signal import ClipSignal
 
 from .carinabox import get_filename, hammerstein, plotdata
-

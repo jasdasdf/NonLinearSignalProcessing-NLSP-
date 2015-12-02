@@ -14,9 +14,9 @@ import head_specific
 Dir = "C:/Users/diplomand.8/Desktop/output_logs/"
 Speaker = "Visaton BF45"
 Signal = 18
-branches = 10
+branches = 5
 method = 'Nelder-Mead'
-start_value = 0.5
+start_value = 0.8
 plotoutput = True
 output_filename = "%s_%d_%d_%s_%f.txt" %(Speaker,Signal,branches,method,start_value)
 
@@ -57,7 +57,7 @@ def Read_log():
             highpass_order += 1
     threshold_decay = [float(i) for i in threshold_decay[0]]
     threshold_assymetry = [float(i) for i in threshold_assymetry[0]]
-    threshold = functools.partial(get_thresholds,branches,start_value)                      # braches, start value, asymmetry
+    threshold = functools.partial(get_thresholds,branches,start_value)
     thresholds_list = threshold(threshold_assymetry[0],threshold_decay[0])
     amplificationfactor = 1
     filter_order = list(reversed(filter_order))
@@ -75,11 +75,11 @@ def Read_log():
     print "threshold assymetry: " ,threshold_assymetry
     print "thresholds list:     " ,thresholds_list
     print "filterbank length:   " ,len(filter_spec)
-    filter_spec = [filter_spec[0],filter_spec[5]*filter_spec[5],
-                   filter_spec[1],filter_spec[6]*filter_spec[6],
-                   filter_spec[2],filter_spec[7]*filter_spec[7],
-                   filter_spec[3],filter_spec[8]*filter_spec[8],
-                   filter_spec[4],filter_spec[9]*filter_spec[9]]
+    filter_spec = [filter_spec[0]*filter_spec[2],
+                   filter_spec[1]*filter_spec[3],
+                   filter_spec[2],
+                   filter_spec[3],
+                   filter_spec[4]]
     return thresholds_list,filter_spec,amplificationfactor
 
 def get_filename(speaker, smd, repetition):
@@ -103,13 +103,14 @@ def get_thresholds(branches, start_value, asymmetry, decay):
     thresholds_list = []
     for i in range(branches):
         minimum = -start_value * math.e**-abs(i * decay)
-        maximum = (start_value + asymmetry) * math.e**-abs(i * decay)
+        maximum = (start_value + asymmetry**i) * math.e**-abs(i * decay)
         thresholds_list.append([minimum, maximum])
     return thresholds_list
 
 # Get the properties of the recorded excitation and response
 length = 2**Signal
 samplingrate = 48000
+prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
 sweep_start_frequency, sweep_stop_frequency, sweep_duration = head_specific.get_sweep_properties(sumpf.modules.SilenceGenerator(length=length, samplingrate=samplingrate).GetSignal())
 load = sumpf.modules.SignalFile(filename=common.get_filename(Speaker, "Sweep%i" % Signal, 1),format=sumpf.modules.SignalFile.WAV_FLOAT)
 split_excitation = sumpf.modules.SplitSignal(channels=[0])
@@ -164,7 +165,9 @@ sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.Set
 thresholds_list,filter_spec,amplificationfactor = Read_log()
 
 # model for extracting the harmonics of simulated signal
-model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(),thresholds_list=thresholds_list,filters=filter_spec,amplificationfactor=amplificationfactor)
+highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=3.0),frequency=100.0,transform=True,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
+model = common.ClippingHammersteinGroupModelWithCascadedLinearity(signal=split_excitation.GetOutput(),thresholds_list=thresholds_list,nonlinearfilters=filter_spec,amplificationfactor=amplificationfactor,linearfilter=highpass)
+#model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(),thresholds_list=thresholds_list,filters=filter_spec,amplificationfactor=amplificationfactor)
 sumpf.connect(split_excitation.GetOutput, model.SetInput)
 fft_model = sumpf.modules.FourierTransform()
 sumpf.connect(model.GetOutput, fft_model.SetSignal)

@@ -8,6 +8,10 @@ from spectrogram import Spectrogram, get_spectrogram
 
 from clipping_hgm import ClippingHammersteinGroupModel, ClippingHammersteinGroupModelWithCascadedLinearity
 
+from hgm import HammersteinGroupModel
+
 from clip_signal import ClipSignal
+
+from poly_signal import PolynomialOfSignal
 
 from .carinabox import get_filename, hammerstein, plotdata

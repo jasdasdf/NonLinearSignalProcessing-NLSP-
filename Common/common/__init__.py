@@ -14,4 +14,6 @@ from clip_signal import ClipSignal
 
 from poly_signal import PolynomialOfSignal
 
+from generic_model import GenericModelClipping,GenericModelPolynomials
+
 from .carinabox import get_filename, hammerstein, plotdata

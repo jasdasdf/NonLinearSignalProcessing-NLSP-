@@ -60,6 +60,7 @@ class GenericModelClipping(object):
         sumpf.connect(self.__adder.SetInput2, adder2.GetOutput)
         common.plot.plot(sumpf.modules.FourierTransform(self.__adder.GetOutput()).GetSpectrum(),show=False)
         self.GetOutput = self.__adder.GetOutput
+
 class GenericModelPolynomials(object):
     def __init__(self, signal=None, powers=None, filters=None, amplificationfactor=None):
 

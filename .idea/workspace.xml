@@ -2,15 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="39d02c43-234b-4a09-97b1-e6ee0ba2638c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/temp.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/common/__init__.py" afterPath="$PROJECT_DIR$/Common/common/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/common/clipping_hgm.py" afterPath="$PROJECT_DIR$/Common/common/clipping_hgm.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/common/hgm.py" afterPath="$PROJECT_DIR$/Common/common/hgm.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main_error_reduction.py" afterPath="$PROJECT_DIR$/main_error_reduction.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main_plot_harmonics.py" afterPath="$PROJECT_DIR$/main_plot_harmonics.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/common/nonlinear_convolution_hgm.py" afterPath="$PROJECT_DIR$/Common/common/nonlinear_convolution_hgm.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run obtained result.py" afterPath="$PROJECT_DIR$/run obtained result.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/temp.py" afterPath="$PROJECT_DIR$/temp.py" />
     </list>
     <ignored path="Loudspeakermodel.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -31,25 +24,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="main_error_reduction.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main_error_reduction.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main_error_reduction.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.425">
-              <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="369" column="48" selection-start-line="369" selection-start-column="48" selection-end-line="369" selection-end-column="48" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="temp.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/temp.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="18" column="34" selection-start-line="18" selection-start-column="34" selection-end-line="18" selection-end-column="34" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -59,9 +40,21 @@
         <entry file="file://$PROJECT_DIR$/run obtained result.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="156" column="69" selection-start-line="156" selection-start-column="69" selection-end-line="156" selection-end-column="69" />
+              <caret line="20" column="84" selection-start-line="20" selection-start-column="84" selection-end-line="20" selection-end-column="84" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="temp.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/temp.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.61041665">
+              <caret line="18" column="34" selection-start-line="18" selection-start-column="34" selection-end-line="18" selection-end-column="34" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -507,7 +500,7 @@
     <frame x="-8" y="-8" width="1296" height="1010" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15421304" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12559618" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32897863" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -954,12 +947,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/temp.py">
+    <entry file="file://$PROJECT_DIR$/main_error_reduction.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="18" column="34" selection-start-line="18" selection-start-column="34" selection-end-line="18" selection-end-column="34" />
+          <caret line="369" column="48" selection-start-line="369" selection-start-column="48" selection-end-line="369" selection-end-column="48" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -967,19 +960,19 @@
     <entry file="file://$PROJECT_DIR$/run obtained result.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="156" column="69" selection-start-line="156" selection-start-column="69" selection-end-line="156" selection-end-column="69" />
+          <caret line="20" column="84" selection-start-line="20" selection-start-column="84" selection-end-line="20" selection-end-column="84" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main_error_reduction.py">
+    <entry file="file://$PROJECT_DIR$/temp.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.425">
-          <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.61041665">
+          <caret line="18" column="34" selection-start-line="18" selection-start-column="34" selection-end-line="18" selection-end-column="34" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>

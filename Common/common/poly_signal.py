@@ -17,12 +17,9 @@ class PolynomialOfSignal(object):
 
     @sumpf.Output(sumpf.Signal)
     def GetOutput(self):
-        channels = []
-        for c in self.__signal.GetChannels():
-            channel = []
-            for s in c:
-                channel.append(s**self.__power)
-            channels.append(tuple(channel))
-        return sumpf.Signal(channels=tuple(channels), labels=self.__signal.GetLabels())
+        signal = self.__signal
+        for i in range(1,self.__power):
+            signal = self.__signal * signal
+        return signal
 
 

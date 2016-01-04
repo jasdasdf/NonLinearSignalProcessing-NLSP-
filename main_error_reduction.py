@@ -12,11 +12,11 @@ import head_specific
 
 ################################ Inputs #########################
 
-Dir = "C:/Users/diplomand.8/Desktop/Logesh_Masterthesis/output_logs/"                # Output directory for logs
+Dir = "C:/Users/diplomand.8/Desktop/Logesh_Masterthesis/output_logs/new/"                                    # Output directory for logs
 Speaker = "Visaton BF45"                                                             # Speaker used
 Signal = 18                                                                          # Length of signal samples 2**Signal
 plotoutput = False                                                                   # True if to plot tf in every iteration
-branches = 10                                                                        # Number of branches in the model
+branches = 5                                                                         # Number of branches in the model
 start_value = 0.8                                                                    # Threshold start value
 method = 'Nelder-Mead'                                                               # Nelder-Mead,Powell,L-BFGS-B
 output_filename = "%s_%d_%d_%s_%f.txt" %(Speaker,Signal,branches,method,start_value) # Output log file
@@ -25,12 +25,13 @@ output_filename = "%s_%d_%d_%s_%f.txt" %(Speaker,Signal,branches,method,start_va
 
 initial_amplification_factor = 1                                                     # amplification factor of the model
 chebyshev_ripple = 3.0                                                               # ripple for chebyshev filter
-inital_threshold_decay = 0                                                           # Initial decay value which will be optimized by the algorithm
-initial_threshold_assymetry = -0.1                                                   # Initial threshold assymetry value which will be optimized by the algorithm
-assymetry_limits = [0.5,0]                                                            # Assymetry value limits
-decay_limits = [0,0.2]
+inital_threshold_decay = 0.1                                                         # Initial decay value which will be optimized by the algorithm
+initial_threshold_assymetry = 0                                                      # Initial threshold assymetry value which will be optimized by the algorithm
+assymetry_limits = [-0.5,0.5]                                                            # Assymetry value limits
+decay_limits = [0,0.3]
 output_file = os.path.join(Dir,output_filename)
-
+if not os.path.exists(output_file):
+    file(output_file, 'w').close()
 #################################################################
 
 def get_thresholds(branches, start_value, asymmetry, decay):
@@ -98,16 +99,16 @@ def errorfunction(parameters):
     denominatorbw4  = parameters[23:26]
     numeratorbw5    = parameters[26:29]
     denominatorbw5  = parameters[29:32]
-    numeratorbw6    = parameters[32:35]
-    denominatorbw6  = parameters[35:38]
-    numeratorcb1    = parameters[38:41]
-    denominatorcb1  = parameters[41:44]
-    numeratorcb2    = parameters[44:47]
-    denominatorcb2  = parameters[47:50]
-    numeratorcb3    = parameters[50:53]
-    denominatorcb3  = parameters[53:56]
-    numeratorcb4    = parameters[56:59]
-    denominatorcb4  = parameters[59:62]
+    numeratorcb1    = parameters[32:35]
+    denominatorcb1  = parameters[35:38]
+    numeratorcb2    = parameters[38:41]
+    denominatorcb2  = parameters[41:44]
+    numeratorcb3    = parameters[44:47]
+    denominatorcb3  = parameters[47:50]
+    numeratorcb4    = parameters[50:53]
+    denominatorcb4  = parameters[53:56]
+    numeratorcb5    = parameters[56:59]
+    denominatorcb5  = parameters[59:62]
 
     # limit the parameters
     threshold_assymetry = map_value(threshold_assymetry,0,assymetry_limits)
@@ -118,36 +119,40 @@ def errorfunction(parameters):
 
     # compute the filters
     prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
-    filter1 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb1,denominator=denominatorcb1),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter2 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb2,denominator=denominatorcb2),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter3 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb3,denominator=denominatorcb3),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter4 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb4,denominator=denominatorcb4),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter5 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw1,denominator=denominatorbw1),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter6 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw2,denominator=denominatorbw2),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter7 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw3,denominator=denominatorbw3),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter8 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw4,denominator=denominatorbw4),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter9 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw5,denominator=denominatorbw5),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
-    filter10 = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw6,denominator=denominatorbw6),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter1hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb1,denominator=denominatorcb1),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter2hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb2,denominator=denominatorcb2),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter3hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb3,denominator=denominatorcb3),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter4hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb4,denominator=denominatorcb4),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter5hp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorcb5,denominator=denominatorcb5),transform=True,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter1lp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw1,denominator=denominatorbw1),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter2lp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw2,denominator=denominatorbw2),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter3lp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw3,denominator=denominatorbw3),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter4lp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw4,denominator=denominatorbw4),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
+    filter5lp = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.TRANSFERFUNCTION(numerator=numeratorbw5,denominator=denominatorbw5),transform=False,length=prp.GetSpectrumLength(),resolution=prp.GetResolution()).GetSpectrum()
 
     # update the model
+    prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
+    highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=chebyshev_ripple),frequency=150.0,transform=True,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
     model.SetParameters(thresholds_list=thresholds_list,
-                        filters=(filter10,filter9,filter8,filter7,filter6,filter5,filter4,filter3,filter2,filter1))
+                        nonlinearfilters=(filter1hp*filter1lp,filter2hp*filter2lp,filter3hp*filter3lp,filter4hp*filter4lp,filter5hp*filter5lp))
 
-    # print model parameters
+   # print model parameters
     print "Speaker and input   ", Speaker,Signal,branches
     print "threshold decay     ", threshold_decay
     print "threshold assymetry ", threshold_assymetry
     print "thresholds:         ", thresholds_list
-    print "filter1 parameter:  ", numeratorcb1,denominatorcb1
-    print "filter2 parameter:  ", numeratorcb2,denominatorcb2
-    print "filter1 parameter:  ", numeratorcb3,denominatorcb3
-    print "filter2 parameter:  ", numeratorcb4,denominatorcb4
-    print "filter2 parameter:  ", numeratorbw1,denominatorbw1
-    print "filter3 parameter:  ", numeratorbw2,denominatorbw2
-    print "filter4 parameter:  ", numeratorbw3,denominatorbw3
-    print "filter5 parameter:  ", numeratorbw4,denominatorbw4
+    print "filter1hp parameter:  ", numeratorcb1,denominatorcb1
+    print "filter2hp parameter:  ", numeratorcb2,denominatorcb2
+    print "filter3hp parameter:  ", numeratorcb3,denominatorcb3
+    print "filter4hp parameter:  ", numeratorcb4,denominatorcb4
+    print "filter5hp parameter:  ", numeratorcb5,denominatorcb5
+    print "filter1lp parameter:  ", numeratorbw1,denominatorbw1
+    print "filter2lp parameter:  ", numeratorbw2,denominatorbw2
+    print "filter3lp parameter:  ", numeratorbw3,denominatorbw3
+    print "filter4lp parameter:  ", numeratorbw4,denominatorbw4
+    print "filter5lp parameter:  ", numeratorbw5,denominatorbw5
     print "output file:        ", output_filename
-    print "filter combinations filter10,filter9,filter8,filter7,filter6,filter5,filter4,filter3,filter2,filter1",
+    print "filter combinations filter1hp*filter1lp,filter2hp*filter2lp,filter3hp*filter3lp,filter4hp*filter4lp,filter5hp*filter5lp",
 
 
     # plot the spectrum
@@ -191,6 +196,10 @@ def errorfunction(parameters):
     f.writelines(["%f," % float(item)  for item in denominatorcb4])
     f.write('highpass,')
     f.write('\n')
+    f.writelines(["%f," % float(item)  for item in numeratorcb5])
+    f.writelines(["%f," % float(item)  for item in denominatorcb5])
+    f.write('highpass,')
+    f.write('\n')
     f.writelines(["%f," % float(item)  for item in numeratorbw1])
     f.writelines(["%f," % float(item)  for item in denominatorbw1])
     f.write('\n')
@@ -206,12 +215,9 @@ def errorfunction(parameters):
     f.writelines(["%f," % float(item)  for item in numeratorbw5])
     f.writelines(["%f," % float(item)  for item in denominatorbw5])
     f.write('\n')
-    f.writelines(["%f," % float(item)  for item in numeratorbw6])
-    f.writelines(["%f," % float(item)  for item in denominatorbw6])
+    f.write('errorexp:%f,error:%f'%(errorexp,error))
     f.write('\n')
-    f.writelines("errorexp:%f ,error:%f:" %(errorexp,error))
-    f.write('\n')
-    f.writelines("filter10,filter9,filter8,filter7,filter6,filter5,filter4,filter3,filter2,filter1")
+    f.write("filter combinations filter1hp*filter1lp,filter2hp*filter2lp,filter3hp*filter3lp,filter4hp*filter4lp,filter5hp*filter5lp")
     f.write('\n')
     f.close()
 
@@ -292,7 +298,9 @@ print "Initial Butterworth coefficients:      ", (butterworth_filter.GetCoeffici
 print "Initial Chebyshev1 coefficients :      ", (chebyshev1_filter.GetCoefficients())
 
 # model for extracting the harmonics of simulated signal
-model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(),thresholds_list=initial_thresholds_list,filters=filter_seq,amplificationfactor=initial_amplification_factor)
+prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
+highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=chebyshev_ripple),frequency=150.0,transform=True,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
+model = common.ClippingHammersteinGroupModelWithCascadedLinearity(signal=split_excitation.GetOutput(),thresholds_list=initial_thresholds_list,nonlinearfilters=filter_seq,amplificationfactor=initial_amplification_factor,linearfilter=highpass)
 sumpf.connect(split_excitation.GetOutput, model.SetInput)
 fft_model = sumpf.modules.FourierTransform()
 sumpf.connect(model.GetOutput, fft_model.SetSignal)
@@ -346,22 +354,19 @@ numeratorbw2, denominatorbw2 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3
 numeratorbw3, denominatorbw3 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
 numeratorbw4, denominatorbw4 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
 numeratorbw5, denominatorbw5 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
-numeratorbw6, denominatorbw6 = (butterworth_filter.GetCoefficients()[0][0]+[0]*3)[:3], butterworth_filter.GetCoefficients()[0][1]
 numeratorcb1, denominatorcb1 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
 numeratorcb2, denominatorcb2 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
 numeratorcb3, denominatorcb3 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
 numeratorcb4, denominatorcb4 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
-
+numeratorcb5, denominatorcb5 = (chebyshev1_filter.GetCoefficients()[0][0]+[0]*3)[:3], chebyshev1_filter.GetCoefficients()[0][1]
 threshold_decay = [inital_threshold_decay]
 threshold_assymetry = [initial_threshold_assymetry]
 
 # Optimize the parameters by reducing the error function
 result = scipy.optimize.minimize(errorfunction,
                                 (threshold_decay+threshold_assymetry
-                                 +numeratorbw1+denominatorbw1+numeratorbw2+denominatorbw2+numeratorbw3+denominatorbw3
-                                 +numeratorbw4+denominatorbw4+numeratorbw5+denominatorbw5+numeratorbw6+denominatorbw6
-                                 +numeratorcb1+denominatorcb1+numeratorcb2+denominatorcb2+numeratorcb3+denominatorcb3
-                                 +numeratorcb4+denominatorcb4),
+                                 +numeratorbw1+denominatorbw1+numeratorbw2+denominatorbw2+numeratorbw3+denominatorbw3+numeratorbw4+denominatorbw4+numeratorbw5+denominatorbw5
+                                 +numeratorcb1+denominatorcb1+numeratorcb2+denominatorcb2+numeratorcb3+denominatorcb3+numeratorcb4+denominatorcb4+numeratorcb5+denominatorcb5),
                                  method= method)
 
 

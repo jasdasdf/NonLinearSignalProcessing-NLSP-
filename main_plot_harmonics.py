@@ -82,9 +82,9 @@ def Comparision(loudspeaker, signaltype, output):
     signal = sumpf.modules.SignalFile(filename=get_filename(loudspeaker, signaltype, 2), format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
     soundpressure = sumpf.modules.SplitSignal(data=signal, channels=[1]).GetOutput()
     voltage = sumpf.modules.SplitSignal(data=signal, channels=[0]).GetOutput()
-    measured_harmonics = harmonics(excitation=voltage, response=soundpressure, order=1)
+    measured_harmonics = harmonics(excitation=voltage, response=soundpressure, order=5)
     model = hammerstein(excitation=voltage)
-    simulated_harmonics = harmonics(excitation=voltage, response=model.GetOutput(), order=1)
+    simulated_harmonics = harmonics(excitation=voltage, response=model.GetOutput(), order=5)
     plot([measured_harmonics, simulated_harmonics])
     merge = sumpf.modules.MergeSignals()
     merge.AddInput(signal=model.GetOutput())
@@ -104,4 +104,3 @@ def main():
 #    Comparision("Visaton BF45", "Music1", "Musicout")
 
 main()
-

@@ -11,7 +11,7 @@ import head_specific
 
 ################################ Inputs #########################
 
-Dir = "C:/Users/diplomand.8/Desktop/output_logs/"
+Dir = "C:/Users/diplomand.8/Desktop/clip_hammer/5 filter NM/"
 Speaker = "Visaton BF45"
 Signal = 18
 branches = 5
@@ -19,7 +19,9 @@ method = 'Nelder-Mead'
 start_value = 0.8
 plotoutput = True
 output_filename = "%s_%d_%d_%s_%f.txt" %(Speaker,Signal,branches,method,start_value)
-
+filter_branches = branches*2
+initial_amplification_factor = 1                                                     # amplification factor of the model
+chebyshev_ripple = 3.0                                                               # ripple for chebyshev filter
 #################################################################
 
 def Read_log():
@@ -35,16 +37,16 @@ def Read_log():
     threshold_assymetry = []
     coefficients = []
     for i,line in enumerate(reversed(open(log_file).readlines())):
-        if i < branches:
+        if i < filter_branches + 2 and i > 1:
             if "highpass" in line:
                 filter_order.append('hp')
                 hp_coeff.append(line.split())
             else:
                 filter_order.append('lp')
                 lp_coeff.append(line.split())
-        elif i == branches+1:
+        elif i == filter_branches +3:
             threshold_decay.append(line.split())
-        elif i == branches:
+        elif i == filter_branches +2:
             threshold_assymetry.append(line.split())
     lowpass_order = 0
     highpass_order = 0
@@ -75,11 +77,11 @@ def Read_log():
     print "threshold assymetry: " ,threshold_assymetry
     print "thresholds list:     " ,thresholds_list
     print "filterbank length:   " ,len(filter_spec)
-    filter_spec = [filter_spec[0]*filter_spec[2],
-                   filter_spec[1]*filter_spec[3],
-                   filter_spec[2],
-                   filter_spec[3],
-                   filter_spec[4]]
+    filter_spec = [filter_spec[0]*filter_spec[5],
+                   filter_spec[1]*filter_spec[6],
+                   filter_spec[2]*filter_spec[7],
+                   filter_spec[3]*filter_spec[8],
+                   filter_spec[4]*filter_spec[9]]
     return thresholds_list,filter_spec,amplificationfactor
 
 def get_filename(speaker, smd, repetition):
@@ -162,12 +164,12 @@ tf_measured_fundamental = sumpf.modules.SplitSpectrum(channels=[0])
 sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.SetInput)
 
 # Get the parameters of the model
-thresholds_list,filter_spec,amplificationfactor = Read_log()
+initial_thresholds_list,filter_seq,initial_amplificationfactor = Read_log()
 
 # model for extracting the harmonics of simulated signal
-highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=3.0),frequency=100.0,transform=True,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
-model = common.ClippingHammersteinGroupModelWithCascadedLinearity(signal=split_excitation.GetOutput(),thresholds_list=thresholds_list,nonlinearfilters=filter_spec,amplificationfactor=amplificationfactor,linearfilter=highpass)
-#model = common.ClippingHammersteinGroupModel(signal=split_excitation.GetOutput(),thresholds_list=thresholds_list,filters=filter_spec,amplificationfactor=amplificationfactor)
+prp = sumpf.modules.ChannelDataProperties(signal_length=length, samplingrate=samplingrate)
+highpass = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2,ripple=chebyshev_ripple),frequency=150.0,transform=True,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
+model = common.ClippingHammersteinGroupModelWithCascadedLinearity(signal=split_excitation.GetOutput(),thresholds_list=initial_thresholds_list,nonlinearfilters=filter_seq,amplificationfactor=initial_amplification_factor,linearfilter=highpass)
 sumpf.connect(split_excitation.GetOutput, model.SetInput)
 fft_model = sumpf.modules.FourierTransform()
 sumpf.connect(model.GetOutput, fft_model.SetSignal)

@@ -109,11 +109,10 @@ class ClippingHammersteinGroupModelWithCascadedLinearity(object):
         # make the input and output methods of the signal processing chain available
         self.GetOutput = self.__li.GetSignal
 
-      def SetParameters(self, thresholds_list, nonlinearfilters, linearfilter):
+      def SetParameters(self, thresholds_list, nonlinearfilters):
         pairs = []
         for i, t in enumerate(thresholds_list):
             pairs.append((self.__clipping[i].SetThresholds, t))
         for i, f in enumerate(nonlinearfilters):
             pairs.append((self.__filterspec[i].SetInput2, f))
-        pairs.append((self.__linearfilterspec.SetInput2, linearfilter))
         sumpf.set_multiple_values(pairs)

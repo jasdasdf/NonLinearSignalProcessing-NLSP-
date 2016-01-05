@@ -13,14 +13,32 @@ class HammersteinGroupModel(object):
         self.__filterspec = []
         self.__iffts = []
         self.__sums = [None] * len(filters)
-
+        self.__samplingrate = 48000
+        self.__highestfreq = 24000
+        self.__signallength = int(signal.GetDuration()*self.__samplingrate)
+        print self.__signallength, self.__samplingrate
         for branch,spectrum in enumerate(filters):
-            p = common.PolynomialOfSignal(power=branch+1,signal=self.__signal)
+            prp = sumpf.modules.ChannelDataProperties(signal_length=self.__signallength,samplingrate=self.__samplingrate)
+            a = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=(self.__highestfreq/(branch+1)),resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
+            af = sumpf.modules.MultiplySpectrums(spectrum2=a*a)
+            at = sumpf.modules.FourierTransform(signal=self.__signal)
+            ai = sumpf.modules.InverseFourierTransform()
+            d = sumpf.modules.ResampleSignal(signal=self.__signal, samplingrate=(self.__samplingrate/(branch+1)))
+            u = sumpf.modules.ResampleSignal(samplingrate=self.__samplingrate)
+            p = common.PolynomialOfSignal(power=branch+1)
             t = sumpf.modules.FourierTransform()
             f = sumpf.modules.MultiplySpectrums(spectrum2=spectrum)
             i = sumpf.modules.InverseFourierTransform()
-            sumpf.connect(p.GetOutput, t.SetSignal)
+            sumpf.connect(at.GetSpectrum, af.SetInput1)
+            sumpf.connect(af.GetOutput, ai.SetSpectrum)
+            sumpf.connect(ai.GetSignal, d.SetInput)
+            print len(d.GetOutput())
+            sumpf.connect(d.GetOutput, p.SetInput)
+            sumpf.connect(p.GetOutput, u.SetInput)
+            sumpf.connect(u.GetOutput, t.SetSignal)
             sumpf.connect(t.GetSpectrum, f.SetInput1)
+            common.plot.log()
+            common.plot.plot(t.GetSpectrum())
             sumpf.connect(f.GetOutput, i.SetSpectrum)
             self.__powers.append(p)
             self.__ffts.append(t)

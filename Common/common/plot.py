@@ -53,7 +53,7 @@ def plot(data, legend=True, show=True):
 				pyplot.plot(x_data, d.GetMagnitude()[i], label=d.GetLabels()[i])
 #				pyplot.plot(x_data[0:len(x_data) // 2], d.GetPhase()[i][0:len(x_data) // 2], label=d.GetLabels()[i])
 #				pyplot.plot(x_data, d.GetGroupDelay()[i], label=d.GetLabels()[i])
-		pyplot.xlim((20.0, 20000.0))
+		pyplot.xlim((20.0, 40000.0))
 	else:
 		for d in data:
 			# create x_data

@@ -94,7 +94,7 @@ sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.Set
 filter = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=20.0,transform=True,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
 
 # model for extracting the harmonics of simulated signal
-model = common.HammersteinGroupModel(signal=split_excitation.GetOutput(),branches=3,filters=[filter,filter,filter])
+model = common.HammersteinGroupModel(signal=split_excitation.GetOutput(),branches=5,filters=[filter,filter,filter,filter,filter])
 
 common.plot.log()
 common.plot.plot(sumpf.modules.FourierTransform(signal=model.GetOutput()).GetSpectrum())

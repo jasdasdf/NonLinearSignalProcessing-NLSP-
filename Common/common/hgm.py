@@ -1,3 +1,4 @@
+import cmath
 import sumpf
 import common
 
@@ -43,8 +44,8 @@ class HammersteinGroupModel(object):
             sumpf.connect(p.GetOutput, t.SetSignal)
             sumpf.connect(t.GetSpectrum,f.SetInput1)
             sumpf.connect(f.GetOutput, i.SetSpectrum)
-            # common.plot.log()
-            # common.plot.plot(f.GetOutput())
+            common.plot.log()
+            common.plot.plot(f.GetOutput())
             self.__powers.append(p)
             self.__ffts.append(t)
             self.__filterspec.append(f)
@@ -71,29 +72,41 @@ class HammersteinGroupModel(object):
             pairs.append((self.__filterspec[i].SetInput2, f))
         sumpf.set_multiple_values(pairs)
 
-class HammersteinGroupModel_Harmonics(object):
-    def __init__(self, signal=None, branches=None, harmonics=None):
+class HammersteinGroupModel_Farina(object):
+    def __init__(self, signal=None, branches=None, impulseresponse=None, sweep_properties=None):
+        self.__impulseresponse = impulseresponse
+        self.__sweepstartfreq = sweep_properties[0]
+        self.__sweepstopfreq = sweep_properties[1]
+        self.__sweepduration = sweep_properties[2]
+        self.__samplingrate = sweep_properties[3]
         self.__signal = signal
-        if branches is None:
-            self.__branches = len(harmonics)
-        else:
-            self.__branches = branches
-        self.__harmonics = harmonics
+        self.__branches = branches
         self.__powers = []
         self.__ffts = []
         self.__filterspec = []
         self.__iffts = []
-        self.__sums = [None] * len(harmonics.GetChannels())
+        self.__sums = [None] * self.__branches
+        self.__signallength = int(signal.GetDuration()*self.__samplingrate)
+        prp = sumpf.modules.ChannelDataProperties(signal_length=self.__signallength,samplingrate=self.__samplingrate)
 
-        for branch,spectrum in enumerate(harmonics.GetChannels()):
-            spliter = sumpf.modules.SplitSpectrum(data=harmonics,channels=[branch])
-            p = common.PolynomialOfSignal(power=branch+1,signal=self.__signal)
+
+        for branch in range(1,self.__branches+1):
+            a = sumpf.modules.FilterGenerator(sumpf.modules.FilterGenerator.BUTTERWORTH(order=20),frequency=(self.__sweepstopfreq/(branch+1)),resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
+            af = sumpf.modules.MultiplySpectrums(spectrum2=a)
+            at = sumpf.modules.FourierTransform(signal=self.__signal)
+            ai = sumpf.modules.InverseFourierTransform()
+            p = common.PolynomialOfSignal(power=branch+1)
             t = sumpf.modules.FourierTransform()
-            f = sumpf.modules.MultiplySpectrums(spectrum2=spliter.GetOutput())
+            f = sumpf.modules.MultiplySpectrums(spectrum2=spectrum)
             i = sumpf.modules.InverseFourierTransform()
+            sumpf.connect(at.GetSpectrum, af.SetInput1)
+            sumpf.connect(af.GetOutput, ai.SetSpectrum)
+            sumpf.connect(ai.GetSignal,p.SetInput)
             sumpf.connect(p.GetOutput, t.SetSignal)
-            sumpf.connect(t.GetSpectrum, f.SetInput1)
+            sumpf.connect(t.GetSpectrum,f.SetInput1)
             sumpf.connect(f.GetOutput, i.SetSpectrum)
+            # common.plot.log()
+            # common.plot.plot(f.GetOutput())
             self.__powers.append(p)
             self.__ffts.append(t)
             self.__filterspec.append(f)
@@ -114,8 +127,23 @@ class HammersteinGroupModel_Harmonics(object):
         self.SetInput = p.SetInput
         self.GetOutput = self.__sums[0].GetOutput
 
-#     def SetParameters(self, filters):
-#         pairs = []
-#         for i, f in enumerate(filters):
-#             pairs.append((self.__filterspec[i].SetInput2, f))
-#         sumpf.set_multiple_values(pairs)
+
+        # Ha1 = sumpf.modules.SplitSpectrum(data=harmonics,channels=[0]).GetOutput()
+        # Ha2 = sumpf.modules.SplitSpectrum(data=harmonics,channels=[1]).GetOutput()
+        # Ha3 = sumpf.modules.SplitSpectrum(data=harmonics,channels=[2]).GetOutput()
+        # Ha4 = sumpf.modules.SplitSpectrum(data=harmonics,channels=[3]).GetOutput()
+        # Ha5 = sumpf.modules.SplitSpectrum(data=harmonics,channels=[4]).GetOutput()
+        # H1 = Ha1+(3*Ha3)+(5*Ha5)
+        # H2 = (2*Ha2)+(8*Ha4)
+        # H3 = (-4*Ha3)+(-20*Ha5)
+        # H4 = (-8*Ha4)
+        # H5 = (16*Ha5)
+        # h1 = sumpf.modules.ConvolveSignals(signal1=sumpf.modules.InverseFourierTransform(H1).GetSignal(),signal2=signal).GetOutput()
+        # h2 = sumpf.modules.ConvolveSignals(signal1=sumpf.modules.InverseFourierTransform(H2).GetSignal()*sumpf.modules.InverseFourierTransform(H2).GetSignal(),signal2=signal).GetOutput()
+        # h3 = sumpf.modules.ConvolveSignals(signal1=sumpf.modules.InverseFourierTransform(H3).GetSignal()*sumpf.modules.InverseFourierTransform(H3).GetSignal()*sumpf.modules.InverseFourierTransform(H3).GetSignal(),signal2=signal).GetOutput()
+        # h4 = sumpf.modules.ConvolveSignals(signal1=sumpf.modules.InverseFourierTransform(H4).GetSignal()*sumpf.modules.InverseFourierTransform(H4).GetSignal()*sumpf.modules.InverseFourierTransform(H4).GetSignal()*sumpf.modules.InverseFourierTransform(H4).GetSignal(),signal2=signal).GetOutput()
+        # h5 = sumpf.modules.ConvolveSignals(signal1=sumpf.modules.InverseFourierTransform(H5).GetSignal()*sumpf.modules.InverseFourierTransform(H5).GetSignal()*sumpf.modules.InverseFourierTransform(H5).GetSignal()*sumpf.modules.InverseFourierTransform(H5).GetSignal()*sumpf.modules.InverseFourierTransform(H5).GetSignal(),signal2=signal).GetOutput()
+        # h = h1+h2+h3+h4+h5
+        # common.plot.plot(h,show=True)
+        # sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/Logesh_Masterthesis/a",signal=h,format=sumpf.modules.SignalFile.WAV_FLOAT)
+        #

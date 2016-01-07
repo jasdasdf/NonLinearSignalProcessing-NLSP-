@@ -9,6 +9,7 @@ import numpy
 import sumpf
 import common
 import head_specific
+import nlsp
 
 ################################ Inputs #########################
 
@@ -69,7 +70,7 @@ h4_measured = sumpf.modules.FindHarmonicImpulseResponse(harmonic_order=4,sweep_s
 sumpf.connect(ir_measured.GetSignal,h4_measured.SetImpulseResponse)
 h5_measured = sumpf.modules.FindHarmonicImpulseResponse(harmonic_order=5,sweep_start_frequency=sweep_start_frequency, sweep_stop_frequency=sweep_stop_frequency, sweep_duration=sweep_duration)
 sumpf.connect(ir_measured.GetSignal,h5_measured.SetImpulseResponse)
-merge_measuered = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+merge_measured = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
 resample1_measured = sumpf.modules.ResampleSignal(samplingrate=load.GetSamplingRate())
 sumpf.connect(h1_measured.GetOutput,resample1_measured.SetInput)
 resample2_measured = sumpf.modules.ResampleSignal(samplingrate=load.GetSamplingRate())
@@ -80,13 +81,13 @@ resample4_measured = sumpf.modules.ResampleSignal(samplingrate=load.GetSamplingR
 sumpf.connect(h4_measured.GetHarmonicImpulseResponse,resample4_measured.SetInput)
 resample5_measured = sumpf.modules.ResampleSignal(samplingrate=load.GetSamplingRate())
 sumpf.connect(h5_measured.GetHarmonicImpulseResponse,resample5_measured.SetInput)
-sumpf.connect(resample1_measured.GetOutput, merge_measuered.AddInput)
-sumpf.connect(resample2_measured.GetOutput, merge_measuered.AddInput)
-sumpf.connect(resample3_measured.GetOutput, merge_measuered.AddInput)
-sumpf.connect(resample4_measured.GetOutput, merge_measuered.AddInput)
-sumpf.connect(resample5_measured.GetOutput, merge_measuered.AddInput)
+sumpf.connect(resample1_measured.GetOutput, merge_measured.AddInput)
+sumpf.connect(resample2_measured.GetOutput, merge_measured.AddInput)
+sumpf.connect(resample3_measured.GetOutput, merge_measured.AddInput)
+sumpf.connect(resample4_measured.GetOutput, merge_measured.AddInput)
+sumpf.connect(resample5_measured.GetOutput, merge_measured.AddInput)
 tf_measured_withharmonics = sumpf.modules.FourierTransform()
-sumpf.connect(merge_measuered.GetOutput, tf_measured_withharmonics.SetSignal)
+sumpf.connect(merge_measured.GetOutput, tf_measured_withharmonics.SetSignal)
 tf_measured_fundamental = sumpf.modules.SplitSpectrum(channels=[0])
 sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.SetInput)
 
@@ -94,10 +95,24 @@ sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.Set
 filter = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=20.0,transform=True,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
 
 # model for extracting the harmonics of simulated signal
-model = common.HammersteinGroupModel(signal=split_excitation.GetOutput(),branches=5,filters=[filter,filter,filter,filter,filter])
+#model = common.HammersteinGroupModel(signal=split_excitation.GetOutput(),branches=5,filters=[filter,filter,filter,filter,filter])
+#model = common.HammersteinGroupModel_Farina(signal=split_excitation.GetOutput(),branches=5,impulseresponse=ir_measured.GetSignal(),sweep_properties=[sweep_start_frequency,sweep_stop_frequency,sweep_duration,load.GetSamplingRate()])
 
-common.plot.log()
-common.plot.plot(sumpf.modules.FourierTransform(signal=model.GetOutput()).GetSpectrum())
+model = nlsp.HammersteinModel(input_signal=split_excitation.GetOutput(),nonlin_func=nlsp.NonlinearFunction.power_series(1),filter_impulseresponse=resample1_measured.GetOutput())
+#model1 = nlsp.AliasCompensatingHammersteinModel(input_signal=split_excitation.GetOutput(),nonlinear_function=nlsp.PowerSeries(power=1),filter_impulseresponse=resample1_measured.GetOutput())
+#model = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=split_excitation.GetOutput(),nonlinear_function=nlsp.NonlinearFunction.power_series(5),filter_impulseresponse=resample1_measured.GetOutput())
+model.SetInput(split_response.GetOutput())
+common.plot.plot(model.GetNLOutput())
+
+# p = nlsp.NonlinearFunction.hermite_polynomial(degree=5)
+# p.SetInput(split_excitation.GetOutput())
+# #common.plot.plot(p.GetOutput())
+# p.SetMaximumHarmonic(9)
+# print p.GetMaximumHarmonic()
+
+
+# common.plot.log()
+# common.plot.plot(sumpf.modules.FourierTransform(signal=model.GetOutput()).GetSpectrum())
 
 
 

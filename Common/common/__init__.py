@@ -8,7 +8,7 @@ from spectrogram import Spectrogram, get_spectrogram
 
 from clipping_hgm import ClippingHammersteinGroupModel, ClippingHammersteinGroupModelWithCascadedLinearity
 
-from hgm import HammersteinGroupModel,HammersteinGroupModel_Harmonics
+from hgm import HammersteinGroupModel,HammersteinGroupModel_Farina
 
 from nonlinear_convolution_hgm import NonlinearConvolutionHgm
 

@@ -1,2 +1,7 @@
-from hammerstein_model import HammersteinModel\
-    # ,AliasCompensatingHammersteinModel,AliasCompensatingHammersteinModelLowpass,AliasCompensatingHammersteinModelUpsample
+from hammerstein_model import HammersteinModel
+
+from antialiaslp_model import AliasCompensatingHammersteinModelLowpass
+
+from antialiasup_model import AliasCompensatingHammersteinModelUpandDown
+
+from antialiasdown_model import AliasCompensatingHammersteinModelDownandUp

@@ -1,28 +1,37 @@
-#
-# class AliasCompensatingHammersteinModelLowpass(AliasCompensatingHammersteinModel):
-#     def __init__(self, input_signal=None, nonlinear_function=None, filter_impulseresponse=None, filterorder=None, filterfunction=None, attenuation=0.0001):
-#         self.__inputsignal = input_signal
-#         if filterorder is None:
-#             self.__filterorder = 20
-#         else:
-#             self.__filterorder = filterorder
-#         if filterfunction is None:
-#             self.__filterfunction = sumpf.modules.FilterGenerator.BUTTERWORTH(order=self.__filterorder)
-#         else:
-#             self.__filterfunction = filterfunction
-#         self.__filterir = filter_impulseresponse
-#         self.__nonlinearfunc = nonlinear_function
-#         prp = sumpf.modules.ChannelDataProperties(signal_length=self.__inputsignal.GetDuration()*self.__inputsignal.GetSamplingRate(),samplingrate=self.__inputsignal.GetSamplingRate())
-#         filt = sumpf.modules.FilterGenerator(filterfunction=self.__filterfunction,frequency=20000/self._branch,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
-#         t = sumpf.modules.FourierTransform()
-#         it = sumpf.modules.InverseFourierTransform()
-#         m = sumpf.modules.MultiplySpectrums(spectrum2=filt)
-#         a = sumpf.modules.AmplifySignal(input=self.__inputsignal,factor=1.0)
-#         sumpf.connect(a.GetOutput,t.SetSignal)
-#         sumpf.connect(t.GetSpectrum,m.SetInput1)
-#         sumpf.connect(m.GetOutput,it.SetSpectrum)
-#         self.__lpsignal = it.GetSignal()
-#         AliasCompensatingHammersteinModel.__init__(self,input_signal=self.__lpsignal,nonlinear_function=self.__nonlinearfunc,filter_impulseresponse=self.__filterir,branch=self._branch,up_position=0)
-#
-#     def _Connect(self):
-#         # connect the input to the lowpass, the lowpass to the nonlinear function etc.
+import sumpf
+import nlsp
+from .hammerstein_model import HammersteinModel
+
+class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
+    def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(degree=1), filter_impulseresponse=None, filterorder=20,
+                 filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(), attenuation=0.0001):
+        if input_signal is None:
+            self.input_signal = sumpf.Signal()
+        else:
+            self.input_signal = input_signal
+        self.nonlin_func = nonlin_func
+        self.filter_inpulseresponse = filter_impulseresponse
+        self.filterorder = filterorder
+        self.filterfunction = filterfunction
+        self.attenuation = attenuation
+        self.prp = sumpf.modules.ChannelDataProperties(signal_length=self.input_signal.GetDuration()*self.input_signal.GetSamplingRate(),
+                                                  samplingrate=self.input_signal.GetSamplingRate())
+        self.branch = self.nonlin_func.GetMaximumHarmonic()
+        f = sumpf.modules.FilterGenerator(filterfunction=self.filterfunction,frequency=20000/self.branch,resolution=self.prp.GetResolution(),
+                                          length=self.prp.GetSpectrumLength())
+        a = sumpf.modules.AmplifySignal(input=self.input_signal)
+        t = sumpf.modules.FourierTransform()
+        m = sumpf.modules.MultiplySpectrums(spectrum1=f.GetSpectrum())
+        it = sumpf.modules.InverseFourierTransform()
+        sumpf.connect(a.GetOutput,t.SetSignal)
+        sumpf.connect(t.GetSpectrum,m.SetInput2)
+        sumpf.connect(m.GetOutput,it.SetSpectrum)
+        super(AliasCompensatingHammersteinModelLowpass,self).__init__(input_signal=it.GetSignal(),
+                                                                      nonlin_func=self.nonlin_func,filter_impulseresponse=self.filter_inpulseresponse)
+        # self.GetOutput = self.output_signal.GetSignal
+        self.GetOutput = self.output_signal.GetOutput
+
+    @sumpf.Input(sumpf.Signal, "GetOutput")
+    def SetInput(self, signal):
+        self.input_signal = signal
+

@@ -4,11 +4,14 @@ import common
 
 class HammersteinModel(object):
     def __init__(self,input_signal=None,nonlin_func=nlsp.NonlinearFunction.power_series(1),filter_impulseresponse=None):
-        self.__input = input_signal
-        self.__inputstage = sumpf.modules.AmplifySignal()
-        self.__inputstage.SetInput(self.__input)
-        self.__nonlin_func = nonlin_func
-        self.__filterir = filter_impulseresponse
+        self.input = input_signal
+        self.inputstage = sumpf.modules.AmplifySignal()
+        self.inputstage.SetInput(self.input)
+        self.nonlin_func = nonlin_func
+        if filter_impulseresponse is None:
+            self.__filterir = sumpf.Signal()
+        else:
+            self.__filterir = filter_impulseresponse
         a = sumpf.modules.AmplifySignal(input=self.__filterir)
         t = sumpf.modules.FourierTransform()
         it = sumpf.modules.InverseFourierTransform()
@@ -16,24 +19,32 @@ class HammersteinModel(object):
         s2 = sumpf.modules.SplitSpectrum(channels=[1])
         m = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
         f = sumpf.modules.MultiplySpectrums()
-        sumpf.connect(self.__inputstage.GetOutput,self.__nonlin_func.SetInput)
-        sumpf.connect(self.__nonlin_func.GetOutput,m.AddInput)
-        sumpf.connect(a.GetOutput,m.AddInput)
-        sumpf.connect(m.GetOutput,t.SetSignal)
-        sumpf.connect(t.GetSpectrum,s1.SetInput)
-        sumpf.connect(t.GetSpectrum,s2.SetInput)
-        sumpf.connect(s1.GetOutput,f.SetInput1)
-        sumpf.connect(s2.GetOutput,f.SetInput2)
-        sumpf.connect(f.GetOutput,it.SetSpectrum)
-        self.__output_signal = it
-        self.GetOutput = self.__output_signal.GetSignal
-        self.GetNLOutput = self.__nonlin_func.GetOutput
+        # sumpf.connect(self.inputstage.GetOutput,self.nonlin_func.SetInput)
+        # sumpf.connect(self.nonlin_func.GetOutput,m.AddInput)
+        # sumpf.connect(a.GetOutput,m.AddInput)
+        # sumpf.connect(m.GetOutput,t.SetSignal)
+        # sumpf.connect(t.GetSpectrum,s1.SetInput)
+        # sumpf.connect(t.GetSpectrum,s2.SetInput)
+        # sumpf.connect(s1.GetOutput,f.SetInput1)
+        # sumpf.connect(s2.GetOutput,f.SetInput2)
+        # sumpf.connect(f.GetOutput,it.SetSpectrum)
+        # self.output_signal = it
+        # self.GetOutput = self.output_signal.GetSignal
+        # self.GetNLOutput = self.nonlin_func.GetOutput
+
+        c = sumpf.modules.ConvolveSignals()
+        sumpf.connect(self.inputstage.GetOutput,self.nonlin_func.SetInput)
+        sumpf.connect(a.GetOutput,c.SetInput1)
+        sumpf.connect(self.nonlin_func.GetOutput,c.SetInput2)
+        self.output_signal = c
+        self.GetOutput = self.output_signal.GetOutput
+        self.GetNLOutput = self.nonlin_func.GetOutput
+        # print len(c.GetOutput())
+
 
     @sumpf.Input(sumpf.Signal, "GetOutput")
     def SetInput(self, signal):
-        self.__input = signal
-
-
+        self.input = signal
 
     # def _Connect(self):
     #     # connect the input to the nonlinear function, the nonlinear function to

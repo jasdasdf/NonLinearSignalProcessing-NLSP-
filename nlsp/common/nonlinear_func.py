@@ -5,7 +5,9 @@ import numpy
 class NonlinearFunction(object):
     """
     Generates the nonlinear output of the input signal. The nonlinearity is introduced by the power series expansion or by applying
-    orthogonal polynomials of the input signal
+    orthogonal polynomials of the input signal.
+    This NonlinearFunction class imports modules from sympy.mpmath to generate the orthogonal polynomials and this uses numpy.multiply to
+    generate the power series expansion
     """
 
     @staticmethod

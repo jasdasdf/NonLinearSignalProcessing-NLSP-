@@ -3,7 +3,19 @@ import nlsp
 import common
 
 class HammersteinModel(object):
+    """
+    A class to generate the output of simple hammerstein model.
+    The simple hammerstein model consists of a nonlinear block followed by the linear filter block. The nonlinear block can be defined by power
+    series or some other polynomial functions.
+    It uses sumpf modules to convolve, transform the signals and nonlinear function class to generate the nonlinear seq of the input signals.
+    """
     def __init__(self,input_signal=None,nonlin_func=nlsp.NonlinearFunction.power_series(1),filter_impulseresponse=None):
+        """
+        :param input_signal: the input signal-instance to the Hammerstein model
+        :param nonlin_func: the nonlinear function-instance for the nonlinear block
+        :param filter_impulseresponse: the impulse response of the linear filter block
+        :return:
+        """
         self.input = input_signal
         self.inputstage = sumpf.modules.AmplifySignal()
         self.inputstage.SetInput(self.input)

@@ -99,28 +99,17 @@ filter = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenera
 #model = common.HammersteinGroupModel_Farina(signal=split_excitation.GetOutput(),branches=5,impulseresponse=ir_measured.GetSignal(),sweep_properties=[sweep_start_frequency,sweep_stop_frequency,sweep_duration,load.GetSamplingRate()])
 
 
-model1 = nlsp.HammersteinModel(input_signal=split_excitation.GetOutput(),nonlin_func=nlsp.NonlinearFunction.power_series(2),
-                                                      filter_impulseresponse=resample1_measured.GetOutput())
-model2 = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=split_excitation.GetOutput(),nonlin_func=nlsp.NonlinearFunction.power_series(2),
-                                                      filter_impulseresponse=resample1_measured.GetOutput())
-model3 = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=split_excitation.GetOutput(),nonlin_func=nlsp.NonlinearFunction.power_series(2),
-                                                      filter_impulseresponse=resample1_measured.GetOutput(),downsampling_position=1)
-model4 = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=split_excitation.GetOutput(),nonlin_func=nlsp.NonlinearFunction.power_series(2),
-                                                      filter_impulseresponse=resample1_measured.GetOutput(),upsampling_position=1)
+# model1 = nlsp.HammersteinModel(input_signal=split_excitation.GetOutput(),nonlin_func=nlsp.NonlinearFunction.power_series(3))
+model2 = nlsp.AliasCompensatingHammersteinModelLowpass(nonlin_func=nlsp.NonlinearFunction.power_series(2))
+# model3 = nlsp.AliasCompensatingHammersteinModelUpandDown(nonlin_func=nlsp.NonlinearFunction.power_series(2),
+#                                                        downsampling_position=1)
+# model4 = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=split_excitation.GetOutput(),nonlin_func=nlsp.NonlinearFunction.power_series(2),
+#                                                       filter_impulseresponse=resample1_measured.GetOutput(),upsampling_position=1)
 
-common.plot.plot(model1.GetOutput(),show=False)
-common.plot.plot(model2.GetOutput(),show=True)
-
-
-# p = nlsp.NonlinearFunction.hermite_polynomial(degree=5)
-# p.SetInput(split_excitation.GetOutput())
-# #common.plot.plot(p.GetOutput())
-# p.SetMaximumHarmonic(9)
-# print p.GetMaximumHarmonic()
-
-
-# common.plot.log()
-# common.plot.plot(sumpf.modules.FourierTransform(signal=model.GetOutput()).GetSpectrum())
+common.plot.plot(model2.GetOutput())
+model2.SetInput(split_excitation.GetOutput())
+common.plot.plot(model2.GetOutput())
+common.plot.plot(model2.GetNLOutput())
 
 
 

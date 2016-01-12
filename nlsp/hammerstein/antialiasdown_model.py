@@ -28,7 +28,7 @@ class AliasCompensatingHammersteinModelDownandUp(HammersteinModel):
         self.nonlin_func = nonlin_func
         self.branch = self.nonlin_func.GetMaximumHarmonic()
         if filter_impulseresponse is None:
-            self.filter_inpulseresponse = sumpf.modules.ImpulseGenerator(length=2,
+            self.filter_inpulseresponse = sumpf.modules.ImpulseGenerator(length=self.branch*2,
                                                                          samplingrate=self.input_signal.GetSamplingRate()).GetSignal()
         else:
             self.filter_inpulseresponse = filter_impulseresponse
@@ -38,12 +38,12 @@ class AliasCompensatingHammersteinModelDownandUp(HammersteinModel):
                                                   samplingrate=self.input_signal.GetSamplingRate())
         self.ai = sumpf.modules.AmplifySignal(input=self.input_signal)
         self.af = sumpf.modules.AmplifySignal(input=self.filter_inpulseresponse)
-        self.sig_samprate = self.input_signal.GetSamplingRate()
-        self.fil_samprate = self.filter_inpulseresponse.GetSamplingRate()
+        self.sig_samprate = self.ai.GetOutput().GetSamplingRate()
         self.di = sumpf.modules.ResampleSignal(samplingrate=self.sig_samprate/self.branch,algorithm=self.resampling_algorithm)
         self.df = sumpf.modules.ResampleSignal(samplingrate=self.sig_samprate/self.branch,algorithm=self.resampling_algorithm)
         sumpf.connect(self.ai.GetOutput,self.di.SetInput)
         sumpf.connect(self.af.GetOutput,self.df.SetInput)
+        print self.di.GetOutput(),self.df.GetOutput()
         super(AliasCompensatingHammersteinModelDownandUp,self).__init__(input_signal=self.di.GetOutput(),nonlin_func=self.nonlin_func,
                                                                       filter_impulseresponse=self.df.GetOutput())
         self.SetInput = self.ai.SetInput

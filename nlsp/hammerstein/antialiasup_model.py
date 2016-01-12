@@ -37,13 +37,11 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
                                                   samplingrate=self.input_signal.GetSamplingRate())
         self.ai = sumpf.modules.AmplifySignal(input=self.input_signal)
         self.af = sumpf.modules.AmplifySignal(input=self.filter_inpulseresponse)
-        self.sig_samprate = self.input_signal.GetSamplingRate()
-        self.fil_samprate = self.filter_inpulseresponse.GetSamplingRate()
+        self.sig_samprate = self.ai.GetOutput().GetSamplingRate()
         self.di = sumpf.modules.ResampleSignal(samplingrate=self.sig_samprate*self.branch,algorithm=self.resampling_algorithm)
         self.df = sumpf.modules.ResampleSignal(samplingrate=self.sig_samprate*self.branch,algorithm=self.resampling_algorithm)
         sumpf.connect(self.ai.GetOutput,self.di.SetInput)
         sumpf.connect(self.af.GetOutput,self.df.SetInput)
-        print self.di.GetOutput().GetSamplingRate(),self.df.GetOutput().GetSamplingRate()
         super(AliasCompensatingHammersteinModelUpandDown,self).__init__(input_signal=self.di.GetOutput(),nonlin_func=self.nonlin_func,
                                                                       filter_impulseresponse=self.df.GetOutput())
         self.SetInput = self.ai.SetInput

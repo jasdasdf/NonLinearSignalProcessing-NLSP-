@@ -1,6 +1,8 @@
 import sumpf
 import nlsp
 from .hammerstein_model import HammersteinModel
+import common
+import math
 
 class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
     """
@@ -17,7 +19,7 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
         :param filter_impulseresponse: the impulse response of the linear filter block
         :param filterorder: the order of the filter function used to lowpass the signal
         :param filterfunction: the type of filter used for lowpass operation. eg. BUTTERWORTH,CHEBYSHEV1,CHEBYSHEV2 etc
-        :param attenuation: the attenuation
+        :param attenuation: the attenuation of the cutoff frequency
         :return:
         """
         if input_signal is None:
@@ -29,14 +31,15 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
         if filter_impulseresponse is None:
             self.filter_inpulseresponse = sumpf.modules.ImpulseGenerator(length=2).GetSignal()
         else:
-            self.filter_inpulseresponse = sumpf.modules.AmplifySignal(input=filter_impulseresponse).GetOutput()
+            self.filter_inpulseresponse = filter_impulseresponse
         self.branch = self.nonlin_func.GetMaximumHarmonic()
         self.filterorder = filterorder
         self.filterfunction = filterfunction
-        self.attenuation = attenuation
+        self.attenuation = 20*math.log(attenuation,10)
+        self.cutofffreq = (24000/self.branch)/(2**(self.attenuation/(6*self.filterorder)))
         self.prp = sumpf.modules.ChannelDataProperties(signal_length=self.input_signal.GetDuration()*self.input_signal.GetSamplingRate(),
                                                   samplingrate=self.input_signal.GetSamplingRate())
-        self.f = sumpf.modules.FilterGenerator(filterfunction=self.filterfunction,frequency=20000/self.branch,resolution=self.prp.GetResolution(),
+        self.f = sumpf.modules.FilterGenerator(filterfunction=self.filterfunction,frequency=self.cutofffreq,resolution=self.prp.GetResolution(),
                                           length=self.prp.GetSpectrumLength())
         self.t = sumpf.modules.FourierTransform()
         self.m = sumpf.modules.MultiplySpectrums(spectrum1=self.f.GetSpectrum())

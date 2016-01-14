@@ -5,9 +5,10 @@ import common
 class HammersteinModel(object):
     """
     A class to generate the output of simple hammerstein model.
-    The simple hammerstein model consists of a nonlinear block followed by the linear filter block. The nonlinear block can be defined by power
-    series or some other polynomial functions.
-    It uses sumpf modules to convolve, transform the signals and nonlinear function class to generate the nonlinear seq of the input signals.
+    The simple hammerstein model consists of a nonlinear block followed by the linear filter block. The nonlinear block
+    can be defined by power series or some other polynomial functions.
+    It uses sumpf modules to convolve, transform the signals and nonlinear function class to generate the nonlinear seq
+    of the input signals.
     """
     def __init__(self,input_signal=None,nonlin_func=nlsp.NonlinearFunction.power_series(1),
                  filter_impulseresponse=None):
@@ -17,37 +18,60 @@ class HammersteinModel(object):
         :param filter_impulseresponse: the impulse response of the linear filter block
         :return:
         """
+        # interpret the input parameters
         if input_signal is None:
-            self.input = sumpf.Signal()
-        else:
-            self.input = input_signal
-        self.nonlin_func = nonlin_func
+            input_signal = sumpf.Signal()
+        self._nonlin_func = nonlin_func
         if filter_impulseresponse is None:
-            self.filterir = sumpf.modules.ImpulseGenerator(length=2).GetSignal()
+            self._filterir = sumpf.modules.ImpulseGenerator(length=20).GetSignal()
         else:
-            self.filterir = filter_impulseresponse
-        self.inputstage = sumpf.modules.AmplifySignal()
-        self.inputstage.SetInput(self.input)
-        self.af = sumpf.modules.AmplifySignal(input=self.filterir)
-        print self.inputstage.GetOutput().GetSamplingRate(),self.af.GetOutput().GetSamplingRate()
-        self.t = sumpf.modules.FourierTransform()
-        self.it = sumpf.modules.InverseFourierTransform()
-        self.s1 = sumpf.modules.SplitSpectrum(channels=[0])
-        self.s2 = sumpf.modules.SplitSpectrum(channels=[1])
-        self.m = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
-        self.f = sumpf.modules.MultiplySpectrums()
-        sumpf.connect(self.inputstage.GetOutput,self.nonlin_func.SetInput)
-        sumpf.connect(self.nonlin_func.GetOutput,self.m.AddInput)
-        sumpf.connect(self.af.GetOutput,self.m.AddInput)
-        sumpf.connect(self.m.GetOutput,self.t.SetSignal)
-        sumpf.connect(self.t.GetSpectrum,self.s1.SetInput)
-        sumpf.connect(self.t.GetSpectrum,self.s2.SetInput)
-        sumpf.connect(self.s1.GetOutput,self.f.SetInput1)
-        sumpf.connect(self.s2.GetOutput,self.f.SetInput2)
-        sumpf.connect(self.f.GetOutput,self.it.SetSpectrum)
-        self.SetInput = self.inputstage.SetInput
-        self.SetFilterIR = self.af.SetInput
-        self.GetOutput = self.it.GetSignal
-        self.GetNLOutput = self.nonlin_func.GetOutput
+            self._filterir = filter_impulseresponse
 
+        # set up the signal processing objects
+        self._ampsignal = sumpf.modules.AmplifySignal(input=input_signal)
+        self._ampfilter = sumpf.modules.AmplifySignal(input=self._filterir)
+        self._transform = sumpf.modules.FourierTransform()
+        self._itransform = sumpf.modules.InverseFourierTransform()
+        self._split1ch = sumpf.modules.SplitSpectrum(channels=[0])
+        self._split2ch = sumpf.modules.SplitSpectrum(channels=[1])
+        self._merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+        self._multiply = sumpf.modules.MultiplySpectrums()
 
+        # define input and output methods
+        self.SetInput = self._ampsignal.SetInput
+        self.SetFilterIR = self._ampfilter.SetInput
+        self.SetNLFunction = self._nonlin_func.SetNonlinearFunction
+        self.SetMaximumHarmonic = self._nonlin_func.SetMaximumHarmonic
+        self.GetOutput = self._itransform.GetSignal
+
+        # connect the signal processing objects
+        self._Connect()
+
+    def _Connect(self):
+        print "base class"
+        sumpf.connect(self._ampsignal.GetOutput,self._nonlin_func.SetInput)
+        sumpf.connect(self._nonlin_func.GetOutput,self._merger.AddInput)
+        sumpf.connect(self._ampfilter.GetOutput,self._merger.AddInput)
+        sumpf.connect(self._merger.GetOutput,self._transform.SetSignal)
+        sumpf.connect(self._transform.GetSpectrum,self._split1ch.SetInput)
+        sumpf.connect(self._transform.GetSpectrum,self._split2ch.SetInput)
+        sumpf.connect(self._split1ch.GetOutput,self._multiply.SetInput1)
+        sumpf.connect(self._split2ch.GetOutput,self._multiply.SetInput2)
+        sumpf.connect(self._multiply.GetOutput,self._itransform.SetSpectrum)
+
+# class Logger(object):
+#     def __init__(self, name):
+#         self.__name = name
+#
+#     @sumpf.Trigger()
+#     def log(self):
+#         print "LOG", self.__name
+#
+# lg = Logger(name="amp")
+# lg._Logger__value = 9
+# sumpf.connect(self.amp.GetOutput, lg.log)
+
+# class NewLogger(Logger):
+#     def __init(self):
+#         Logger.__init__(self, name="")
+#         self.value = 12

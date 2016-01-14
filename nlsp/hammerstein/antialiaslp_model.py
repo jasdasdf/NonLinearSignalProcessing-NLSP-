@@ -11,8 +11,9 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
     on the input signal.
     It imports the sumpf modules to do the signal processing functions.
     """
-    def __init__(self,input_signal=None,nonlin_func=nlsp.NonlinearFunction.power_series(degree=1),filter_impulseresponse=None,filterorder=20,
-                 filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(),attenuation=0.0001):
+    def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(degree=1),
+                 filter_impulseresponse=None, filterorder=20, filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=20),
+                 attenuation=0.0001):
         """
         :param input_signal: the input signal instance to the Alias compensated Hammerstein model
         :param nonlin_func: the nonlinear function-instance for the nonlinear block
@@ -22,33 +23,58 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
         :param attenuation: the attenuation of the cutoff frequency
         :return:
         """
+        self._filterorder = filterorder
+        self._filterfunction = filterfunction
+        self._asignal = sumpf.modules.AmplifySignal(input=input_signal)
+        self._afilter = sumpf.modules.AmplifySignal(input=filter_impulseresponse)
+        self._cutofffreq = ((self._asignal.GetOutput().GetSamplingRate()/2)/nonlin_func.GetMaximumHarmonic())/\
+                           (2**(20*math.log(attenuation,10)/(6*filterorder)))
         if input_signal is None:
-            self.input_signal = sumpf.Signal()
+            self._prp = sumpf.modules.ChannelDataProperties(signal_length=sumpf.Signal().GetDuration()*
+                                                                          sumpf.Signal().GetSamplingRate(),
+                                                            samplingrate=sumpf.Signal().GetSamplingRate())
         else:
-            self.input_signal = input_signal
-        self.a = sumpf.modules.AmplifySignal(input=self.input_signal)
-        self.nonlin_func = nonlin_func
-        if filter_impulseresponse is None:
-            self.filter_inpulseresponse = sumpf.modules.ImpulseGenerator(length=2).GetSignal()
-        else:
-            self.filter_inpulseresponse = filter_impulseresponse
-        self.branch = self.nonlin_func.GetMaximumHarmonic()
-        self.filterorder = filterorder
-        self.filterfunction = filterfunction
-        self.attenuation = 20*math.log(attenuation,10)
-        self.cutofffreq = (24000/self.branch)/(2**(self.attenuation/(6*self.filterorder)))
-        self.prp = sumpf.modules.ChannelDataProperties(signal_length=self.input_signal.GetDuration()*self.input_signal.GetSamplingRate(),
-                                                  samplingrate=self.input_signal.GetSamplingRate())
-        self.f = sumpf.modules.FilterGenerator(filterfunction=self.filterfunction,frequency=self.cutofffreq,resolution=self.prp.GetResolution(),
-                                          length=self.prp.GetSpectrumLength())
-        self.t = sumpf.modules.FourierTransform()
-        self.m = sumpf.modules.MultiplySpectrums(spectrum1=self.f.GetSpectrum())
-        self.it = sumpf.modules.InverseFourierTransform()
-        sumpf.connect(self.a.GetOutput,self.t.SetSignal)
-        sumpf.connect(self.t.GetSpectrum,self.m.SetInput2)
-        sumpf.connect(self.m.GetOutput,self.it.SetSpectrum)
-        super(AliasCompensatingHammersteinModelLowpass,self).__init__(input_signal=self.it.GetSignal(),
-                                                                      nonlin_func=self.nonlin_func,filter_impulseresponse=self.filter_inpulseresponse)
-        self.SetInput = self.a.SetInput
-        self.GetOutput = self.it.GetSignal
-        self.GetNLOutput = self.nonlin_func.GetOutput
+            self._prp = sumpf.modules.ChannelDataProperties(signal_length=self._asignal.GetOutput().GetDuration()*
+                                                                      self._asignal.GetOutput().GetSamplingRate(),
+                                                  samplingrate=self._asignal.GetOutput().GetSamplingRate())
+        self._resolution = self._prp.GetResolution()
+        self._spectrallength = self._prp.GetSpectrumLength()
+        self._lpfilter = sumpf.modules.FilterGenerator(filterfunction=self._filterfunction,frequency=self._cutofffreq,
+                                               resolution=self._resolution,
+                                          length=self._spectrallength)
+        self._lptransform = sumpf.modules.FourierTransform()
+        self._lpitransform = sumpf.modules.InverseFourierTransform()
+        self._lpmultiply = sumpf.modules.MultiplySpectrums()
+
+        # define input and output methods
+        # self.SetNLFunction = self._nonlin_func.SetNonlinearFunction
+        # self.SetMaximumHarmonic = self._nonlin_func.SetMaximumHarmonic
+        self.SetInput = self._asignal.SetInput
+        self.SetFilterIR = self._afilter.SetInput
+
+        # call the base classes constructor (which also calls _Connect)
+        super(AliasCompensatingHammersteinModelLowpass, self).__init__(input_signal=input_signal,
+                                                                         nonlin_func=nonlin_func,
+                                                                         filter_impulseresponse=filter_impulseresponse)
+        self.GetOutput = self._itransform.GetSignal
+
+    def _Connect(self):
+        print self._ampsignal.GetOutput().GetDuration()*self._ampsignal.GetOutput().GetSamplingRate()
+        sumpf.connect(self._lpfilter.GetSpectrum,self._lpmultiply.SetInput1)
+        sumpf.connect(self._ampsignal.GetOutput, self._lptransform.SetSignal)
+        sumpf.connect(self._lptransform.GetSpectrum, self._lpmultiply.SetInput2)
+        # print self._lpfilter.GetSpectrum().GetResolution(),self._lptransform.GetSpectrum().GetResolution()
+        # print self._lpfilter.GetSpectrum(),self._lptransform.GetSpectrum()
+        # print self._lpmultiply.GetOutput()
+        # self._lpitransform.SetSpectrum(self._lpmultiply.GetOutput())
+        # print self._lpitransform.GetSignal()
+        sumpf.connect(self._lpmultiply.GetOutput, self._lpitransform.SetSpectrum)
+        sumpf.connect(self._lpitransform.GetSignal, self._nonlin_func.SetInput)
+        sumpf.connect(self._nonlin_func.GetOutput, self._merger.AddInput)
+        sumpf.connect(self._ampfilter.GetOutput, self._merger.AddInput)
+        sumpf.connect(self._merger.GetOutput, self._transform.SetSignal)
+        sumpf.connect(self._transform.GetSpectrum, self._split1ch.SetInput)
+        sumpf.connect(self._transform.GetSpectrum, self._split2ch.SetInput)
+        sumpf.connect(self._split1ch.GetOutput, self._multiply.SetInput1)
+        sumpf.connect(self._split2ch.GetOutput, self._multiply.SetInput2)
+        sumpf.connect(self._multiply.GetOutput, self._itransform.SetSpectrum)

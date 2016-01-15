@@ -1,6 +1,8 @@
+import math
 import sumpf
 import nlsp
 import common
+import collections
 
 class HammersteinModel(object):
     """
@@ -10,7 +12,7 @@ class HammersteinModel(object):
     It uses sumpf modules to convolve, transform the signals and nonlinear function class to generate the nonlinear seq
     of the input signals.
     """
-    def __init__(self,input_signal=None,nonlin_func=nlsp.NonlinearFunction.power_series(1),
+    def __init__(self,input_signal=None, nonlin_func=nlsp.NonlinearFunction.polynomials(1,"power"),
                  filter_impulseresponse=None):
         """
         :param input_signal: the input signal-instance to the Hammerstein model
@@ -40,15 +42,15 @@ class HammersteinModel(object):
         # define input and output methods
         self.SetInput = self._ampsignal.SetInput
         self.SetFilterIR = self._ampfilter.SetInput
-        self.SetNLFunction = self._nonlin_func.SetNonlinearFunction
-        self.SetMaximumHarmonic = self._nonlin_func.SetMaximumHarmonic
+        if self._nonlin_func is  not None:
+            self.SetNLFunction = self._nonlin_func.SetNonlinearFunction
+            self.SetMaximumHarmonic = self._nonlin_func.SetMaximumHarmonic
         self.GetOutput = self._itransform.GetSignal
 
         # connect the signal processing objects
         self._Connect()
 
     def _Connect(self):
-        print "base class"
         sumpf.connect(self._ampsignal.GetOutput,self._nonlin_func.SetInput)
         sumpf.connect(self._nonlin_func.GetOutput,self._merger.AddInput)
         sumpf.connect(self._ampfilter.GetOutput,self._merger.AddInput)
@@ -58,6 +60,11 @@ class HammersteinModel(object):
         sumpf.connect(self._split1ch.GetOutput,self._multiply.SetInput1)
         sumpf.connect(self._split2ch.GetOutput,self._multiply.SetInput2)
         sumpf.connect(self._multiply.GetOutput,self._itransform.SetSpectrum)
+
+
+    # @sumpf.Input(collections.Callable, "_Connect")
+    # def SetNLFunction(self,nonlinear_function):
+    #     self._nonlin_func = nonlinear_function
 
 # class Logger(object):
 #     def __init__(self, name):

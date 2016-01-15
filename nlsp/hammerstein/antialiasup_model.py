@@ -10,7 +10,7 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
     downsampling is done at different positions.
     It imports the sumpf modules to do the signal processing functions.
     """
-    def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.polynomials(1,"power"),
+    def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1),
                  filter_impulseresponse=None, downsampling_position=None,
                  resampling_algorithm = sumpf.modules.ResampleSignal.SPECTRUM):
         """
@@ -70,4 +70,4 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
 
     @sumpf.Output(float)
     def _GetSamplingRate(self):
-        return self._prp.GetSamplingRate()*self._nonlin_function.GetMaximumHarmonic()
+        return self._prp.GetSamplingRate()*self._GetMaximumHarmonic()

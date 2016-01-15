@@ -12,7 +12,7 @@ class HammersteinModel(object):
     It uses sumpf modules to convolve, transform the signals and nonlinear function class to generate the nonlinear seq
     of the input signals.
     """
-    def __init__(self,input_signal=None, nonlin_func=nlsp.NonlinearFunction.polynomials(1,"power"),
+    def __init__(self,input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1),
                  filter_impulseresponse=None):
         """
         :param input_signal: the input signal-instance to the Hammerstein model

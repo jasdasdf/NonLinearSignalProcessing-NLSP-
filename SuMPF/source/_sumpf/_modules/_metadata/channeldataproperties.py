@@ -101,6 +101,16 @@ class ChannelDataProperties(object):
         """
         self.__SetResolution(resolution)
 
+    @sumpf.Input(sumpf.Signal, ["GetSignalLength", "GetSpectrumLength", "GetSamplingRate", "GetResolution"])
+    def SetSignal(self, signal):
+        self.__SetSamplingRate(signal.GetSamplingRate())
+        self.__SetSignalLength(len(signal))
+
+    @sumpf.Input(sumpf.Spectrum, ["GetSignalLength", "GetSpectrumLength", "GetSamplingRate", "GetResolution"])
+    def SetSpectrum(self, spectrum):
+        self.__SetResolution(spectrum.GetResolution())
+        self.__SetSpectrumLength(len(spectrum))
+
     @sumpf.Output(int, caching=False)
     def GetSignalLength(self):
         """

@@ -5,10 +5,10 @@ import nlsp
 
 class NonlinearFunction(object):
     """
-    Generates the nonlinear output of the input signal. The nonlinearity is introduced by the power series expansion or by applying
-    orthogonal polynomials of the input signal.
-    This NonlinearFunction class imports modules from sympy.mpmath to generate the orthogonal polynomials and this uses numpy.multiply to
-    generate the power series expansion
+    Generates the nonlinear output of the input signal. The nonlinearity is introduced by the power series expansion or
+    by applying orthogonal polynomials of the input signal.
+    This NonlinearFunction class imports modules from sympy.mpmath to generate the orthogonal polynomials and this uses
+    numpy.multiply to generate the power series expansion
     """
 
     @staticmethod
@@ -28,7 +28,6 @@ class NonlinearFunction(object):
                 channell.append(mpmath.hermite(degree,channel[i]))
             return channell
         return NonlinearFunction(nonlin_func=func, max_harm=degree)
-
     @staticmethod
     def legrendre_polynomial(degree):
         def func(channel):
@@ -95,7 +94,7 @@ class NonlinearFunction(object):
         new_channels = []
         for c in self.__signal.GetChannels():
             self.__dummy = c
-            new_channels.append(tuple(self.__nonlin_func(c)))
+            new_channels.append(tuple(self.__nonlin_func((c))))
         return sumpf.Signal(channels=new_channels, samplingrate=self.__signal.GetSamplingRate(), labels=self.__signal.GetLabels())
 
     @sumpf.Output(int)

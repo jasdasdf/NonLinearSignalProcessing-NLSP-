@@ -12,7 +12,7 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
     on the input signal.
     It imports the sumpf modules to do the signal processing functions.
     """
-    def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1),
+    def __init__(self, input_signal=None, nonlin_func=lambda x:x, max_harm=1,
                  filter_impulseresponse=None, filterorder=20,
                  filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=20),
                  attenuation=0.0001):
@@ -25,11 +25,12 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
         :param attenuation: the attenuation of the cutoff frequency
         :return:
         """
+
         self._filterorder = filterorder
         self._filterfunction = filterfunction
         self._attenuation = attenuation
         self._nonlin_function = nonlin_func
-        self._max_harmonic = nonlin_func.GetMaximumHarmonic()
+        self._max_harmonic = self._nonlin_function.GetMaximumHarmonic()
         self._prp = sumpf.modules.ChannelDataProperties()
         self._lpfilter = sumpf.modules.FilterGenerator(filterfunction=self._filterfunction)
         self._lptransform = sumpf.modules.FourierTransform()
@@ -43,9 +44,10 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
                                                                          nonlin_func=None,
                                                                          filter_impulseresponse=filter_impulseresponse)
         self.GetOutput = self._itransform.GetSignal
+        self.GetNLOutput = self._nonlin_function.GetOutput
+        self.GetMaximumHarmonic = self._GetMaximumHarmonic
 
     def _Connect(self):
-
         sumpf.connect(self._ampsignal.GetOutput, self._prp.SetSignal)
         sumpf.connect(self._prp.GetResolution, self._lpfilter.SetResolution)
         sumpf.connect(self._prp.GetSpectrumLength, self._lpfilter.SetLength)
@@ -71,7 +73,7 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
 
     @sumpf.Output(float)
     def _GetMaximumHarmonic(self):
-        return self._max_harmonic
+        return self._nonlin_function.GetMaximumHarmonic()
 
     @sumpf.Output(float)
     def _GetCutoffFrequency(self):

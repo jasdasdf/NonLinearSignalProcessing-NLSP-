@@ -4,6 +4,7 @@ import nlsp
 import common
 import collections
 
+
 class HammersteinModel(object):
     """
     A class to generate the output of simple hammerstein model.
@@ -12,7 +13,7 @@ class HammersteinModel(object):
     It uses sumpf modules to convolve, transform the signals and nonlinear function class to generate the nonlinear seq
     of the input signals.
     """
-    def __init__(self,input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1),
+    def __init__(self,input_signal=None, nonlin_func=lambda x: x, max_harm=1,
                  filter_impulseresponse=None):
         """
         :param input_signal: the input signal-instance to the Hammerstein model
@@ -23,7 +24,6 @@ class HammersteinModel(object):
         # interpret the input parameters
         if input_signal is None:
             input_signal = sumpf.Signal()
-        self._nonlin_func = nonlin_func
         if filter_impulseresponse is None:
             self._filterir = sumpf.modules.ImpulseGenerator(length=20).GetSignal()
         else:
@@ -31,6 +31,7 @@ class HammersteinModel(object):
 
         # set up the signal processing objects
         self._ampsignal = sumpf.modules.AmplifySignal(input=input_signal)
+        self._nonlin_func = nonlin_func
         self._ampfilter = sumpf.modules.AmplifySignal(input=self._filterir)
         self._transform = sumpf.modules.FourierTransform()
         self._itransform = sumpf.modules.InverseFourierTransform()
@@ -45,7 +46,9 @@ class HammersteinModel(object):
         if self._nonlin_func is  not None:
             self.SetNLFunction = self._nonlin_func.SetNonlinearFunction
             self.SetMaximumHarmonic = self._nonlin_func.SetMaximumHarmonic
+            self.GetNLOutput = self._nonlin_func.GetOutput
         self.GetOutput = self._itransform.GetSignal
+
 
         # connect the signal processing objects
         self._Connect()
@@ -60,25 +63,3 @@ class HammersteinModel(object):
         sumpf.connect(self._split1ch.GetOutput,self._multiply.SetInput1)
         sumpf.connect(self._split2ch.GetOutput,self._multiply.SetInput2)
         sumpf.connect(self._multiply.GetOutput,self._itransform.SetSpectrum)
-
-
-    # @sumpf.Input(collections.Callable, "_Connect")
-    # def SetNLFunction(self,nonlinear_function):
-    #     self._nonlin_func = nonlinear_function
-
-# class Logger(object):
-#     def __init__(self, name):
-#         self.__name = name
-#
-#     @sumpf.Trigger()
-#     def log(self):
-#         print "LOG", self.__name
-#
-# lg = Logger(name="amp")
-# lg._Logger__value = 9
-# sumpf.connect(self.amp.GetOutput, lg.log)
-
-# class NewLogger(Logger):
-#     def __init(self):
-#         Logger.__init__(self, name="")
-#         self.value = 12

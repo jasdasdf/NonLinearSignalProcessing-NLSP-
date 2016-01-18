@@ -10,7 +10,7 @@ class AliasCompensatingHammersteinModelDownandUp(HammersteinModel):
     downsampling is done at different positions.
     It imports the sumpf modules to do the signal processing functions.
     """
-    def __init__(self, input_signal=None, nonlin_func=lambda x:x, max_harm=1,
+    def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1), max_harm=1,
                  filter_impulseresponse=None, upsampling_position=None,
                  resampling_algorithm = sumpf.modules.ResampleSignal.SPECTRUM):
         """
@@ -26,13 +26,14 @@ class AliasCompensatingHammersteinModelDownandUp(HammersteinModel):
         # interpret the input parameters
         self._upsampling_position = upsampling_position
         self._resampling_algorithm = resampling_algorithm
-        self._nonlin_function = nonlin_func
+        self._nonlin_function = nlsp.NonlinearFunction(nonlin_func = nonlin_func, max_harm = max_harm)
         # self._max_harmonic = nonlin_func.GetMaximumHarmonic()
 
         # create the signal processing objects
         self._prp = sumpf.modules.ChannelDataProperties()
         self._downsignal = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
         self._downfilter = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
+        self._upoutput = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
 
         self.SetNLFunction = self._nonlin_function.SetNonlinearFunction
 
@@ -40,7 +41,7 @@ class AliasCompensatingHammersteinModelDownandUp(HammersteinModel):
         super(AliasCompensatingHammersteinModelDownandUp, self).__init__(input_signal=input_signal,
                                                                          nonlin_func=None,
                                                                          filter_impulseresponse=filter_impulseresponse)
-        self.GetOutput = self._itransform.GetSignal
+        self.GetOutput = self._upoutput.GetOutput
         self.GetNLOutput = self._nonlin_function.GetOutput
         self.GetMaximumHarmonic = self._GetMaximumHarmonic
 
@@ -59,6 +60,8 @@ class AliasCompensatingHammersteinModelDownandUp(HammersteinModel):
         sumpf.connect(self._split1ch.GetOutput,self._multiply.SetInput1)
         sumpf.connect(self._split2ch.GetOutput,self._multiply.SetInput2)
         sumpf.connect(self._multiply.GetOutput,self._itransform.SetSpectrum)
+        sumpf.connect(self._itransform.GetSignal, self._upoutput.SetInput)
+        sumpf.connect(self._prp.GetSamplingRate, self._upoutput.SetSamplingRate)
 
     @sumpf.Input(collections.Callable, ("_GetMaximumHarmonic", "_GetSamplingRate"))
     def SetMaximumHarmonic(self, max_harmonic):
@@ -71,5 +74,4 @@ class AliasCompensatingHammersteinModelDownandUp(HammersteinModel):
 
     @sumpf.Output(float)
     def _GetSamplingRate(self):
-        print self._prp.GetSamplingRate()/self._GetMaximumHarmonic()
         return self._prp.GetSamplingRate()/self._GetMaximumHarmonic()

@@ -12,57 +12,33 @@ class NonlinearFunction(object):
     """
 
     @staticmethod
-    def power_series(degree):
-        def func(channel):
-            result = channel
-            for i in range(1, degree):
-                result = numpy.multiply(result, channel)
-            return result
-        return NonlinearFunction(nonlin_func=func, max_harm=degree)
+    def power_series(degree, signal=None):
+        return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.power_series(degree), max_harm=degree)
 
     @staticmethod
-    def hermite_polynomial(degree):
-        def func(channel):
-            channell = []
-            for i in range(0,len(channel)):
-                channell.append(mpmath.hermite(degree,channel[i]))
-            return channell
-        return NonlinearFunction(nonlin_func=func, max_harm=degree)
-    @staticmethod
-    def legrendre_polynomial(degree):
-        def func(channel):
-            channell = []
-            for i in range(0,len(channel)):
-                channell.append(mpmath.legendre(degree,channel[i]))
-            return channell
-        return NonlinearFunction(nonlin_func=func, max_harm=degree)
+    def hermite_polynomial(degree, signal=None):
+        return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.hermite_polynomial(degree),
+                                 max_harm=degree)
 
     @staticmethod
-    def chebyshev1_polynomial(degree):
-        def func(channel):
-            channell = []
-            for i in range(0,len(channel)):
-                channell.append(mpmath.chebyt(degree,channel[i]))
-            return channell
-        return NonlinearFunction(nonlin_func=func, max_harm=degree)
+    def legrendre_polynomial(degree, signal=None):
+        return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.legrendre_polynomial(degree),
+                                 max_harm=degree)
 
     @staticmethod
-    def chebyshev2_polynomial(degree):
-        def func(channel):
-            channell = []
-            for i in range(0,len(channel)):
-                channell.append(mpmath.chebyu(degree,channel[i]))
-            return channell
-        return NonlinearFunction(nonlin_func=func, max_harm=degree)
+    def chebyshev1_polynomial(degree, signal=None):
+        return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.chebyshev1_polynomial(degree),
+                                 max_harm=degree)
 
     @staticmethod
-    def laguerre_polynomial(degree):
-        def func(channel):
-            channell = []
-            for i in range(0,len(channel)):
-                channell.append(mpmath.laguerre(degree,channel[i]))
-            return channell
-        return NonlinearFunction(nonlin_func=func, max_harm=degree)
+    def chebyshev2_polynomial(degree, signal=None):
+        return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.chebyshev2_polynomial(degree),
+                                 max_harm=degree)
+
+    @staticmethod
+    def laguerre_polynomial(degree, signal=None):
+        return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.laguerre_polynomial(degree), max_harm=degree)
+
 
     def __init__(self, signal=None, nonlin_func=lambda x: x, max_harm=1):
         """

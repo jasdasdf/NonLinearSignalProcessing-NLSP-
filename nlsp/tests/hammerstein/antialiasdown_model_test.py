@@ -13,7 +13,7 @@ def test_connectors():
     freq = 10000
     s_rate = 48000
     length = s_rate
-    model = nlsp.AliasCompensatingHammersteinModelDownandUp(nonlin_func=nlsp.NonlinearFunction.power_series(1))
+    model = nlsp.AliasCompensatingHammersteinModelDownandUp(nonlin_func=nlsp.function_factory.power_series(1),max_harm=1)
     energy1 = common.calculateenergy(model.GetOutput())
     assert energy1 == [0]
     gen_sine = sumpf.modules.SineWaveGenerator(frequency=freq,
@@ -50,7 +50,7 @@ def test_linearity_of_model():
                                       samplingrate=48000,
                                       length=48000).GetSignal()
     model = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=gen_sine,
-                                                            nonlin_func=nlsp.NonlinearFunction.power_series(1))
+                                                            nonlin_func=nlsp.function_factory.power_series(1), max_harm=1)
     energy_ip = common.calculateenergy(gen_sine)
     energy_op = common.calculateenergy(model.GetOutput())
     assert int(energy_ip[0]) == int(energy_op[0])
@@ -73,7 +73,7 @@ def test_aliasingtest():
                                           length=length)
     sine_spec = sumpf.modules.FourierTransform(signal=sine_signal.GetSignal())
     Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=sine_signal.GetSignal(),
-                                                   nonlin_func=nlsp.NonlinearFunction.power_series(max_harm))
+                                                   nonlin_func=nlsp.function_factory.power_series(max_harm),max_harm=max_harm)
     Test_Model_Hammerstein.SetMaximumHarmonic(1)
     Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
     Test_Model_outputspec = sumpf.modules.FourierTransform(Test_Model_outputsignal).GetSpectrum()
@@ -101,14 +101,14 @@ def test_aliasingtest_comparewithupsampling():
                                               samplingrate=s_rate,
                                               length=length)
         sine_spec = sumpf.modules.FourierTransform(signal=sine_signal.GetSignal())
-        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=sine_signal.GetSignal(),
-                                                       nonlin_func=nlsp.NonlinearFunction.power_series(max_harm))
+        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=sine_signal.GetSignal(),
+                                                       nonlin_func=nlsp.function_factory.power_series(max_harm),max_harm=max_harm)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
         Test_Model_outputspec = sumpf.modules.FourierTransform(Test_Model_outputsignal).GetSpectrum()
         Test_Model_HarmonicFreq = []
         frequencies = common.find_frequencies(Test_Model_outputsignal)
         predict_freq = common.predictharmonics_usingupsampling([freq],max_harm,s_rate)
-        if freq*max_harm < s_rate/2:
+        if freq*max_harm < Test_Model_Hammerstein._GetSamplingRate()/2:
             assert frequencies == predict_freq
         else:
             assert frequencies != predict_freq
@@ -134,13 +134,13 @@ def test_modelquality():
                                                   length=length)
         sine_spec = sumpf.modules.FourierTransform(signal=sine_signal.GetSignal())
         Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=sine_signal.GetSignal(),
-                                                           nonlin_func=nlsp.NonlinearFunction.power_series(harm))
+                                                           nonlin_func=nlsp.function_factory.power_series(harm),max_harm=harm)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
         e = common.calculateenergy(Test_Model_outputsignal)
         h = common.predictharmonics_usingupsampling([freq],harm,s_rate)
         f = common.calculateenergy_atparticularfrequencies(Test_Model_outputsignal,h)
         quality = numpy.sum(f)/numpy.sum(e)
-        if freq*harm > s_rate/2:
+        if freq*harm > Test_Model_Hammerstein._GetSamplingRate()/2:
             assert quality <= 1
         else:
             assert quality == 1
@@ -157,14 +157,16 @@ def test_reliability():
     """
     sweep_samplingrate = 48000
     sweep_length = (2**18)
-    max_harm = 2
+    max_harm = 9
+    while True:
+        if (sweep_length % max_harm) == 0 and ((sweep_length - sweep_length % max_harm) % 2) == 0:
+            break
+        sweep_length = sweep_length -1
     ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sweep_samplingrate,length=sweep_length)
     ip_sweep_spec = sumpf.modules.FourierTransform(ip_sweep_signal)
     DownHModel = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=ip_sweep_signal.GetSignal(),
-                                                             nonlin_func=nlsp.NonlinearFunction.power_series(1))
+                                                             nonlin_func=nlsp.function_factory.power_series(1),max_harm=1)
     DownHModel.SetMaximumHarmonic(max_harm)
     ip_energy = common.calculateenergy(ip_sweep_signal.GetSignal())
     op_energy = common.calculateenergy(DownHModel.GetNLOutput())
-    assert int(numpy.divide(ip_energy,op_energy)) == max_harm**2
-
-test_reliability()
+    assert ip_energy > op_energy

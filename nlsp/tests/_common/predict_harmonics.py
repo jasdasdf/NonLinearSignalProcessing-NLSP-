@@ -24,7 +24,7 @@ def predictharmonics_usingupsampling(frequency,max_harm,samplingrate):
         sine_combined_signal = sine_combined_signal + sine_signal.GetSignal()
     sine_combined_spec = sumpf.modules.FourierTransform(signal=sine_combined_signal).GetSpectrum()
     Reference_Model = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=sine_combined_signal,
-                                                            nonlin_func=nlsp.NonlinearFunction.power_series(max_harm))
+                                                            nonlin_func=nlsp.function_factory.power_series(max_harm),max_harm=max_harm)
     Reference_Model_outputsignal = Reference_Model.GetOutput()
     Reference_Model_outputspec = sumpf.modules.FourierTransform(Reference_Model_outputsignal).GetSpectrum()
     Reference_Model_HarmonicFreq = []

@@ -13,7 +13,7 @@ class HammersteinModel(object):
     It uses sumpf modules to convolve, transform the signals and nonlinear function class to generate the nonlinear seq
     of the input signals.
     """
-    def __init__(self,input_signal=None, nonlin_func=lambda x: x, max_harm=1,
+    def __init__(self,input_signal=None, nonlin_func=nlsp.function_factory.power_series(1), max_harm=1,
                  filter_impulseresponse=None):
         """
         :param input_signal: the input signal-instance to the Hammerstein model
@@ -25,13 +25,14 @@ class HammersteinModel(object):
         if input_signal is None:
             input_signal = sumpf.Signal()
         if filter_impulseresponse is None:
-            self._filterir = sumpf.modules.ImpulseGenerator(length=20).GetSignal()
+            self._filterir = sumpf.modules.ImpulseGenerator(length=len(input_signal),
+                                                            samplingrate=input_signal.GetSamplingRate()).GetSignal()
         else:
             self._filterir = filter_impulseresponse
 
         # set up the signal processing objects
         self._ampsignal = sumpf.modules.AmplifySignal(input=input_signal)
-        self._nonlin_func = nonlin_func
+        self._nonlin_func = nlsp.NonlinearFunction(nonlin_func=nonlin_func, max_harm=max_harm)
         self._ampfilter = sumpf.modules.AmplifySignal(input=self._filterir)
         self._transform = sumpf.modules.FourierTransform()
         self._itransform = sumpf.modules.InverseFourierTransform()
@@ -43,12 +44,10 @@ class HammersteinModel(object):
         # define input and output methods
         self.SetInput = self._ampsignal.SetInput
         self.SetFilterIR = self._ampfilter.SetInput
-        if self._nonlin_func is  not None:
+        if nonlin_func is not None:
             self.SetNLFunction = self._nonlin_func.SetNonlinearFunction
-            self.SetMaximumHarmonic = self._nonlin_func.SetMaximumHarmonic
             self.GetNLOutput = self._nonlin_func.GetOutput
         self.GetOutput = self._itransform.GetSignal
-
 
         # connect the signal processing objects
         self._Connect()

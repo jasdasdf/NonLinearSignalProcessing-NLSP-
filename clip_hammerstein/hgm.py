@@ -95,21 +95,54 @@ sumpf.connect(tf_measured_withharmonics.GetSpectrum, tf_measured_fundamental.Set
 filter = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),frequency=20.0,transform=True,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
 
 # model for extracting the harmonics of simulated signal
-#model = common.HammersteinGroupModel(signal=split_excitation.GetOutput(),branches=5,filters=[filter,filter,filter,filter,filter])
-#model = common.HammersteinGroupModel_Farina(signal=split_excitation.GetOutput(),branches=5,impulseresponse=ir_measured.GetSignal(),sweep_properties=[sweep_start_frequency,sweep_stop_frequency,sweep_duration,load.GetSamplingRate()])
+model1 = nlsp.HammersteinModel(nonlin_func=nlsp.NonlinearFunction.power_series(2))
 
 
-# model1 = nlsp.HammersteinModel(input_signal=split_excitation.GetOutput(),nonlin_func=nlsp.NonlinearFunction.power_series(3))
-model2 = nlsp.AliasCompensatingHammersteinModelLowpass(nonlin_func=nlsp.NonlinearFunction.power_series(2))
-# model3 = nlsp.AliasCompensatingHammersteinModelUpandDown(nonlin_func=nlsp.NonlinearFunction.power_series(2),
-#                                                        downsampling_position=1)
-# model4 = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=split_excitation.GetOutput(),nonlin_func=nlsp.NonlinearFunction.power_series(2),
-#                                                       filter_impulseresponse=resample1_measured.GetOutput(),upsampling_position=1)
+model1.SetNLFunction(nlsp.NonlinearFunction.power_series(3))
+model1.SetInput(split_excitation.GetOutput())
+common.plot.plot(model1.GetOutput())
+# print model1._GetCutoffFrequency()
+spec = sumpf.modules.FourierTransform(model1.GetOutput()).GetSpectrum()
 
-common.plot.plot(model2.GetOutput())
-model2.SetInput(split_excitation.GetOutput())
-common.plot.plot(model2.GetOutput())
-common.plot.plot(model2.GetNLOutput())
+common.plot.log()
+common.plot.plot(spec)
+
+# model1.SetFilterIR(resample1_measured.GetOutput())
+# print model1._GetSamplingRate()
+# print model1._GetMaximumHarmonic()
+# model1.SetNLFunction(nlsp.NonlinearFunction.power_series(2))
+# print model1._GetSamplingRate()
+# print model1._GetMaximumHarmonic()
+# model1.SetMaximumHarmonic(2)
+# print model1._GetSamplingRate()
+# print model1._GetMaximumHarmonic()
+# common.plot.plot(model1.GetOutput())
+# common.plot.plot(model1.GetOutput())
+# common.plot.plot(model1.GetOutput())
+
+# model1.SetFilterIR(resample1_measured.GetOutput())
+# common.plot.plot(model1.GetOutput())
+# model1.SetMaximumHarmonic(2)
+# common.plot.plot(model1.GetOutput())
+
+# print model1._asignal.GetOutput().GetDuration()
+
+# print model1._asignal.GetOutput().GetDuration()
+# common.plot.plot(model1.GetOutput())
+# print model1._afilter.GetOutput().GetDuration()
+# print model1._prp.GetResolution()
+# sp1 = model1._lpfilter
+# sp2 = sumpf.modules.FourierTransform(signal=model1._asignal.GetOutput()).GetSpectrum()
+#
+# print sumpf.modules.MultiplySpectrums(sp1,sp2).GetOutput()
+# model1.SetFilterIR(resample1_measured.GetOutput())
+# print model1._cutofffreq, model1._asignal.GetOutput().GetDuration(),model1._asignal.GetOutput().GetSamplingRate()
+# print model1._afilter.GetOutput().GetDuration()
+# model1.SetInput(split_excitation.GetOutput())
+# common.plot.plot(model1.GetOutput())
+# model1.SetFilterIR(resample1_measured.GetOutput())
+# common.plot.plot(model1.GetOutput())
+
 
 
 

@@ -71,6 +71,8 @@ class Butterworth(FilterFunction):
                 coefficients.append(([1.0], [1.0, b1, 1.0]))
         return coefficients
 
+    def GetOrder(self):
+        return self.__order
 
 
 class Bessel(FilterFunction):
@@ -94,6 +96,9 @@ class Bessel(FilterFunction):
             denominator = (2.0 ** (self.__order - k)) * math.factorial(k) * math.factorial(self.__order - k)
             coefficients.append(numerator / denominator)
         return [([coefficients[0]], coefficients)]
+
+    def GetOrder(self):
+        return self.__order
 
 
 
@@ -132,7 +137,8 @@ class Chebychev1(FilterFunction):
                 coefficients.append(([1.0], [1.0, b1, b2]))
         return coefficients
 
-
+    def GetOrder(self):
+        return self.__order
 
 class Bandpass(FilterFunction):
     """
@@ -156,6 +162,9 @@ class Bandpass(FilterFunction):
         b1 = a1
         b2 = 1.0
         return [([a0, a1], [b0, b1, b2])]
+
+    def GetOrder(self):
+        return self.__order
 
 
 
@@ -182,6 +191,9 @@ class Bandstop(FilterFunction):
         b2 = 1.0
         return [([a0, a1, a2], [b0, b1, b2])]
 
+    def GetOrder(self):
+        return self.__order
+
 
 
 class TransferFunction(FilterFunction):
@@ -207,6 +219,9 @@ class TransferFunction(FilterFunction):
         @retval : a list of tuples (a, b) where a and b are lists of coefficients
         """
         return [(self.__numerator, self.__denominator)]
+
+    def GetOrder(self):
+        return self.__order
 
 
 

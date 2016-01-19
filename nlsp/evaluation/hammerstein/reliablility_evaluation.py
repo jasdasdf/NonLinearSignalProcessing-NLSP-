@@ -3,8 +3,8 @@ import nlsp
 import common
 
 sweep_samplingrate = 48000
-sweep_length = 2**18
-plot = True
+sweep_length = 2**16-4
+plot = False
 
 def reliabilityofaliasing(sweep_samplingrate, sweep_length):
     """
@@ -20,13 +20,16 @@ def reliabilityofaliasing(sweep_samplingrate, sweep_length):
     ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sweep_samplingrate,length=sweep_length)
     ip_sweep_spec = sumpf.modules.FourierTransform(ip_sweep_signal)
     UPHModel = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sweep_signal.GetSignal(),
-                                                             nonlin_func=nlsp.NonlinearFunction.power_series(1))
+                                                             nonlin_func=nlsp.function_factory.power_series(1),
+                                                               max_harm=1)
     LPHModel = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal.GetSignal(),
-                                                             nonlin_func=nlsp.NonlinearFunction.power_series(1),
+                                                             nonlin_func=nlsp.function_factory.power_series(1),
+                                                             max_harm=1,
                                                              filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
                                                              filterorder=100)
     DOWNHModel = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=ip_sweep_signal.GetSignal(),
-                                                                 nonlin_func=nlsp.NonlinearFunction.power_series(1))
+                                                                 nonlin_func=nlsp.function_factory.power_series(1),
+                                                                 max_harm=1)
     print LPHModel.GetMaximumHarmonic()
     print UPHModel.GetMaximumHarmonic()
     print DOWNHModel.GetMaximumHarmonic()
@@ -36,7 +39,6 @@ def reliabilityofaliasing(sweep_samplingrate, sweep_length):
     print LPHModel.GetMaximumHarmonic()
     print UPHModel.GetMaximumHarmonic()
     print DOWNHModel.GetMaximumHarmonic()
-
     if plot is True:
         # down sampling model plot - signal
         common.plot.plot(ip_sweep_signal.GetSignal(), show=False)

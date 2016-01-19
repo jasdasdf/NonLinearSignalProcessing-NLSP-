@@ -33,6 +33,7 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
         self._upsignal = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
         self._upfilter = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
         self._downoutput = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
+        self._attenuator = sumpf.modules.AmplifySignal()
 
         self.SetNLFunction = self._nonlin_function.SetNonlinearFunction
 
@@ -48,10 +49,12 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
         sumpf.connect(self._ampsignal.GetOutput, self._prp.SetSignal)
         sumpf.connect(self._GetSamplingRate, self._upsignal.SetSamplingRate)
         sumpf.connect(self._GetSamplingRate, self._upfilter.SetSamplingRate)
+        sumpf.connect(self._Getattenuation, self._attenuator.SetAmplificationFactor)
         sumpf.connect(self._ampsignal.GetOutput, self._upsignal.SetInput)
         sumpf.connect(self._ampfilter.GetOutput, self._upfilter.SetInput)
         sumpf.connect(self._upsignal.GetOutput,self._nonlin_function.SetInput)
-        sumpf.connect(self._nonlin_function.GetOutput,self._merger.AddInput)
+        sumpf.connect(self._nonlin_function.GetOutput, self._attenuator.SetInput)
+        sumpf.connect(self._attenuator.GetOutput, self._merger.AddInput)
         sumpf.connect(self._upfilter.GetOutput,self._merger.AddInput)
         sumpf.connect(self._merger.GetOutput,self._transform.SetSignal)
         sumpf.connect(self._transform.GetSpectrum,self._split1ch.SetInput)
@@ -61,6 +64,8 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
         sumpf.connect(self._multiply.GetOutput,self._itransform.SetSpectrum)
         sumpf.connect(self._itransform.GetSignal, self._downoutput.SetInput)
         sumpf.connect(self._prp.GetSamplingRate, self._downoutput.SetSamplingRate)
+
+
 
     @sumpf.Input(collections.Callable, ("_GetMaximumHarmonic", "_GetSamplingRate"))
     def SetMaximumHarmonic(self, max_harmonic):
@@ -74,3 +79,7 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
     @sumpf.Output(float)
     def _GetSamplingRate(self):
         return self._prp.GetSamplingRate()*self._GetMaximumHarmonic()
+
+    @sumpf.Output(float)
+    def _Getattenuation(self):
+        return (1/float(self._GetMaximumHarmonic()))

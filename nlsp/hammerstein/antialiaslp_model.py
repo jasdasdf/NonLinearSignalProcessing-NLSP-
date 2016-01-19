@@ -13,7 +13,7 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
     It imports the sumpf modules to do the signal processing functions.
     """
     def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1), max_harm=1,
-                 filter_impulseresponse=None, filterorder=20,
+                 filter_impulseresponse=None,
                  filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=20),
                  attenuation=0.0001):
         """
@@ -26,8 +26,8 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
         :return:
         """
 
-        self._filterorder = filterorder
         self._filterfunction = filterfunction
+        self._filterorder = self._filterfunction.GetOrder()
         self._attenuation = attenuation
         self._nonlin_function = nlsp.NonlinearFunction(nonlin_func = nonlin_func, max_harm = max_harm)
         self._max_harmonic = self._nonlin_function.GetMaximumHarmonic()

@@ -1,8 +1,5 @@
 import sumpf
-import sympy.mpmath as mpmath
-import numpy
 import nlsp
-import common.plot as plot
 
 class HammersteinGroupModel(object):
     """
@@ -10,7 +7,7 @@ class HammersteinGroupModel(object):
     and maximum harmonics
     """
 
-    def __init__(self, signal=None, nonlinear_functions=(nlsp.function_factory.power_series(1),),
+    def __init__(self, input_signal=None, nonlinear_functions=(nlsp.function_factory.power_series(1),),
                  filter_irs=None, max_harmonics=(1,)):
         """
         :param signal: the input signal
@@ -19,14 +16,14 @@ class HammersteinGroupModel(object):
         :param max_harmonics: the tuple of maximum harmonics
         :return:
         """
-        if signal is None:
+        if input_signal is None:
             self.__signal = sumpf.Signal()
         else:
-            self.__signal = signal
+            self.__signal = input_signal
         self.inputstage = sumpf.modules.AmplifySignal(input=self.__signal)
         self.__nlfunctions = nonlinear_functions
         if filter_irs is None:
-            self.__filter_irs = (sumpf.modules.ImpulseGenerator(length=len(signal)).GetSignal(),)
+            self.__filter_irs = (sumpf.modules.ImpulseGenerator(length=len(input_signal)).GetSignal(),)
         else:
             self.__filter_irs = filter_irs
         self.__max_harmonics = max_harmonics
@@ -55,8 +52,7 @@ class HammersteinGroupModel(object):
                 # print "connecting adder %i to adder %i" % (i+1, i)
                 sumpf.connect(self.hmodels[i+1].GetOutput, self.__a.SetInput2)
             self.__sums[i] = self.__a
-
-        self.GetOutput = self.__sums[0].GetOutput
+        self.GetOutput = self.__sums[self.__branches-2].GetOutput
 
     @sumpf.Input(sumpf.Signal)
     def SetInput(self, signal):

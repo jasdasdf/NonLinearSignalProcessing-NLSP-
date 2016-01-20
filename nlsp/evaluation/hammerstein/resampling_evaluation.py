@@ -75,5 +75,31 @@ def resampler_compensation_evaluation():
     common.plot.plot(DownHModel_imp.GetOutput(),show=False)
     common.plot.plot(DownHModel_filt.GetOutput(),show=True)
 
+def resampling_power_evaluation():
+    """
+    Evaluation of power of original, upsampled and downsampled excitation signals
+    The exciation signals are up sampled and down sampled and are compared with the original input signals
+    we expect after upsampling of the sweep signal, the result will have sinusoidal amplitude distribution
+    """
+    spectrum = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH()).GetSpectrum()
+    impulse = sumpf.modules.InverseFourierTransform(spectrum=spectrum).GetSignal()
+    #impulse = sumpf.modules.ImpulseGenerator().GetSignal()
+    impulse = sumpf.modules.SweepGenerator().GetSignal()
+
+    upsampled = sumpf.modules.ResampleSignal(signal=impulse, samplingrate=5 * impulse.GetSamplingRate(),
+                                             algorithm=sumpf.modules.ResampleSignal.SPECTRUM).GetOutput()
+    downsampled = sumpf.modules.ResampleSignal(signal=upsampled, samplingrate=impulse.GetSamplingRate(),
+                                               algorithm=sumpf.modules.ResampleSignal.SPECTRUM).GetOutput()
+    merged = sumpf.modules.MergeSignals(signals=[impulse, downsampled]).GetOutput()
+
+    print "original impulse power:   ", sumpf.modules.RootMeanSquare(signal=impulse, integration_time=sumpf.modules.RootMeanSquare.FULL).GetOutput().GetChannels()[0][0] * impulse.GetDuration()
+    print "upsampled impulse power:  ", sumpf.modules.RootMeanSquare(signal=upsampled, integration_time=sumpf.modules.RootMeanSquare.FULL).GetOutput().GetChannels()[0][0] * upsampled.GetDuration()
+    print "downsampled impulse power:", sumpf.modules.RootMeanSquare(signal=downsampled, integration_time=sumpf.modules.RootMeanSquare.FULL).GetOutput().GetChannels()[0][0] * downsampled.GetDuration()
+
+    common.plot.plot(upsampled[0:100 * int(round(upsampled.GetSamplingRate() / impulse.GetSamplingRate()))],show=True)
+    common.plot.plot(merged[0:100],show=True)
+
+
 resampler_compensation_evaluation()
 resampler_evaluation()
+resampling_power_evaluation()

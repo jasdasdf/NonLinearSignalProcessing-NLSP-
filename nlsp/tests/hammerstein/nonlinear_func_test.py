@@ -2,7 +2,7 @@ import sumpf
 import nlsp
 import _common as common
 
-def nonlinearfunction_test():
+def test_nonlinearfunction():
     """
     test whether the factory function and the function for nonlinearity generation works fine.
     the nonlinear function is called in three different methods with same input signal and same degree of

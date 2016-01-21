@@ -1,8 +1,26 @@
 import sumpf
 import nlsp
-import common.plot as plot
 
-def nonlinearconvolution_identification(input_sweep, output_sweep):
+def nonlinearconvolution_identification_filter(input_sweep, output_sweep):
+    """
+    Function to find the filter impulse response of the hammerstein group model using Nonlinear convolution method.
+    It is used for nonlinear system identification.
+    This function computes the impulse response of the nonlinear system by multiplying the transfer function of the
+    output sweep and the regularized spectral inversion of the input sweep. The regularized spectral inversion makes
+    sure that the low magnitude frequencies in the input signal is not amplified unanticipatedly due to division in
+    frequency domain.
+    Then the transfer function is inverse transformed to get the impulse response of the nonlinear system.
+    From the nonlinear system impulse response the impulse response of the harmonics are seperated. The higher order
+    harmonics impulse response are found in the noncausal part. Since we have calculated the impulse response from the
+    frequency domain, it appears in the end of the impulse response due to circular convolution.
+    Then the transfer function of the harmonics impulse response is calculated and the mathematical calculation which is
+    specified by Farina in Nonlinear convolution paper is performed to find the transfer function of filters which shall
+    be used in hammerstein group model. Then it is transformed to time domain and returned.
+    The mathematical functions are performed by using the sumpf classes.
+    :param input_sweep: the input sweep signal which is given to the nonlinear system
+    :param output_sweep: the output signal which is observed from the nonlinear system
+    :return: the impulse response of the filters of hammerstein group model
+    """
     if isinstance(input_sweep ,(sumpf.Signal)):
         ip_s = input_sweep
         ip = sumpf.modules.FourierTransform(signal=input_sweep).GetSpectrum()
@@ -41,3 +59,16 @@ def nonlinearconvolution_identification(input_sweep, output_sweep):
         ift = sumpf.modules.InverseFourierTransform(spectrum=kernel).GetSignal()
         h.append(ift)
     return h
+
+def nonlinearconvolution_identification_nlfunction():
+    """
+    This function returns the nonlinear function to the nonlinear blocks of the hammerstein group model.
+    In nonlinear convolution method the nonlinear function is defined by power series expansion, Hence it returns
+    the power series expansion functions.
+    The power series expansion is done by using nlsp classes.
+    :return: the nonlinear functions to the hammerstein group model
+    """
+    nl = []
+    for i in range(5):
+        nl.append(nlsp.function_factory.power_series(i+1))
+    return nl

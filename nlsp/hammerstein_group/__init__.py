@@ -1,2 +1,2 @@
 from hammerstein_group_model import HammersteinGroupModel
-from nlconvolution_identification import nonlinearconvolution_identification
+from nlconvolution_identification import nonlinearconvolution_identification_filter, nonlinearconvolution_identification_nlfunction

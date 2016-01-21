@@ -41,19 +41,3 @@ def nonlinearconvolution_identification(input_sweep, output_sweep):
         ift = sumpf.modules.InverseFourierTransform(spectrum=kernel).GetSignal()
         h.append(ift)
     return h
-
-input_sweep = sumpf.modules.SweepGenerator(samplingrate=48000,length=48000*5).GetSignal()
-output_sweep = sumpf.modules.ClipSignal(signal=input_sweep,thresholds=(-0.6,0.6)).GetOutput()
-h = nonlinearconvolution_identification(input_sweep=input_sweep,output_sweep=output_sweep)
-
-h_model = nlsp.HammersteinGroupModel(nonlinear_functions=(nlsp.function_factory.power_series(1),
-                                                              nlsp.function_factory.power_series(2),
-                                                              nlsp.function_factory.power_series(3),
-                                                              nlsp.function_factory.power_series(4),
-                                                              nlsp.function_factory.power_series(5)),
-                                    filter_irs=h,max_harmonics=(1,2,3,4,5))
-
-h_model.SetInput(input_sweep)
-plot.log()
-plot.plot(sumpf.modules.FourierTransform(output_sweep).GetSpectrum(),show=False)
-plot.plot(sumpf.modules.FourierTransform(h_model.GetOutput()).GetSpectrum(),show=True)

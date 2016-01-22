@@ -50,9 +50,10 @@ class HammersteinGroupModel(object):
                 sumpf.connect(self.hmodels[i+1].GetOutput, self.__a.SetInput2)
             else:
                 # print "connecting adder %i to adder %i" % (i+1, i)
-                sumpf.connect(self.hmodels[i+1].GetOutput, self.__a.SetInput2)
+                sumpf.connect(self.__sums[i+1].GetOutput, self.__a.SetInput2)
             self.__sums[i] = self.__a
-        self.GetOutput = self.__sums[self.__branches-2].GetOutput
+
+        self.GetOutput = self.__sums[0].GetOutput
 
     @sumpf.Input(sumpf.Signal)
     def SetInput(self, signal):

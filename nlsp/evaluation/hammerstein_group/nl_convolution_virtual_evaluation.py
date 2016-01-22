@@ -15,13 +15,13 @@ def clipping_evaluation():
     """
     sampling_rate = 48000
     threshold = [-0.5,0.5]
-    length = 2**18
+    length = 2**15
     ip_freq = 2000
     input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length).GetSignal()
     output_sweep = sumpf.modules.ClipSignal(signal=input_sweep,thresholds=threshold).GetOutput()
 
     h = nlsp.nonlinearconvolution_identification_filter(input_sweep=input_sweep,output_sweep=output_sweep)
-    nl = nlsp.nonlinearconvolution_identification_nlfunction()
+    nl = nlsp.nonlinearconvolution_identification_nlfunction(5)
 
     h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=(1,2,3,4,5))
 
@@ -48,13 +48,13 @@ def amplification_evaluation():
     """
     sampling_rate = 48000
     amplification = 2
-    length = 2**18
+    length = 2**15
     ip_freq = 2000
     input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length).GetSignal()
     output_sweep = sumpf.modules.AmplifySignal(input=input_sweep,factor=amplification).GetOutput()
 
     h = nlsp.nonlinearconvolution_identification_filter(input_sweep=input_sweep,output_sweep=output_sweep)
-    nl = nlsp.nonlinearconvolution_identification_nlfunction()
+    nl = nlsp.nonlinearconvolution_identification_nlfunction(5)
 
     h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=(1,2,3,4,5))
 
@@ -81,7 +81,7 @@ def filtering_evaluation():
     """
     sampling_rate = 48000
     filter_lp = 3000
-    length = 2**18
+    length = 2**15
     ip_freq = 2000
     input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length).GetSignal()
     ip_prp = sumpf.modules.ChannelDataProperties()
@@ -94,7 +94,7 @@ def filtering_evaluation():
                                         spectrum2=sumpf.modules.FourierTransform(input_sweep).GetSpectrum()).GetOutput()
 
     h = nlsp.nonlinearconvolution_identification_filter(input_sweep=input_sweep,output_sweep=output_sweep)
-    nl = nlsp.nonlinearconvolution_identification_nlfunction()
+    nl = nlsp.nonlinearconvolution_identification_nlfunction(5)
 
     h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=(1,2,3,4,5))
 
@@ -110,7 +110,100 @@ def filtering_evaluation():
     plot.plot(op_sine,show=False)
     plot.plot(sumpf.modules.FourierTransform(h_model.GetOutput()).GetSpectrum(),show=True)
 
-clipping_evaluation()
-amplification_evaluation()
-filtering_evaluation()
+def polynomial_op_evaluation():
+    """
+    Evaluation of Nonlinear convolution method by comparing the outputs.
+    A Nonlinear system is constructed using hammerstein group models with power series expansion as nonlinear function
+    and certain lowpass filters as linear blocks.
+    Sweep signal is given to this nonlinear system and output is observed. These input and output signals are given to
+    the Nonlinear convolution type system identification to identify the filters.
+    The identified filter impulse response is used to construct a hammerstein group model. A pure tone is given to both
+    nonlinear system and model and output is evaluated.
+    We expect comparable outputs.
+    """
+    sampling_rate = 48000
+    filter_freq = (4000,8000,10000,15000,20000)
+    length = 2**15
+    ip_freq = 2000
+    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length).GetSignal()
+    ip_sine = sumpf.modules.SineWaveGenerator(frequency=ip_freq,
+                                              phase=0.0,
+                                              samplingrate=sampling_rate,
+                                              length=length).GetSignal()
+    ip_prp = sumpf.modules.ChannelDataProperties()
+    ip_prp.SetSignal(input_sweep)
+    filter_spec = []
+    for frequency in filter_freq:
+        op = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                                                frequency=frequency,
+                                                resolution=ip_prp.GetResolution(),
+                                                length=ip_prp.GetSpectrumLength()).GetSpectrum()
+        op_s = sumpf.modules.InverseFourierTransform(op).GetSignal()
+        filter_spec.append(op_s)
+    output_sweep = nlsp.HammersteinGroupModel(input_signal=input_sweep,
+                                              nonlinear_functions=nlsp.nonlinearconvolution_identification_nlfunction(5),
+                                              filter_irs=filter_spec,
+                                              max_harmonics=(1,2,3,4,5))
+    ref_output = nlsp.HammersteinGroupModel(input_signal=ip_sine,
+                                          nonlinear_functions=nlsp.nonlinearconvolution_identification_nlfunction(5),
+                                          filter_irs=filter_spec,
+                                          max_harmonics=(1,2,3,4,5))
+    model_op = nlsp.HammersteinGroupModel(input_signal=ip_sine,
+                                nonlinear_functions=nlsp.nonlinearconvolution_identification_nlfunction(5),
+                                filter_irs=nlsp.nonlinearconvolution_identification_filter(input_sweep,output_sweep.GetOutput()),
+                                max_harmonics=(1,2,3,4,5))
+    plot.log()
+    plot.plot(sumpf.modules.FourierTransform(ref_output.GetOutput()).GetSpectrum(),show=False)
+    plot.plot(sumpf.modules.FourierTransform(model_op.GetOutput()).GetSpectrum(),show=True)
 
+
+def polynomial_filter_evaluation():
+    """
+    Evaluation of Nonlinear convolution method by identification of filter.
+    A Nonlinear system is constructed using hammerstein group models with power series expansion as nonlinear function
+    and certain bandpass filters as linear blocks.
+    Sweep signal is given to this nonlinear system and output is observed. These input and output signals are given to
+    the Nonlinear convolution type system identification.
+    We expect the Nonlinear convolution method identifies the spectrum of the filters.
+    :return:
+    """
+    sampling_rate = 48000
+    filter_freq = (2000,5000,8000,10000,20000)
+    sweep_start_freq = 20.0
+    sweep_stop_freq = 20000.0
+    sweep_length = 2**15
+    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=sweep_length,
+                                               start_frequency=sweep_start_freq,
+                                               stop_frequency=sweep_stop_freq).GetSignal()
+    ip_prp = sumpf.modules.ChannelDataProperties()
+    ip_prp.SetSignal(input_sweep)
+    filter_spec_tofind = []
+    for freq in filter_freq:
+        filter_spec_tofind.append(sumpf.modules.InverseFourierTransform(
+            sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                                            frequency=freq,
+                                            resolution=ip_prp.GetResolution(),
+                                            length=ip_prp.GetSpectrumLength()).GetSpectrum()*
+                    sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                                            frequency=freq/2,transform=True,
+                                            resolution=ip_prp.GetResolution(),
+                                            length=ip_prp.GetSpectrumLength()).GetSpectrum()).GetSignal())
+    nlsystem = nlsp.HammersteinGroupModel(nonlinear_functions=nlsp.nonlinearconvolution_identification_nlfunction(5),
+                                              filter_irs=filter_spec_tofind,
+                                              max_harmonics=(1,2,3,4,5))
+    nlsystem.SetInput(input_sweep)
+    found_filter_spec = nlsp.nonlinearconvolution_identification_filter(input_sweep,nlsystem.GetOutput())
+    model_nlsystem = nlsp.HammersteinGroupModel(input_signal=input_sweep,
+                                              nonlinear_functions=nlsp.nonlinearconvolution_identification_nlfunction(5),
+                                              filter_irs=found_filter_spec,
+                                              max_harmonics=(1,2,3,4,5))
+    plot.log()
+    plot.plot(sumpf.modules.FourierTransform(nlsystem.GetOutput()).GetSpectrum(),show=False)
+    plot.plot(sumpf.modules.FourierTransform(model_nlsystem.GetOutput()).GetSpectrum(),show=True)
+
+clipping_evaluation()
+polynomial_filter_evaluation()
+polynomial_op_evaluation()
+filtering_evaluation()
+amplification_evaluation()
+clipping_evaluation()

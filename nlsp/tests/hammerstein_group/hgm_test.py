@@ -79,10 +79,10 @@ def test_aliasing():
 def test_energy():
     """
     Test of the relation between the energy of hammerstein group model and simple hammerstein model.
-    (a + b)^ <= 2a^2 + 2b^2
+    (a + b)^2 <= 2a^2 + 2b^2
     The above relation is proved for the model using this test
     """
-    max_harm = [1]*5
+    max_harm = [1]*2
     freq = 5000
     s_rate = 48000
     length = s_rate
@@ -100,7 +100,8 @@ def test_energy():
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
         e.append(numpy.multiply(common.calculateenergy(Test_Model_outputsignal),2))
     hammerstein_group = nlsp.HammersteinGroupModel(input_signal=ip_sine_signal,
-                                                   nonlinear_functions=(nlsp.function_factory.power_series(max_harm[0]),)*len(max_harm),
+                                                   nonlinear_functions=(nlsp.function_factory.power_series(max_harm[0]),
+                                                                        )*len(max_harm),
                                                    filter_irs=(imp,)*len(max_harm),
                                                    max_harmonics=max_harm)
     e_g = common.calculateenergy(hammerstein_group.GetOutput())

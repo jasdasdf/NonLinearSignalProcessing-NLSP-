@@ -168,7 +168,7 @@ def polynomial_filter_evaluation():
     :return:
     """
     sampling_rate = 48000
-    filter_freq = (2000,5000,8000,10000,20000)
+    filter_freq = (100,500,1500,5000,15000)
     sweep_start_freq = 20.0
     sweep_stop_freq = 20000.0
     sweep_length = 2**15
@@ -179,27 +179,25 @@ def polynomial_filter_evaluation():
     ip_prp.SetSignal(input_sweep)
     filter_spec_tofind = []
     for freq in filter_freq:
-        filter_spec_tofind.append(sumpf.modules.InverseFourierTransform(
-            sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+        spec =  (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
                                             frequency=freq,
                                             resolution=ip_prp.GetResolution(),
-                                            length=ip_prp.GetSpectrumLength()).GetSpectrum()*
-                    sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                                            length=ip_prp.GetSpectrumLength()).GetSpectrum())*\
+                (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
                                             frequency=freq/2,transform=True,
                                             resolution=ip_prp.GetResolution(),
-                                            length=ip_prp.GetSpectrumLength()).GetSpectrum()).GetSignal())
+                                            length=ip_prp.GetSpectrumLength()).GetSpectrum())
+        filter_spec_tofind.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
     nlsystem = nlsp.HammersteinGroupModel(nonlinear_functions=nlsp.nonlinearconvolution_identification_nlfunction(5),
                                               filter_irs=filter_spec_tofind,
                                               max_harmonics=(1,2,3,4,5))
     nlsystem.SetInput(input_sweep)
     found_filter_spec = nlsp.nonlinearconvolution_identification_filter(input_sweep,nlsystem.GetOutput())
-    model_nlsystem = nlsp.HammersteinGroupModel(input_signal=input_sweep,
-                                              nonlinear_functions=nlsp.nonlinearconvolution_identification_nlfunction(5),
-                                              filter_irs=found_filter_spec,
-                                              max_harmonics=(1,2,3,4,5))
-    plot.log()
-    plot.plot(sumpf.modules.FourierTransform(nlsystem.GetOutput()).GetSpectrum(),show=False)
-    plot.plot(sumpf.modules.FourierTransform(model_nlsystem.GetOutput()).GetSpectrum(),show=True)
+    for i,foundspec in enumerate(found_filter_spec):
+        plot.log()
+        plot.plot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),show=False)
+        plot.plot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),show=False)
+    plot.show()
 
 def nonlinear_clipping_evaluation():
     """

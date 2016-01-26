@@ -5,21 +5,22 @@ import collections
 
 class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
     """
-    A class to generate the output of the Aliasing compensated Hammerstein model.
-    This extends the functionality of simple hammerstein model by upsampling the input signal to the Hammerstein model and the
-    downsampling is done at different positions.
-    It imports the sumpf modules to do the signal processing functions.
+    A class which is derived from HammersteinModel class and this compensates the aliasing problem of the HammersteinModel.
+    This extends the signal processing blocks of simple hammerstein model by upsampling the input signal prior to the
+    nonlinear block and then downsampling at the end of the branch.
+    It uses sumpf modules to do the signal processing stuff.
     """
     def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1), max_harm=1,
                  filter_impulseresponse=None, downsampling_position=None,
                  resampling_algorithm = sumpf.modules.ResampleSignal.SPECTRUM):
         """
         :param input_signal: the input signal instance to the Alias compensated Hammerstein model
-        :param nonlin_func: the nonlinear function-instance for the nonlinear block
+        :param nonlin_func: the nonlinear function for the nonlinear block
         :param filter_impulseresponse: the impulse response of the linear filter block
-        :param downsampling_position: the downsampling position, It is a integer value which may be 1,2,3 for downsampling after nonlinear
-                                    signal block, after the linear filter block, after the summation of the hammerstein model signals
-                                    respectively. It this parameter is not given then the downsampling is done at the end
+        :param downsampling_position: the downsampling position, It is a integer value which may be 1,2,3 for
+                                      downsampling after nonlinear signal block, after the linear filter block,
+                                      after the summation of the hammerstein model signals respectively.
+                                      If this parameter is not given then the downsampling is done at the end
         :param resampling_algorithm: the algorithm which can be used to downsample and upsample the signal
         :return:
         """

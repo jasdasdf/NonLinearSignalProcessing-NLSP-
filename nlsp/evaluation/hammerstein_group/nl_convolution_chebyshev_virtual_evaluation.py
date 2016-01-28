@@ -1,177 +1,29 @@
+        ###############################################################################
+        # Chebyshev nonlinear convolution type system identification evaluation script#
+        ###############################################################################
+
+# Sweep signal is used as excitation for system identification.
+# This input sweep signal is given to the virtual nonlinear system and output is obtained. The input and output is used
+#       for chebyshev nonlinear convolution type system identification.
+# The system identification identifies the linear block impulse response and the nonlinear block for chebyshev nl
+#       convolution type system identification is given by chebyshev polynomials.
+# The hammerstein group model is constructed using the identified parameters
+
 import sumpf
 import nlsp
 import common.plot as plot
 import _common as common
 
-def clipping_evaluation():
+def findfilter_evaluation(filter_frequencies):
     """
-    Evaluation of the Chebyshev Nonlinear convolution identification method of nonlinear system by simulating a clipping system.
-    The clipping system is assumed as a nonlinear system and a sweep signal is generated and is given to this system.
-    The input and output of this clipping system is given to chebyshev nonlinear convolution type of system identification and the
-    filter impulse response and the nonlinear functions are obtained.
-    These parameters are given to the Hammerstein group model to simulate the system. This system is evaluated by giving
-    a pure sine tone to the clipping system and this hammerstein group model and the outputs of both systems are
-    evaluated for performance
+    Evaluation of System Identification method by hgm nl system
+    nonlinear system - virtual hammerstein group model with chebyshev polynomials as nl function and bandpass filters as
+                       linear functions
+    inputsignal - sweep signal
+    plot - the original filter spectrum and the identified filter spectrum
+    expectation - utmost similarity between the two spectrums
     """
-    sampling_rate = 48000
-    threshold = [-0.5,0.5]
-    length = 2**15
-    ip_freq = 2000
-    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length).GetSignal()
-    output_sweep = sumpf.modules.ClipSignal(signal=input_sweep,thresholds=threshold).GetOutput()
-
-    h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep,output_sweep=output_sweep)
-    nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(5)
-
-    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=(1,2,3,4,5))
-
-    ip_sine = sumpf.modules.SineWaveGenerator(frequency=ip_freq,
-                                          phase=0.0,
-                                          samplingrate=sampling_rate,
-                                          length=length).GetSignal()
-
-    op_sine = sumpf.modules.ClipSignal(signal=ip_sine,thresholds=threshold).GetOutput()
-    h_model.SetInput(ip_sine)
-    plot.log()
-    plot.plot(sumpf.modules.FourierTransform(op_sine).GetSpectrum(),show=False)
-    plot.plot(sumpf.modules.FourierTransform(h_model.GetOutput()).GetSpectrum(),show=True)
-
-def amplification_evaluation():
-    """
-    Evaluation of the Chebyshev Nonlinear convolution identification method of nonlinear system by simulating a amplification
-    system. The amplification system is assumed as a nonlinear system and a sweep signal is generated and is given to
-    this system. The input and output of this amplification system is given to chebyshev nonlinear convolution type of system
-    identification and the filter impulse response and the nonlinear functions are obtained.
-    These parameters are given to the Hammerstein group model to simulate the system. This system is evaluated by giving
-    a pure sine tone to the amplification system and this hammerstein group model and the outputs of both systems are
-    evaluated for performance
-    """
-    sampling_rate = 48000
-    amplification = 2
-    length = 2**15
-    ip_freq = 2000
-    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length).GetSignal()
-    output_sweep = sumpf.modules.AmplifySignal(input=input_sweep,factor=amplification).GetOutput()
-
-    h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep,output_sweep=output_sweep)
-    nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(5)
-
-    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=(1,2,3,4,5))
-
-    ip_sine = sumpf.modules.SineWaveGenerator(frequency=ip_freq,
-                                          phase=0.0,
-                                          samplingrate=sampling_rate,
-                                          length=length).GetSignal()
-
-    op_sine = sumpf.modules.AmplifySignal(input=ip_sine,factor=amplification).GetOutput()
-    h_model.SetInput(ip_sine)
-    plot.log()
-    plot.plot(sumpf.modules.FourierTransform(op_sine).GetSpectrum(),show=False)
-    plot.plot(sumpf.modules.FourierTransform(h_model.GetOutput()).GetSpectrum(),show=True)
-
-def filtering_evaluation():
-    """
-    Evaluation of the Chebyshev Nonlinear convolution identification method of nonlinear system by simulating a lowpass filtering
-    system. The lowpass filtering system is assumed as a nonlinear system and a sweep signal is generated and is given
-    to this system. The input and output of this lowpassfiltering system is given to chebyshev nonlinear convolution type of
-    system identification and the filter impulse response and the nonlinear functions are obtained.
-    These parameters are given to the Hammerstein group model to simulate the system. This system is evaluated by giving
-    a pure sine tone to the lowpass filtering system and this hammerstein group model and the outputs of both systems
-    are evaluated for performance
-    """
-    sampling_rate = 48000
-    filter_lp = 3000
-    length = 2**15
-    ip_freq = 2000
-    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length).GetSignal()
-    ip_prp = sumpf.modules.ChannelDataProperties()
-    ip_prp.SetSignal(input_sweep)
-    filter =  sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
-                                            frequency=filter_lp,
-                                            resolution=ip_prp.GetResolution(),
-                                            length=ip_prp.GetSpectrumLength()).GetSpectrum()
-    output_sweep = sumpf.modules.MultiplySpectrums(spectrum1=filter,
-                                        spectrum2=sumpf.modules.FourierTransform(input_sweep).GetSpectrum()).GetOutput()
-
-    h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep,output_sweep=output_sweep)
-    nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(5)
-
-    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=(1,2,3,4,5))
-
-    ip_sine = sumpf.modules.SineWaveGenerator(frequency=ip_freq,
-                                          phase=0.0,
-                                          samplingrate=sampling_rate,
-                                          length=length).GetSignal()
-
-    op_sine = sumpf.modules.MultiplySpectrums(spectrum1=filter,
-                                        spectrum2=sumpf.modules.FourierTransform(input_sweep).GetSpectrum()).GetOutput()
-    h_model.SetInput(ip_sine)
-    plot.log()
-    plot.plot(op_sine,show=False)
-    plot.plot(sumpf.modules.FourierTransform(h_model.GetOutput()).GetSpectrum(),show=True)
-
-def polynomial_op_evaluation():
-    """
-    Evaluation of Chebyshev Nonlinear convolution method by comparing the outputs.
-    A Nonlinear system is constructed using hammerstein group models with power series expansion as nonlinear function
-    and certain lowpass filters as linear blocks.
-    Sweep signal is given to this nonlinear system and output is observed. These input and output signals are given to
-    the Chebyshev Nonlinear convolution type system identification to identify the filters.
-    The identified filter impulse response is used to construct a hammerstein group model. A pure tone is given to both
-    nonlinear system and model and output is evaluated.
-    We expect comparable outputs.
-    """
-    sampling_rate = 48000
-    filter_freq = (4000,8000,10000,15000,20000)
-    length = 2**15
-    ip_freq = 2000
-    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length).GetSignal()
-    ip_sine = sumpf.modules.SineWaveGenerator(frequency=ip_freq,
-                                              phase=0.0,
-                                              samplingrate=sampling_rate,
-                                              length=length).GetSignal()
-    ip_prp = sumpf.modules.ChannelDataProperties()
-    ip_prp.SetSignal(input_sweep)
-    filter_spec = []
-    for frequency in filter_freq:
-        op = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
-                                                frequency=frequency,
-                                                resolution=ip_prp.GetResolution(),
-                                                length=ip_prp.GetSpectrumLength()).GetSpectrum()
-        op_s = sumpf.modules.InverseFourierTransform(op).GetSignal()
-        filter_spec.append(op_s)
-    output_sweep = nlsp.HammersteinGroupModel(input_signal=input_sweep,
-                                              nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(5),
-                                              filter_irs=filter_spec,
-                                              max_harmonics=(1,2,3,4,5))
-    ref_output = nlsp.HammersteinGroupModel(input_signal=ip_sine,
-                                          nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(5),
-                                          filter_irs=filter_spec,
-                                          max_harmonics=(1,2,3,4,5))
-    model_op = nlsp.HammersteinGroupModel(input_signal=ip_sine,
-                                nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(5),
-                                filter_irs=nlsp.nonlinearconvolution_chebyshev_filter(input_sweep,output_sweep.GetOutput()),
-                                max_harmonics=(1,2,3,4,5))
-    plot.log()
-    plot.plot(sumpf.modules.FourierTransform(ref_output.GetOutput()).GetSpectrum(),show=False)
-    plot.plot(sumpf.modules.FourierTransform(model_op.GetOutput()).GetSpectrum(),show=True)
-
-
-def polynomial_filter_evaluation():
-    """
-    Evaluation of Chebyshev Nonlinear convolution method by identification of filter.
-    A Nonlinear system is constructed using hammerstein group models with power series expansion as nonlinear function
-    and certain bandpass filters as linear blocks.
-    Sweep signal is given to this nonlinear system and output is observed. These input and output signals are given to
-    the Chebyshev Nonlinear convolution type system identification.
-    We expect the Chebyshev Nonlinear convolution method identifies the spectrum of the filters.
-    :return:
-    """
-    sampling_rate = 48000
-    filter_freq = (100,500,1500,5000,15000)
-    sweep_start_freq = 20.0
-    sweep_stop_freq = 20000.0
-    sweep_length = 2**15
+    filter_freq = filter_frequencies
     input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=sweep_length,
                                                start_frequency=sweep_start_freq,
                                                stop_frequency=sweep_stop_freq).GetSignal()
@@ -188,44 +40,136 @@ def polynomial_filter_evaluation():
                                             resolution=ip_prp.GetResolution(),
                                             length=ip_prp.GetSpectrumLength()).GetSpectrum())
         filter_spec_tofind.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
-    nlsystem = nlsp.HammersteinGroupModel(nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(5),
+    nlsystem = nlsp.HammersteinGroupModel(nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(branches),
                                               filter_irs=filter_spec_tofind,
-                                              max_harmonics=(1,2,3,4,5))
+                                              max_harmonics=range(1,branches+1))
     nlsystem.SetInput(input_sweep)
-    found_filter_spec = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep,nlsystem.GetOutput())
+    found_filter_spec = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep,nlsystem.GetOutput(),[sweep_start_freq,
+                                                                                                     sweep_stop_freq,
+                                                                                                     branches])
     for i,foundspec in enumerate(found_filter_spec):
         plot.log()
         plot.plot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),show=False)
         plot.plot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),show=False)
     plot.show()
 
-def nonlinear_clipping_evaluation():
+def sweep_evaluation(filter_frequencies):
     """
-    Evaluation of the Chebyshev Nonlinear convolution identification method of nonlinear system by simulating a nonlinear
-    clipping system. The clipping system is assumed as a nonlinear system and a sweep signal is generated and is given
-    to this system. The input and output of this clipping system is given to Chebyshev nonlinear convolution type of system
-    identification and the filter impulse response and the nonlinear functions are obtained.
-    These parameters are given to the Hammerstein group model to simulate the system. This system is evaluated by giving
-    a pure sine tone to the clipping system and this hammerstein group model and the outputs of both systems are
-    evaluated for performance
+    Evaluation of System Identification method by hgm nl system
+    nonlinear system - virtual hammerstein group model with chebyshev polynomials as nl function and bandpass filters as
+                       linear functions
+    inputsignal - sweep signal
+    plot - the virtual nl system output and the identified nl system output
+    expectation - utmost similarity between the two outputs
     """
-    sampling_rate = 48000
-    threshold = [-1,1]
-    length = 2**15
-    ip_freq = 2000
-    power = 1/float(3)
-    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length).GetSignal()
-    output_sweep = nlsp.NLClipSignal(signal=input_sweep,thresholds=threshold,power=power).GetOutput()
+    filter_freq = filter_frequencies
+    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=sweep_length,
+                                               start_frequency=sweep_start_freq,
+                                               stop_frequency=sweep_stop_freq).GetSignal()
+    ip_prp = sumpf.modules.ChannelDataProperties()
+    ip_prp.SetSignal(input_sweep)
+    filter_spec_tofind = []
+    for freq in filter_freq:
+        spec =  (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                                            frequency=freq,
+                                            resolution=ip_prp.GetResolution(),
+                                            length=ip_prp.GetSpectrumLength()).GetSpectrum())*\
+                (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                                            frequency=freq/2,transform=True,
+                                            resolution=ip_prp.GetResolution(),
+                                            length=ip_prp.GetSpectrumLength()).GetSpectrum())
+        filter_spec_tofind.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
+    nlsystem = nlsp.HammersteinGroupModel(nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(branches),
+                                              filter_irs=filter_spec_tofind,
+                                              max_harmonics=range(1,branches+1))
+    nlsystem.SetInput(input_sweep)
+    found_filter_spec = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep,nlsystem.GetOutput(),[sweep_start_freq,
+                                                                                                     sweep_stop_freq,
+                                                                                                     branches])
+    hgm = nlsp.HammersteinGroupModel(nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(branches),
+                                              filter_irs=found_filter_spec,
+                                              max_harmonics=range(1,branches+1))
+    hgm.SetInput(input_sweep)
+    plot.log()
+    plot.plot(sumpf.modules.FourierTransform(hgm.GetOutput()).GetSpectrum(), show=False)
+    plot.plot(sumpf.modules.FourierTransform(nlsystem.GetOutput()).GetSpectrum(), show=True)
 
-    h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep,output_sweep=output_sweep)
-    nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(5)
+def puretone_op_evaluation(filter_frequencies, puretone_freq):
+    """
+    Evaluation of System Identification method by hgm nl system
+    nonlinear system - virtual hammerstein group model with chebyshev polynomials as nl function and bandpass filters as
+                       linear functions
+    inputsignal - puretone signal mixture
+    plot - the virtual nl system output and the identified nl system output
+    expectation - utmost similarity between the two outputs
+    """
+    filter_freq = filter_frequencies
+    ip_freq = puretone_freq
+    input_sweep = sumpf.modules.SweepGenerator(start_frequency=sweep_start_freq, stop_frequency=sweep_stop_freq,
+                                               samplingrate=sampling_rate, length=sweep_length).GetSignal()
+    ip_sine = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=sampling_rate,
+                                                                 length=sweep_length).GetSignal()
+    for freq in range(0,len(ip_freq)):
+        sine_signal = sumpf.modules.SineWaveGenerator(frequency=ip_freq[freq],
+                                              phase=0.0,
+                                              samplingrate=sampling_rate,
+                                              length=sweep_length)
+        ip_sine = ip_sine + sine_signal.GetSignal()
+    ip_prp = sumpf.modules.ChannelDataProperties()
+    ip_prp.SetSignal(input_sweep)
+    filter_spec = []
+    for frequency in filter_freq:
+        op = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                                                frequency=frequency,
+                                                resolution=ip_prp.GetResolution(),
+                                                length=ip_prp.GetSpectrumLength()).GetSpectrum()
+        op_s = sumpf.modules.InverseFourierTransform(op).GetSignal()
+        filter_spec.append(op_s)
+    output_sweep = nlsp.HammersteinGroupModel(input_signal=input_sweep,
+                                              nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(branches),
+                                              filter_irs=filter_spec,
+                                              max_harmonics=range(1,branches+1))
+    ref_output = nlsp.HammersteinGroupModel(input_signal=ip_sine,
+                                          nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(5),
+                                          filter_irs=filter_spec,
+                                          max_harmonics=range(1,branches+1))
+    model_op = nlsp.HammersteinGroupModel(input_signal=ip_sine,
+                                nonlinear_functions=nlsp.nonlinearconvolution_chebyshev_nlfunction(branches),
+                                filter_irs=nlsp.nonlinearconvolution_chebyshev_filter(input_sweep,
+                                                                                      output_sweep.GetOutput(),
+                                                                                      [sweep_start_freq,sweep_stop_freq,branches]),
+                                max_harmonics=range(1,branches+1))
+    plot.log()
+    plot.plot(sumpf.modules.FourierTransform(ref_output.GetOutput()).GetSpectrum(),show=False)
+    plot.plot(sumpf.modules.FourierTransform(model_op.GetOutput()).GetSpectrum(),show=True)
 
-    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=(1,2,3,4,5))
+def puretone_hardclipping_evaluation(thresholds,puretone_freq):
+    """
+    Evaluation of System Identification method by hard clipping system
+    nonlinear system - virtual clipping systems which hard clips the signal amplitute which are not in the threshold range
+    inputsignal - puretone signal mixture
+    plot - the virtual nl system output and the identified nl system output
+    expectation - utmost similarity between the two outputs
+    """
+    threshold = thresholds
+    ip_freq = puretone_freq
+    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=sweep_length).GetSignal()
+    output_sweep = sumpf.modules.ClipSignal(signal=input_sweep,thresholds=threshold).GetOutput()
 
-    ip_sine = sumpf.modules.SineWaveGenerator(frequency=ip_freq,
-                                          phase=0.0,
-                                          samplingrate=sampling_rate,
-                                          length=length).GetSignal()
+    h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep, output_sweep=output_sweep,
+                                                   prop=[sweep_start_freq,sweep_stop_freq,branches])
+    nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(branches)
+
+    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
+
+    ip_sine = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=sampling_rate,
+                                                                 length=sweep_length).GetSignal()
+    for freq in range(0,len(ip_freq)):
+        sine_signal = sumpf.modules.SineWaveGenerator(frequency=ip_freq[freq],
+                                              phase=0.0,
+                                              samplingrate=sampling_rate,
+                                              length=sweep_length)
+        ip_sine = ip_sine + sine_signal.GetSignal()
 
     op_sine = sumpf.modules.ClipSignal(signal=ip_sine,thresholds=threshold).GetOutput()
     h_model.SetInput(ip_sine)
@@ -233,13 +177,87 @@ def nonlinear_clipping_evaluation():
     plot.plot(sumpf.modules.FourierTransform(op_sine).GetSpectrum(),show=False)
     plot.plot(sumpf.modules.FourierTransform(h_model.GetOutput()).GetSpectrum(),show=True)
 
+def puretone_softclipping_evaluation(thresholds,puretone_freq,power):
+    """
+    Evaluation of System Identification method by soft clipping system
+    nonlinear system - virtual clipping systems which soft clips the signal amplitute which are not in the threshold range
+    inputsignal - puretone signal mixture
+    plot - the virtual nl system output and the identified nl system output
+    expectation - utmost similarity between the two outputs
+    """
+    threshold = thresholds
+    ip_freq = puretone_freq
+    clip_power = power
+    input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=sweep_length).GetSignal()
+    output_sweep = nlsp.NLClipSignal(signal=input_sweep,thresholds=threshold,power=clip_power).GetOutput()
 
-clipping_evaluation()
-polynomial_filter_evaluation()
-polynomial_op_evaluation()
-filtering_evaluation()
-amplification_evaluation()
-clipping_evaluation()
-nonlinear_clipping_evaluation()
+    h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep, output_sweep=output_sweep,
+                                                   prop=[sweep_start_freq,sweep_stop_freq,branches])
+    nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(branches)
 
+    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
+
+    ip_sine = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=sampling_rate,
+                                                                 length=sweep_length).GetSignal()
+    for freq in range(0,len(ip_freq)):
+        sine_signal = sumpf.modules.SineWaveGenerator(frequency=ip_freq[freq],
+                                              phase=0.0,
+                                              samplingrate=sampling_rate,
+                                              length=sweep_length)
+        ip_sine = ip_sine + sine_signal.GetSignal()
+
+    op_sine = nlsp.NLClipSignal(signal=ip_sine,thresholds=threshold,power=clip_power).GetOutput()
+    h_model.SetInput(ip_sine)
+    plot.log()
+    plot.plot(sumpf.modules.FourierTransform(op_sine).GetSpectrum(),show=False)
+    plot.plot(sumpf.modules.FourierTransform(h_model.GetOutput()).GetSpectrum(),show=True)
+
+def linear_amplification_evaluation(amplification_factor,puretone_freq):
+    """
+    Evaluation of System Identification method by linear amplification
+    nonlinear system - no nonlinearity, linear amplifier as linear system
+    inputsignal - puretone signal mixture
+    plot - the virtual linear system output and the identified linear system output
+    expectation - utmost similarity between the two outputs
+    """
+    amplification = amplification_factor
+    ip_freq = puretone_freq
+
+    input_sweep = sumpf.modules.SweepGenerator(start_frequency=sweep_start_freq, stop_frequency=sweep_stop_freq,
+                                               samplingrate=sampling_rate, length=sweep_length).GetSignal()
+    output_sweep = sumpf.modules.AmplifySignal(input=input_sweep,factor=amplification).GetOutput()
+
+    h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep,output_sweep=output_sweep,
+                                                   prop=[sweep_start_freq,sweep_stop_freq,branches])
+    nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(branches)
+
+    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
+
+    ip_sine = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=sampling_rate,
+                                                                 length=sweep_length).GetSignal()
+    for freq in range(0,len(ip_freq)):
+        sine_signal = sumpf.modules.SineWaveGenerator(frequency=ip_freq[freq],
+                                              phase=0.0,
+                                              samplingrate=sampling_rate,
+                                              length=sweep_length)
+        ip_sine = ip_sine + sine_signal.GetSignal()
+
+    op_sine = sumpf.modules.AmplifySignal(input=ip_sine,factor=amplification).GetOutput()
+    h_model.SetInput(ip_sine)
+    plot.log()
+    plot.plot(sumpf.modules.FourierTransform(op_sine).GetSpectrum(),show=False)
+    plot.plot(sumpf.modules.FourierTransform(h_model.GetOutput()).GetSpectrum(),show=True)
+
+sampling_rate = 48000
+sweep_start_freq = 20.0
+sweep_stop_freq = 20000.0
+branches = 5
+sweep_length = 2**10
+
+findfilter_evaluation(filter_frequencies=(300,800,2000,8000,12000))
+sweep_evaluation(filter_frequencies=(300,800,2000,8000,12000))
+puretone_op_evaluation(filter_frequencies=(300,800,2000,8000,12000),puretone_freq=(500,1000))
+puretone_hardclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000))
+puretone_softclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000),power=1/float(3))
+linear_amplification_evaluation(amplification_factor=1.0,puretone_freq=(500,1000))
 

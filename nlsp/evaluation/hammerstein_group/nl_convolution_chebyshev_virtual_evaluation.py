@@ -12,7 +12,6 @@
 import sumpf
 import nlsp
 import common.plot as plot
-import _common as common
 
 def findfilter_evaluation(filter_frequencies):
     """
@@ -107,14 +106,7 @@ def puretone_op_evaluation(filter_frequencies, puretone_freq):
     ip_freq = puretone_freq
     input_sweep = sumpf.modules.SweepGenerator(start_frequency=sweep_start_freq, stop_frequency=sweep_stop_freq,
                                                samplingrate=sampling_rate, length=sweep_length).GetSignal()
-    ip_sine = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=sampling_rate,
-                                                                 length=sweep_length).GetSignal()
-    for freq in range(0,len(ip_freq)):
-        sine_signal = sumpf.modules.SineWaveGenerator(frequency=ip_freq[freq],
-                                              phase=0.0,
-                                              samplingrate=sampling_rate,
-                                              length=sweep_length)
-        ip_sine = ip_sine + sine_signal.GetSignal()
+    ip_sine = nlsp.generate_puretones(frequencies=ip_freq, sampling_rate=sampling_rate, length=sweep_length)
     ip_prp = sumpf.modules.ChannelDataProperties()
     ip_prp.SetSignal(input_sweep)
     filter_spec = []
@@ -159,18 +151,8 @@ def puretone_hardclipping_evaluation(thresholds,puretone_freq):
     h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep, output_sweep=output_sweep,
                                                    prop=[sweep_start_freq,sweep_stop_freq,branches])
     nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(branches)
-
     h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
-
-    ip_sine = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=sampling_rate,
-                                                                 length=sweep_length).GetSignal()
-    for freq in range(0,len(ip_freq)):
-        sine_signal = sumpf.modules.SineWaveGenerator(frequency=ip_freq[freq],
-                                              phase=0.0,
-                                              samplingrate=sampling_rate,
-                                              length=sweep_length)
-        ip_sine = ip_sine + sine_signal.GetSignal()
-
+    ip_sine = nlsp.generate_puretones(frequencies=ip_freq, sampling_rate=sampling_rate, length=sweep_length)
     op_sine = sumpf.modules.ClipSignal(signal=ip_sine,thresholds=threshold).GetOutput()
     h_model.SetInput(ip_sine)
     plot.log()
@@ -194,18 +176,8 @@ def puretone_softclipping_evaluation(thresholds,puretone_freq,power):
     h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep, output_sweep=output_sweep,
                                                    prop=[sweep_start_freq,sweep_stop_freq,branches])
     nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(branches)
-
     h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
-
-    ip_sine = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=sampling_rate,
-                                                                 length=sweep_length).GetSignal()
-    for freq in range(0,len(ip_freq)):
-        sine_signal = sumpf.modules.SineWaveGenerator(frequency=ip_freq[freq],
-                                              phase=0.0,
-                                              samplingrate=sampling_rate,
-                                              length=sweep_length)
-        ip_sine = ip_sine + sine_signal.GetSignal()
-
+    ip_sine = nlsp.generate_puretones(frequencies=ip_freq, sampling_rate=sampling_rate, length=sweep_length)
     op_sine = nlsp.NLClipSignal(signal=ip_sine,thresholds=threshold,power=clip_power).GetOutput()
     h_model.SetInput(ip_sine)
     plot.log()
@@ -230,18 +202,8 @@ def linear_amplification_evaluation(amplification_factor,puretone_freq):
     h = nlsp.nonlinearconvolution_chebyshev_filter(input_sweep=input_sweep,output_sweep=output_sweep,
                                                    prop=[sweep_start_freq,sweep_stop_freq,branches])
     nl = nlsp.nonlinearconvolution_chebyshev_nlfunction(branches)
-
     h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
-
-    ip_sine = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=sampling_rate,
-                                                                 length=sweep_length).GetSignal()
-    for freq in range(0,len(ip_freq)):
-        sine_signal = sumpf.modules.SineWaveGenerator(frequency=ip_freq[freq],
-                                              phase=0.0,
-                                              samplingrate=sampling_rate,
-                                              length=sweep_length)
-        ip_sine = ip_sine + sine_signal.GetSignal()
-
+    ip_sine = nlsp.generate_puretones(frequencies=ip_freq, sampling_rate=sampling_rate, length=sweep_length)
     op_sine = sumpf.modules.AmplifySignal(input=ip_sine,factor=amplification).GetOutput()
     h_model.SetInput(ip_sine)
     plot.log()

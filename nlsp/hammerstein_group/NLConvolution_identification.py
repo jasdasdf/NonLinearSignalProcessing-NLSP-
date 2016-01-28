@@ -1,7 +1,7 @@
 import sumpf
 import nlsp
 
-def nonlinearconvolution_identification_filter(input_sweep, output_sweep, prop):
+def nonlinearconvolution_powerseries_filter(input_sweep, output_sweep, prop):
     """
     Function to find the filter impulse response of the hammerstein group model using Nonlinear convolution method.
     It is used for nonlinear system identification.
@@ -27,8 +27,8 @@ def nonlinearconvolution_identification_filter(input_sweep, output_sweep, prop):
     sweep_start_freq = prop[0]
     sweep_stop_freq = prop[1]
     sweep_length = len(input_sweep)
-    branch = prop[3]
-    print "NL convolution type identification"
+    branch = prop[2]
+    print "NL convolution powerseries type identification"
     print "sweep_start:%f, stop:%f, length:%f, branch:%d" %(sweep_start_freq,sweep_stop_freq,sweep_length,branch)
 
     if isinstance(input_sweep ,(sumpf.Signal)):
@@ -76,7 +76,7 @@ def nonlinearconvolution_identification_filter(input_sweep, output_sweep, prop):
         Volterra_ir.append(ift)
     return Volterra_ir
 
-def nonlinearconvolution_identification_nlfunction(branches):
+def nonlinearconvolution_powerseries_nlfunction(branches):
     """
     This function returns the nonlinear function to the nonlinear blocks of the hammerstein group model.
     In nonlinear convolution method the nonlinear function is defined by power series expansion, Hence it returns
@@ -89,7 +89,7 @@ def nonlinearconvolution_identification_nlfunction(branches):
         nl_functions.append(nlsp.function_factory.power_series(i+1))
     return nl_functions
 
-def nonlinearconvolution_identification_debug(input_sweep, output_sweep):
+def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep):
     """
     Fuction for debugging purpose
     :param input_sweep: the input sweep signal which is given to the nonlinear system

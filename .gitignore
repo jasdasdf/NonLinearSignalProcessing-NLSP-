@@ -10,3 +10,13 @@ __pycache__
 # ignore C sources that have been created by Cython
 source/_sumpf/_modules/_models/_thielesmallparameters/auralization_nonlinear_cython.c
 
+# ignore temp file, used as rough file
+/temp.py
+
+# ignore pycache
+nlsp/tests/.cache/
+
+# ignore plot
+Common/common/plot.py
+
+

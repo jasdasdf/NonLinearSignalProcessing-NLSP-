@@ -1,0 +1,5 @@
+from .nlconvolution_powerseries import nonlinearconvolution_powerseries_nlfunction,nonlinearconvolution_powerseries_filter,nonlinearconvolution_powerseries_debug
+
+from .nlconvolution_chebyshev import nonlinearconvolution_chebyshev_nlfunction,nonlinearconvolution_chebyshev_filter
+
+

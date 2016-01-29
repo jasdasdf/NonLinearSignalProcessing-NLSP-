@@ -39,13 +39,14 @@ def findfilter_evaluation(filter_frequencies):
                                             resolution=ip_prp.GetResolution(),
                                             length=ip_prp.GetSpectrumLength()).GetSpectrum())
         filter_spec_tofind.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
-    nlsystem = nlsp.HammersteinGroupModel(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
+    nlsystem = nlsp.HammersteinGroupModel_up(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
                                               filter_irs=filter_spec_tofind,
                                               max_harmonics=range(1,branches+1))
     nlsystem.SetInput(input_sweep)
     found_filter_spec = nlsp.nonlinearconvolution_powerseries_filter(input_sweep,nlsystem.GetOutput(),[sweep_start_freq,
                                                                                                      sweep_stop_freq,
                                                                                                      branches])
+    print nlsp.mean_squared_error(found_filter_spec,filter_spec_tofind)
     for i,foundspec in enumerate(found_filter_spec):
         plot.log()
         plot.plot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),show=False)
@@ -78,14 +79,14 @@ def sweep_evaluation(filter_frequencies):
                                             resolution=ip_prp.GetResolution(),
                                             length=ip_prp.GetSpectrumLength()).GetSpectrum())
         filter_spec_tofind.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
-    nlsystem = nlsp.HammersteinGroupModel(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
+    nlsystem = nlsp.HammersteinGroupModel_up(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
                                               filter_irs=filter_spec_tofind,
                                               max_harmonics=range(1,branches+1))
     nlsystem.SetInput(input_sweep)
     found_filter_spec = nlsp.nonlinearconvolution_powerseries_filter(input_sweep,nlsystem.GetOutput(),[sweep_start_freq,
                                                                                                      sweep_stop_freq,
                                                                                                      branches])
-    hgm = nlsp.HammersteinGroupModel(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
+    hgm = nlsp.HammersteinGroupModel_up(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
                                               filter_irs=found_filter_spec,
                                               max_harmonics=range(1,branches+1))
     hgm.SetInput(input_sweep)
@@ -117,15 +118,15 @@ def puretone_op_evaluation(filter_frequencies, puretone_freq):
                                                 length=ip_prp.GetSpectrumLength()).GetSpectrum()
         op_s = sumpf.modules.InverseFourierTransform(op).GetSignal()
         filter_spec.append(op_s)
-    output_sweep = nlsp.HammersteinGroupModel(input_signal=input_sweep,
+    output_sweep = nlsp.HammersteinGroupModel_up(input_signal=input_sweep,
                                               nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
                                               filter_irs=filter_spec,
                                               max_harmonics=range(1,branches+1))
-    ref_output = nlsp.HammersteinGroupModel(input_signal=ip_sine,
+    ref_output = nlsp.HammersteinGroupModel_up(input_signal=ip_sine,
                                           nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(5),
                                           filter_irs=filter_spec,
                                           max_harmonics=range(1,branches+1))
-    model_op = nlsp.HammersteinGroupModel(input_signal=ip_sine,
+    model_op = nlsp.HammersteinGroupModel_up(input_signal=ip_sine,
                                 nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
                                 filter_irs=nlsp.nonlinearconvolution_powerseries_filter(input_sweep,
                                                                                       output_sweep.GetOutput(),
@@ -151,7 +152,7 @@ def puretone_hardclipping_evaluation(thresholds,puretone_freq):
     h = nlsp.nonlinearconvolution_powerseries_filter(input_sweep=input_sweep, output_sweep=output_sweep,
                                                    prop=[sweep_start_freq,sweep_stop_freq,branches])
     nl = nlsp.nonlinearconvolution_powerseries_nlfunction(branches)
-    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
+    h_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
     ip_sine = nlsp.generate_puretones(frequencies=ip_freq, sampling_rate=sampling_rate, length=sweep_length)
     op_sine = sumpf.modules.ClipSignal(signal=ip_sine,thresholds=threshold).GetOutput()
     h_model.SetInput(ip_sine)
@@ -176,7 +177,7 @@ def puretone_softclipping_evaluation(thresholds,puretone_freq,power):
     h = nlsp.nonlinearconvolution_powerseries_filter(input_sweep=input_sweep, output_sweep=output_sweep,
                                                    prop=[sweep_start_freq,sweep_stop_freq,branches])
     nl = nlsp.nonlinearconvolution_powerseries_nlfunction(branches)
-    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
+    h_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
     ip_sine = nlsp.generate_puretones(frequencies=ip_freq, sampling_rate=sampling_rate, length=sweep_length)
     op_sine = nlsp.NLClipSignal(signal=ip_sine,thresholds=threshold,power=clip_power).GetOutput()
     h_model.SetInput(ip_sine)
@@ -201,8 +202,8 @@ def linear_amplification_evaluation(amplification_factor,puretone_freq):
 
     h = nlsp.nonlinearconvolution_powerseries_filter(input_sweep=input_sweep,output_sweep=output_sweep,
                                                    prop=[sweep_start_freq,sweep_stop_freq,branches])
-    nl = nlsp.nonlinearconvolution_powerseries_nlfunction(branches)
-    h_model = nlsp.HammersteinGroupModel(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
+    nl = nlsp.HammersteinGroupModel_up(branches)
+    h_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
     ip_sine = nlsp.generate_puretones(frequencies=ip_freq, sampling_rate=sampling_rate, length=sweep_length)
     op_sine = sumpf.modules.AmplifySignal(input=ip_sine,factor=amplification).GetOutput()
     h_model.SetInput(ip_sine)
@@ -214,12 +215,12 @@ sampling_rate = 48000
 sweep_start_freq = 20.0
 sweep_stop_freq = 20000.0
 branches = 5
-sweep_length = 2**15
+sweep_length = 2**10
 
 findfilter_evaluation(filter_frequencies=(300,800,2000,8000,12000))
-sweep_evaluation(filter_frequencies=(300,800,2000,8000,12000))
-puretone_op_evaluation(filter_frequencies=(300,800,2000,8000,12000),puretone_freq=(500,1000))
-puretone_hardclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000))
-puretone_softclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000),power=1/float(3))
-linear_amplification_evaluation(amplification_factor=1.0,puretone_freq=(500,1000))
+# sweep_evaluation(filter_frequencies=(300,800,2000,8000,12000))
+# puretone_op_evaluation(filter_frequencies=(300,800,2000,8000,12000),puretone_freq=(500,1000))
+# puretone_hardclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000))
+# puretone_softclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000),power=1/float(3))
+# linear_amplification_evaluation(amplification_factor=1.0,puretone_freq=(500,1000))
 

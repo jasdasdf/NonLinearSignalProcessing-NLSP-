@@ -6,7 +6,7 @@ import common.plot as plot
 
 def test_puretone():
     """
-    Tests whether hammerstein group model produces relaiable result for pure sine tone.
+    Tests whether hammerstein group model produces reliable result for pure sine tone.
     The pure sine tone is given to hammerstein model of different maximum harmonic alias compensation and the output
     freq are found for each branch. Then the same pure sine tone is given to hammerstein group model and the output
     is observed. It should have the same frequencies which we get from individual hammerstein model.
@@ -21,14 +21,14 @@ def test_puretone():
                                           length=length).GetSignal()
     h = []
     for harm in max_harm:
-        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sine_signal,
+        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sine_signal,
                                                        nonlin_func=nlsp.function_factory.power_series(harm),
                                                        max_harm=harm)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
         h.append(common.find_frequencies(Test_Model_outputsignal))
     Test_model_freq = sorted(list(set([item for sublist in h for item in sublist])))
     imp = sumpf.modules.ImpulseGenerator(samplingrate=s_rate, length=length).GetSignal()
-    hammerstein_group = nlsp.HammersteinGroupModel(input_signal=ip_sine_signal,
+    hammerstein_group = nlsp.HammersteinGroupModel_lp(input_signal=ip_sine_signal,
                                                    nonlinear_functions=(nlsp.function_factory.power_series(max_harm[0]),
                                                    nlsp.function_factory.power_series(max_harm[1]),
                                                    nlsp.function_factory.power_series(max_harm[2]),
@@ -42,7 +42,7 @@ def test_puretone():
 def test_aliasing():
     """
     Tests whether aliasing is present in the hammerstein group model.
-    The pure sine tone is given to the model and the ouput frequencies found in all the branches are found. The energy
+    The pure sine tone is given to the model and the output frequencies found in all the branches are found. The energy
     of these frequencies in the output of the hammerstein group model is calculated. If there is no aliasing then this
     should be equal to the total energy of the output signal.
     """
@@ -56,14 +56,14 @@ def test_aliasing():
                                           length=length).GetSignal()
     h = []
     for harm in max_harm:
-        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sine_signal,
+        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sine_signal,
                                                        nonlin_func=nlsp.function_factory.power_series(harm),
                                                        max_harm=harm)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
         h.append(common.find_frequencies(Test_Model_outputsignal))
     Test_model_freq = sorted(list(set([item for sublist in h for item in sublist])))
     imp = sumpf.modules.ImpulseGenerator(samplingrate=s_rate, length=length).GetSignal()
-    hammerstein_group = nlsp.HammersteinGroupModel(input_signal=ip_sine_signal,
+    hammerstein_group = nlsp.HammersteinGroupModel_lp(input_signal=ip_sine_signal,
                                                    nonlinear_functions=(nlsp.function_factory.power_series(max_harm[0]),
                                                    nlsp.function_factory.power_series(max_harm[1]),
                                                    nlsp.function_factory.power_series(max_harm[2]),
@@ -74,7 +74,7 @@ def test_aliasing():
     Test_groupmodel_energy_freq = common.calculateenergy_atparticularfrequencies(hammerstein_group.GetOutput(),
                                                                             frequencies=Test_model_freq)
     Test_groupmodel_energy_all = common.calculateenergy(hammerstein_group.GetOutput())
-    assert numpy.sum(Test_groupmodel_energy_all) == numpy.sum(Test_groupmodel_energy_freq)
+    assert int(numpy.sum(Test_groupmodel_energy_all)) == int(numpy.sum(Test_groupmodel_energy_freq))
 
 def test_energy():
     """
@@ -93,13 +93,13 @@ def test_energy():
     imp = sumpf.modules.ImpulseGenerator(samplingrate=s_rate, length=length).GetSignal()
     e = []
     for harm in max_harm:
-        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sine_signal,
+        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sine_signal,
                                                        nonlin_func=nlsp.function_factory.power_series(harm),
                                                        filter_impulseresponse=imp,
                                                        max_harm=harm)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
         e.append(numpy.multiply(common.calculateenergy(Test_Model_outputsignal),2))
-    hammerstein_group = nlsp.HammersteinGroupModel(input_signal=ip_sine_signal,
+    hammerstein_group = nlsp.HammersteinGroupModel_lp(input_signal=ip_sine_signal,
                                                    nonlinear_functions=(nlsp.function_factory.power_series(max_harm[0]),
                                                                         )*len(max_harm),
                                                    filter_irs=(imp,)*len(max_harm),

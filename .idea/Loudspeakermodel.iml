@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/Common" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/SuMPF/source" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/nlsp/tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/nlsp/hammerstein_group_identification" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 2.7.10 (D:\WinPython-64bit-2.7.10.2\python-2.7.10.amd64\python.exe)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

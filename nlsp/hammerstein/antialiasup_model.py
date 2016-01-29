@@ -11,21 +11,16 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
     It uses sumpf modules to do the signal processing stuff.
     """
     def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1), max_harm=1,
-                 filter_impulseresponse=None, downsampling_position=None,
+                 filter_impulseresponse=None,
                  resampling_algorithm = sumpf.modules.ResampleSignal.SPECTRUM):
         """
         :param input_signal: the input signal instance to the Alias compensated Hammerstein model
         :param nonlin_func: the nonlinear function for the nonlinear block
         :param filter_impulseresponse: the impulse response of the linear filter block
-        :param downsampling_position: the downsampling position, It is a integer value which may be 1,2,3 for
-                                      downsampling after nonlinear signal block, after the linear filter block,
-                                      after the summation of the hammerstein model signals respectively.
-                                      If this parameter is not given then the downsampling is done at the end
         :param resampling_algorithm: the algorithm which can be used to downsample and upsample the signal
         :return:
         """
         # interpret the input parameters
-        self._downsampling_position = downsampling_position
         self._resampling_algorithm = resampling_algorithm
 
         # create the signal processing objects
@@ -40,7 +35,7 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
 
         # call the base classes constructor (which also calls _Connect)
         super(AliasCompensatingHammersteinModelUpandDown, self).__init__(input_signal=input_signal,
-                                                                         nonlin_func=None, max_harm=None,
+                                                                         nonlin_func=None,
                                                                          filter_impulseresponse=filter_impulseresponse)
         self.GetOutput = self._downoutput.GetOutput
         self.GetNLOutput = self._nonlin_function.GetOutput

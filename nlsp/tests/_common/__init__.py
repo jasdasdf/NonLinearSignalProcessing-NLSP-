@@ -7,4 +7,4 @@ from .predict_harmonics import predictharmonics_usingupsampling
 
 from .find_frequencies import find_frequencies
 
-from .mse import mean_squared_error
+from .mse import mean_squared_error,squared_error

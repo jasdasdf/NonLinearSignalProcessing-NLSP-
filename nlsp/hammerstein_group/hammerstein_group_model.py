@@ -3,8 +3,6 @@ import nlsp
 
 import functools
 
-hgm = HammersteinGroupModel(branch_class=functools.partial(nlsp.HammersteinGroupModel_lp, attenuation=1000))
-
 class HammersteinGroupModel(object):
     """
     A class to generate the output of hammerstein group model with given nonlinear functions, filter impulse responses
@@ -41,7 +39,7 @@ class HammersteinGroupModel(object):
         self.__sums = [None] * self.__branches
 
         for nl,ir in zip(self.__nlfunctions,self.__filter_irs):
-            h = self.__branch_class(input_signal=self.inputstage.GetOutput(), nonlin_func=nl,
+            h = nlsp.HammersteinModel(input_signal=self.inputstage.GetOutput(), nonlin_func=nl,
                                       filter_impulseresponse=ir)
             self.hmodels.append(h)
 

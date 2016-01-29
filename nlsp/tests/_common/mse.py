@@ -3,30 +3,25 @@ import numpy
 
 def mean_squared_error(observed_signalorspectrum,identified_signalorspectrum):
     """
-    Calculates the average of squares of the errors in identification.
-    In the case of length conflict zeros are appended.
-    :param observed_signal: the array of observed signal or spectrum from the nonlinear system
-    :param identified_signal: the array of identified signal or spectrum from the system identification method
-    :return: the array of mean squared error of given signal or spectrum
+    Calculates the mean of squares of error of two signals.
+    This function calculates the mean square error in time domain. If the input is spectrum then it transforms it to
+    time domain. And in the case of length conflict zeros are appended.
+    :param observed_signal: the array of observed signal or spectrum
+    :param identified_signal: the array of identified signal or spectrum
+    :return: the array of mean squared error of given signals or spectrums
     """
     mse = []
     for observed,identified in zip(observed_signalorspectrum,identified_signalorspectrum):
         if isinstance(observed,(sumpf.Signal,sumpf.Spectrum)) and isinstance(observed,(sumpf.Signal,sumpf.Spectrum)):
-            if type(observed) != type(identified):
-                if isinstance(observed,sumpf.Spectrum):
-                    observed = sumpf.modules.InverseFourierTransform(observed).GetSignal()
-                else:
-                    identified = sumpf.modules.InverseFourierTransform(identified).GetSignal()
-            if isinstance(observed,sumpf.Signal):
+            if isinstance(observed,sumpf.Spectrum):
+                observed = sumpf.modules.InverseFourierTransform(observed).GetSignal()
+            if isinstance(identified,sumpf.Spectrum):
+                identified = sumpf.modules.InverseFourierTransform(identified).GetSignal()
+            if len(observed) != len(identified):
                 merged_signal = sumpf.modules.MergeSignals(signals=[observed,identified],
                                                    on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS).GetOutput()
                 observed = sumpf.modules.SplitSignal(data=merged_signal,channels=[0]).GetOutput()
                 identified = sumpf.modules.SplitSignal(data=merged_signal,channels=[1]).GetOutput()
-            else:
-                merged_spectrum = sumpf.modules.MergeSpectrums(spectrums=[observed,identified],
-                                                   on_length_conflict=sumpf.modules.MergeSpectrums.FILL_WITH_ZEROS).GetOutput()
-                observed = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[0]).GetOutput()
-                identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
             signal = observed - identified
             mse.append(numpy.mean(numpy.square(signal.GetChannels())**2))
         else:

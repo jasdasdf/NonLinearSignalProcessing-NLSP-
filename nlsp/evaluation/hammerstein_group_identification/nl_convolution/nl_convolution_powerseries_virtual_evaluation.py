@@ -46,7 +46,6 @@ def findfilter_evaluation(filter_frequencies):
     found_filter_spec = nlsp.nonlinearconvolution_powerseries_filter(input_sweep,nlsystem.GetOutput(),[sweep_start_freq,
                                                                                                      sweep_stop_freq,
                                                                                                      branches])
-    print nlsp.mean_squared_error(found_filter_spec,filter_spec_tofind)
     for i,foundspec in enumerate(found_filter_spec):
         plot.log()
         plot.plot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),show=False)
@@ -215,12 +214,12 @@ sampling_rate = 48000
 sweep_start_freq = 20.0
 sweep_stop_freq = 20000.0
 branches = 5
-sweep_length = 2**10
+sweep_length = 2**15
 
 findfilter_evaluation(filter_frequencies=(300,800,2000,8000,12000))
-# sweep_evaluation(filter_frequencies=(300,800,2000,8000,12000))
-# puretone_op_evaluation(filter_frequencies=(300,800,2000,8000,12000),puretone_freq=(500,1000))
-# puretone_hardclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000))
-# puretone_softclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000),power=1/float(3))
-# linear_amplification_evaluation(amplification_factor=1.0,puretone_freq=(500,1000))
+sweep_evaluation(filter_frequencies=(300,800,2000,8000,12000))
+puretone_op_evaluation(filter_frequencies=(300,800,2000,8000,12000),puretone_freq=(500,1000))
+puretone_hardclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000))
+puretone_softclipping_evaluation(thresholds=[-0.5,0.5],puretone_freq=(500,1000),power=1/float(3))
+linear_amplification_evaluation(amplification_factor=1.0,puretone_freq=(500,1000))
 

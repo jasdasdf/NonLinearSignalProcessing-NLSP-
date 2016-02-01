@@ -19,4 +19,4 @@ nlsp/tests/.cache/
 # ignore plot
 Common/common/plot.py
 
-
+/.idea/workspace.xml

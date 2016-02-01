@@ -50,19 +50,21 @@ def get_sweep_harmonics_spectrum(excitation, response, sweep_start_freq, sweep_s
     """
     impulse_response = get_impulse_response(excitation,response)
     linear = sumpf.modules.CutSignal(signal=impulse_response,start=0,stop=len(impulse_response)/2).GetOutput()
-    merger = sumpf.modules.MergeSpectrums(on_length_conflict=sumpf.modules.MergeSpectrums.FILL_WITH_ZEROS)
-    merger.AddInput(sumpf.modules.FourierTransform(linear).GetSpectrum())
+    merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+    merger.AddInput(linear)
     for i in range(2,max_harm+1):
         harmonics = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=impulse_response, harmonic_order=i,
                                                               sweep_start_frequency=sweep_start_freq,
                                                               sweep_stop_frequency=sweep_stop_freq,
-                                                              sweep_duration=len(excitation)).GetHarmonicImpulseResponse()
-        merger.AddInput(harmonics)
-    return merger.GetOutput()
+                                                              sweep_duration=len(excitation)/excitation.GetSamplingRate()).GetHarmonicImpulseResponse()
+        merger.AddInput(sumpf.Signal(channels=harmonics.GetChannels(),
+                                        samplingrate=excitation.GetSamplingRate(), labels=harmonics.GetLabels()))
+    harmonics_spec = sumpf.modules.FourierTransform(merger.GetOutput()).GetSpectrum()
+    return harmonics_spec
 
 def get_sweep_harmonics_ir(excitation, response, sweep_start_freq, sweep_stop_freq, max_harm):
     """
-    Calculate the harmonics of the sweep based on farina method
+    Calculate the harmonics of the sweep based on nonconvolution
     :param excitation: the excitation sweep of the system
     :param response: the response of the system
     :param sweep_start_freq: start frequency of the sweep signal
@@ -75,8 +77,8 @@ def get_sweep_harmonics_ir(excitation, response, sweep_start_freq, sweep_stop_fr
     merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     merger.AddInput(linear)
     for i in range(2,max_harm+1):
-        harmonics = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=impulse_response,harmonic_order=i,sweep_start_frequency=20.0,
-                                                  sweep_stop_frequency=20000.0,sweep_duration=len(excitation)).GetHarmonicImpulseResponse()
+        harmonics = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=impulse_response,harmonic_order=i,sweep_start_frequency=sweep_start_freq,
+                                                  sweep_stop_frequency=sweep_stop_freq,sweep_duration=len(excitation)).GetHarmonicImpulseResponse()
         merger.AddInput(harmonics)
     return merger.GetOutput()
 
@@ -87,7 +89,7 @@ def log_bpfilter(start_freq,stop_freq,branches,input):
     :param stop_freq: the stop frequency of the bandpass filter
     :param branches: the number of branches of bandpass filter
     :param input: the input signal to get the filter parameters
-    :return:
+    :return: a tuple of filter spectrums, and the list of frequencies
     """
     ip_prp = sumpf.modules.ChannelDataProperties()
     ip_prp.SetSignal(input)

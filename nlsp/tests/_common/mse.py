@@ -1,7 +1,9 @@
+import math
 import sumpf
 import numpy
+import nlsp
 
-def mean_squared_error(observed_signalorspectrum,identified_signalorspectrum):
+def mean_squared_error(observed_signalorspectrum, identified_signalorspectrum):
     """
     Calculates the mean of squares of error of two signals.
     This function calculates the mean square error in time domain. If the input is spectrum then it transforms it to
@@ -28,7 +30,7 @@ def mean_squared_error(observed_signalorspectrum,identified_signalorspectrum):
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
     return mse
 
-def squared_error(observed_signalorspectrum,identified_signalorspectrum):
+def squared_error(observed_signalorspectrum, identified_signalorspectrum):
     """
     Calculates the squares of error of two signals.
     This function calculates the squares of error in time domain. If the input is spectrum then it transforms it to
@@ -54,3 +56,24 @@ def squared_error(observed_signalorspectrum,identified_signalorspectrum):
         else:
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
     return signal
+
+def get_snr(input_signalorspectrum, output_signalorspectrum):
+    """
+    Calculates the Signal to Noise Ratio of the input and output signals of the model
+    :param input_signalorspectrum:
+    :param output_signalorspectrum:
+    :return:
+    """
+    if isinstance(input_signalorspectrum,sumpf.Spectrum):
+        input = sumpf.modules.InverseFourierTransform(input_signalorspectrum).GetSignal()
+    else:
+        input = input_signalorspectrum
+    if isinstance(output_signalorspectrum,sumpf.Spectrum):
+        output = sumpf.modules.InverseFourierTransform(output_signalorspectrum).GetSignal()
+    else:
+        output = output_signalorspectrum
+    noise =  input - output
+    noise_energy = nlsp.calculateenergy(noise)
+    input_energy =  nlsp.calculateenergy(input)
+    snr = 10*math.log10(input_energy[0]/noise_energy[0])
+    return snr

@@ -92,6 +92,9 @@ def sweep_evaluation(filter_frequencies):
     plot.log()
     plot.plot(sumpf.modules.FourierTransform(hgm.GetOutput()).GetSpectrum(), show=False)
     plot.plot(sumpf.modules.FourierTransform(nlsystem.GetOutput()).GetSpectrum(), show=True)
+    print "Signal to noise ratio of ip: %r and op: %r of chebyshev nl convolution method" \
+          %(nlsp.get_snr(input_sweep,nlsystem.GetOutput()),
+            nlsp.get_snr(input_sweep,hgm.GetOutput()))
 
 def puretone_op_evaluation(filter_frequencies, puretone_freq):
     """
@@ -214,7 +217,7 @@ sampling_rate = 48000
 sweep_start_freq = 20.0
 sweep_stop_freq = 20000.0
 branches = 5
-sweep_length = 2**10
+sweep_length = 2**15
 
 findfilter_evaluation(filter_frequencies=(300,800,2000,8000,12000))
 sweep_evaluation(filter_frequencies=(300,800,2000,8000,12000))

@@ -92,6 +92,9 @@ def sweep_evaluation(filter_frequencies):
     plot.log()
     plot.plot(sumpf.modules.FourierTransform(hgm.GetOutput()).GetSpectrum(), show=False)
     plot.plot(sumpf.modules.FourierTransform(nlsystem.GetOutput()).GetSpectrum(), show=True)
+    print "Signal to noise ratio of ip: %r and op: %r of powerseries nl convolution method" \
+          %(nlsp.get_snr(input_sweep,nlsystem.GetOutput()),
+            nlsp.get_snr(input_sweep,hgm.GetOutput()))
 
 def puretone_op_evaluation(filter_frequencies, puretone_freq):
     """
@@ -201,7 +204,7 @@ def linear_amplification_evaluation(amplification_factor,puretone_freq):
 
     h = nlsp.nonlinearconvolution_powerseries_filter(input_sweep=input_sweep,output_sweep=output_sweep,
                                                    prop=[sweep_start_freq,sweep_stop_freq,branches])
-    nl = nlsp.HammersteinGroupModel_up(branches)
+    nl = nlsp.nonlinearconvolution_powerseries_nlfunction(branches)
     h_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl, filter_irs=h, max_harmonics=range(1,branches+1))
     ip_sine = nlsp.generate_puretones(frequencies=ip_freq, sampling_rate=sampling_rate, length=sweep_length)
     op_sine = sumpf.modules.AmplifySignal(input=ip_sine,factor=amplification).GetOutput()

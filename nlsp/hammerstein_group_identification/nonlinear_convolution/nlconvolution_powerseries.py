@@ -89,17 +89,21 @@ def nonlinearconvolution_powerseries_nlfunction(branches):
         nl_functions.append(nlsp.function_factory.power_series(i+1))
     return nl_functions
 
-def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep):
+def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, prop):
     """
     Fuction for debugging purpose
     :param input_sweep: the input sweep signal which is given to the nonlinear system
     :param output_sweep: the output signal which is observed from the nonlinear system
     :return: the impulse response of the filters of hammerstein group model
     """
-    sweep_start_freq = 20.0
-    sweep_stop_freq = 20000.0
-    sweep_length = 2**15
-    branch = 5
+    if prop is None:
+        prop = [20.0, 20000.0, 5]
+    sweep_start_freq = prop[0]
+    sweep_stop_freq = prop[1]
+    sweep_length = len(input_sweep)
+    branch = prop[2]
+    print "NL convolution powerseries type identification"
+    print "sweep_start:%f, stop:%f, length:%f, branch:%d" %(sweep_start_freq,sweep_stop_freq,sweep_length,branch)
 
     if isinstance(input_sweep ,(sumpf.Signal)):
         ip_signal = input_sweep
@@ -115,7 +119,7 @@ def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep):
                                                              stop_frequency=sweep_stop_freq).GetOutput()
     tf_sweep = sumpf.modules.MultiplySpectrums(spectrum1=inversed_ip, spectrum2=op_spectrum).GetOutput()
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
-    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=2**8).GetOutput()
+    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=sweep_length/10).GetOutput()
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
 

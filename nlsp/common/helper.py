@@ -1,3 +1,4 @@
+import math
 import sumpf
 import nlsp
 
@@ -115,3 +116,16 @@ def log_bpfilter(start_freq,stop_freq,branches,input):
                                             length=ip_prp.GetSpectrumLength()).GetSpectrum())
         filter_spec.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
     return filter_spec
+
+def append_zeros(signal, length=None):
+    """
+    Appends zeros until the signal has the given length. If no length is given,
+    zeros will be appended until the length is a power of 2.
+    """
+    if length is None:
+        length = 2 ** int(math.ceil(math.log(len(signal), 2)))
+    zeros = length - len(signal)
+    result = sumpf.Signal(channels=tuple([c + (0.0,) * zeros for c in signal.GetChannels()]),
+                          samplingrate=signal.GetSamplingRate(),
+                          labels=signal.GetLabels())
+    return result

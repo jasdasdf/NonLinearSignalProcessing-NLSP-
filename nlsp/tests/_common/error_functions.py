@@ -4,7 +4,7 @@ import numpy
 import nlsp
 import common.plot as plot
 
-def mean_squared_error(observed_signalorspectrum, identified_signalorspectrum):
+def mean_squared_error(input_signalorspectrum, output_signalorspectrum):
     """
     Calculates the mean of squares of error of two signals.
     This function calculates the mean square error in time domain. If the input is spectrum then it transforms it to
@@ -13,16 +13,16 @@ def mean_squared_error(observed_signalorspectrum, identified_signalorspectrum):
     :param identified_signal: the array of identified signal or spectrum
     :return: the array of mean squared error of given signals or spectrums
     """
-    if isinstance(observed_signalorspectrum, list) != True:
+    if isinstance(input_signalorspectrum, list) != True:
         observed_l = []
-        observed_l.append(observed_signalorspectrum)
+        observed_l.append(input_signalorspectrum)
     else:
-        observed_l = observed_signalorspectrum
-    if isinstance(identified_signalorspectrum, list) != True:
+        observed_l = input_signalorspectrum
+    if isinstance(output_signalorspectrum, list) != True:
         identified_l = []
-        identified_l.append(identified_signalorspectrum)
+        identified_l.append(output_signalorspectrum)
     else:
-        identified_l = identified_signalorspectrum
+        identified_l = output_signalorspectrum
     mse = []
     for observed,identified in zip(observed_l,identified_l):
         if isinstance(observed,(sumpf.Signal,sumpf.Spectrum)) and isinstance(observed,(sumpf.Signal,sumpf.Spectrum)):
@@ -41,7 +41,7 @@ def mean_squared_error(observed_signalorspectrum, identified_signalorspectrum):
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
     return mse
 
-def squared_error(observed_signalorspectrum, identified_signalorspectrum):
+def squared_error(input_signalorspectrum, output_signalorspectrum):
     """
     Calculates the squares of error of two signals.
     This function calculates the squares of error in time domain. If the input is spectrum then it transforms it to
@@ -51,7 +51,7 @@ def squared_error(observed_signalorspectrum, identified_signalorspectrum):
     :return: the squared error signal
     """
     signal = []
-    for observed,identified in zip(observed_signalorspectrum,identified_signalorspectrum):
+    for observed,identified in zip(input_signalorspectrum,output_signalorspectrum):
         if isinstance(observed,(sumpf.Signal,sumpf.Spectrum)) and isinstance(observed,(sumpf.Signal,sumpf.Spectrum)):
             if isinstance(observed,sumpf.Spectrum):
                 observed = sumpf.modules.InverseFourierTransform(observed).GetSignal()
@@ -109,3 +109,25 @@ def signal_to_noise_ratio_range(input_signalorspectrum, output_signalorspectrum,
     output_spec_m = nlsp.cut_spectrum(output_spec,freq_range)
     snr = nlsp.signal_to_noise_ratio(input_spec_m,output_spec_m)
     return snr
+
+def mean_squared_error_range(input_signalorspectrum, output_signalorspectrum, freq_range):
+    """
+    Calculates the mean of squares of error of two signals.
+    This function calculates the mean square error in time domain. If the input is spectrum then it transforms it to
+    time domain. And in the case of length conflict zeros are appended.
+    :param observed_signal: the array of observed signal or spectrum
+    :param identified_signal: the array of identified signal or spectrum
+    :return: the array of mean squared error of given signals or spectrums
+    """
+    if isinstance(input_signalorspectrum, sumpf.Signal):
+        input_spec = sumpf.modules.FourierTransform(signal=input_signalorspectrum).GetSpectrum()
+    else:
+        input_spec = input_signalorspectrum
+    if isinstance(output_signalorspectrum, sumpf.Signal):
+        output_spec = sumpf.modules.FourierTransform(signal=output_signalorspectrum).GetSpectrum()
+    else:
+        output_spec = output_signalorspectrum
+    input_spec_m = nlsp.cut_spectrum(input_spec,freq_range)
+    output_spec_m = nlsp.cut_spectrum(output_spec,freq_range)
+    mse = nlsp.mean_squared_error(input_spec_m,output_spec_m)
+    return mse

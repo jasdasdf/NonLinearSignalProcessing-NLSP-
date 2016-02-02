@@ -2,6 +2,7 @@ import math
 import sumpf
 import numpy
 import nlsp
+import common.plot as plot
 
 def mean_squared_error(observed_signalorspectrum, identified_signalorspectrum):
     """
@@ -67,12 +68,12 @@ def squared_error(observed_signalorspectrum, identified_signalorspectrum):
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
     return signal
 
-def get_snr(input_signalorspectrum, output_signalorspectrum):
+def signal_to_noise_ratio(input_signalorspectrum, output_signalorspectrum):
     """
     Calculates the Signal to Noise Ratio of the input and output signals of the model
-    :param input_signalorspectrum:
-    :param output_signalorspectrum:
-    :return:
+    :param input_signalorspectrum: the input signal or spectrum
+    :param output_signalorspectrum: the output signal or spectrum
+    :return: the signal to noise ratio between the input and output
     """
     if isinstance(input_signalorspectrum,sumpf.Spectrum):
         input = sumpf.modules.InverseFourierTransform(input_signalorspectrum).GetSignal()
@@ -86,4 +87,25 @@ def get_snr(input_signalorspectrum, output_signalorspectrum):
     noise_energy = nlsp.calculateenergy(noise)
     input_energy =  nlsp.calculateenergy(input)
     snr = 10*math.log10(input_energy[0]/noise_energy[0])
+    return snr
+
+def signal_to_noise_ratio_range(input_signalorspectrum, output_signalorspectrum, freq_range):
+    """
+    Calculates the Signal to Noise ratio between the range of frequencies
+    :param input_signalorspectrum: the input signal or spectrum
+    :param output_signalorspectrum: the output signal or spectrum
+    :param freq_range: the range of frequencies over which the SNR has to be calculated
+    :return: the signal to noise ratio between the input and output
+    """
+    if isinstance(input_signalorspectrum, sumpf.Signal):
+        input_spec = sumpf.modules.FourierTransform(signal=input_signalorspectrum).GetSpectrum()
+    else:
+        input_spec = input_signalorspectrum
+    if isinstance(output_signalorspectrum, sumpf.Signal):
+        output_spec = sumpf.modules.FourierTransform(signal=output_signalorspectrum).GetSpectrum()
+    else:
+        output_spec = output_signalorspectrum
+    input_spec_m = nlsp.cut_spectrum(input_spec,freq_range)
+    output_spec_m = nlsp.cut_spectrum(output_spec,freq_range)
+    snr = nlsp.signal_to_noise_ratio(input_spec_m,output_spec_m)
     return snr

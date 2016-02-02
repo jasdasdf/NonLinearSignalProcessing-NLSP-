@@ -12,8 +12,18 @@ def mean_squared_error(observed_signalorspectrum, identified_signalorspectrum):
     :param identified_signal: the array of identified signal or spectrum
     :return: the array of mean squared error of given signals or spectrums
     """
+    if isinstance(observed_signalorspectrum, list) != True:
+        observed_l = []
+        observed_l.append(observed_signalorspectrum)
+    else:
+        observed_l = observed_signalorspectrum
+    if isinstance(identified_signalorspectrum, list) != True:
+        identified_l = []
+        identified_l.append(identified_signalorspectrum)
+    else:
+        identified_l = identified_signalorspectrum
     mse = []
-    for observed,identified in zip(observed_signalorspectrum,identified_signalorspectrum):
+    for observed,identified in zip(observed_l,identified_l):
         if isinstance(observed,(sumpf.Signal,sumpf.Spectrum)) and isinstance(observed,(sumpf.Signal,sumpf.Spectrum)):
             if isinstance(observed,sumpf.Spectrum):
                 observed = sumpf.modules.InverseFourierTransform(observed).GetSignal()

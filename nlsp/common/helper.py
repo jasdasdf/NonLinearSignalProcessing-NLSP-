@@ -114,4 +114,4 @@ def log_bpfilter(start_freq,stop_freq,branches,input):
                                             resolution=ip_prp.GetResolution(),
                                             length=ip_prp.GetSpectrumLength()).GetSpectrum())
         filter_spec.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
-    return filter_spec, frequencies
+    return filter_spec

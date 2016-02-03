@@ -63,7 +63,7 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
 
 
 
-    @sumpf.Input(collections.Callable, ("_GetMaximumHarmonic", "_GetSamplingRate"))
+    @sumpf.Input(collections.Callable, ("_GetMaximumHarmonic", "_GetSamplingRate", "_Getattenuation"))
     def SetMaximumHarmonic(self, max_harmonic):
         self._max_harmonic = max_harmonic
         self._nonlin_function.SetMaximumHarmonic(max_harmonic)

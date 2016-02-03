@@ -1,6 +1,5 @@
 import math
 import sumpf
-import numpy
 import nlsp
 
 def signal_to_noise_ratio_time(input_signalorspectrum, output_signalorspectrum):
@@ -36,7 +35,7 @@ def signal_to_noise_ratio_time(input_signalorspectrum, output_signalorspectrum):
                 identified = sumpf.modules.SplitSignal(data=merged_signal,channels=[1]).GetOutput()
             noise = observed - identified
             noise_energy = nlsp.calculateenergy_time(noise)
-            input_energy =  nlsp.calculateenergy_time(input)
+            input_energy =  nlsp.calculateenergy_time(observed)
             snr.append(10*math.log10(input_energy[0]/noise_energy[0]))
         else:
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
@@ -110,7 +109,7 @@ def signal_to_noise_ratio_freq(input_signalorspectrum, output_signalorspectrum):
                 identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
             noise = observed - identified
             noise_energy = nlsp.calculateenergy_time(noise)
-            input_energy =  nlsp.calculateenergy_time(input)
+            input_energy =  nlsp.calculateenergy_time(observed)
             snr.append(10*math.log10(input_energy[0]/noise_energy[0]))
         else:
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"

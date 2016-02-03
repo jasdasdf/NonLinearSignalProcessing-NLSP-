@@ -106,7 +106,7 @@ def mean_squared_error_freq(input_signalorspectrum, output_signalorspectrum):
                 observed = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[0]).GetOutput()
                 identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
             error = observed - identified
-            mse.append(numpy.mean(numpy.square(error.GetChannels())**2))
+            mse.append(numpy.mean(abs((numpy.square(error.GetChannels())))))
         else:
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
     return mse

@@ -1,5 +1,6 @@
 
-from .calculate_energy import calculateenergy_freq,calculateenergy_time,calculateenergy_atparticularfrequencies
+from .calculate_energy import calculateenergy_freq,calculateenergy_time,calculateenergy_atparticularfrequencies,\
+    calculateenergy_betweenfreq_freq,calculateenergy_betweenfreq_time
 
 from .predict_aliasing import predictoutputfreq_usingsamplingtheory
 

@@ -41,7 +41,7 @@ def calculateenergy_freq(input):
     return energy_allchannels
 
 
-def calculateenergy_atparticularfrequencies_freq(input,frequencies):
+def calculateenergy_atparticularfrequencies(input,frequencies):
     """
     Calculates the energy of input signal at certain frequencies in freq domain
     :param input: the input signal or spectrum whose energy has to be calculated

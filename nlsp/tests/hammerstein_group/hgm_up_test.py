@@ -73,7 +73,7 @@ def test_aliasing():
                                                    max_harmonics=max_harm)
     Test_groupmodel_energy_freq = common.calculateenergy_atparticularfrequencies(hammerstein_group.GetOutput(),
                                                                             frequencies=Test_model_freq)
-    Test_groupmodel_energy_all = common.calculateenergy(hammerstein_group.GetOutput())
+    Test_groupmodel_energy_all = common.calculateenergy_freq(hammerstein_group.GetOutput())
     assert numpy.sum(Test_groupmodel_energy_all) == numpy.sum(Test_groupmodel_energy_freq)
 
 def test_energy():
@@ -98,11 +98,11 @@ def test_energy():
                                                        filter_impulseresponse=imp,
                                                        max_harm=harm)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
-        e.append(numpy.multiply(common.calculateenergy(Test_Model_outputsignal),2))
+        e.append(numpy.multiply(common.calculateenergy_freq(Test_Model_outputsignal),2))
     hammerstein_group = nlsp.HammersteinGroupModel_up(input_signal=ip_sine_signal,
                                                    nonlinear_functions=(nlsp.function_factory.power_series(max_harm[0]),
                                                                         )*len(max_harm),
                                                    filter_irs=(imp,)*len(max_harm),
                                                    max_harmonics=max_harm)
-    e_g = common.calculateenergy(hammerstein_group.GetOutput())
+    e_g = common.calculateenergy_freq(hammerstein_group.GetOutput())
     assert float(numpy.sum(e_g)) <= float(numpy.sum(e))

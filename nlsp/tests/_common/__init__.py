@@ -1,5 +1,5 @@
 
-from .calculate_energy import calculateenergy,calculateenergy_atparticularfrequencies
+from .calculate_energy import calculateenergy_freq,calculateenergy_time,calculateenergy_atparticularfrequencies_freq
 
 from .predict_aliasing import predictoutputfreq_usingsamplingtheory
 
@@ -7,4 +7,6 @@ from .predict_harmonics import predictharmonics_usingupsampling
 
 from .find_frequencies import find_frequencies
 
-from .error_functions import mean_squared_error, squared_error, signal_to_noise_ratio, signal_to_noise_ratio_range, mean_squared_error_range
+from .error_functions import mean_squared_error, signal_to_noise_ratio, signal_to_noise_ratio_range, mean_squared_error_range
+
+from .error_functions import mean_squared_error_freq

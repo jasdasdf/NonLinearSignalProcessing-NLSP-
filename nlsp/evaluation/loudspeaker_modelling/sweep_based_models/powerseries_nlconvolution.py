@@ -26,7 +26,7 @@ def loudspeakerevaluation():
     kernel = nlsp.nonlinearconvolution_powerseries_debug(excitation,response,[20.0,20000.0,branches])
 
     # use identified kernel in nl convolution hammerstein model
-    model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
+    model = nlsp.HammersteinGroupModel_lp(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
                                        filter_irs=kernel,max_harmonics=range(1,branches+1))
 
     # model = nlsp.HammersteinGroupModel_lp(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),

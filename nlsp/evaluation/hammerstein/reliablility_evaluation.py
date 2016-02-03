@@ -25,8 +25,7 @@ def reliabilityofaliasing(sweep_samplingrate, sweep_length):
     LPHModel = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal.GetSignal(),
                                                              nonlin_func=nlsp.function_factory.power_series(1),
                                                              max_harm=1,
-                                                             filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
-                                                             filterorder=100)
+                                                             filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100))
     DOWNHModel = nlsp.AliasCompensatingHammersteinModelDownandUp(input_signal=ip_sweep_signal.GetSignal(),
                                                                  nonlin_func=nlsp.function_factory.power_series(1),
                                                                  max_harm=1)

@@ -10,37 +10,29 @@ def sweep_evaluation_power():
     the SNR and MSE between the expected and identified output is evaluated
     """
     # virtual nonlinear systems for evaluation
-    nlsystem_up = nlsp.HammersteinGroupModel_up(nonlinear_functions=nonlinear_functions_power,
-                                              filter_irs=filter_spec_tofind,
-                                              max_harmonics=max_harmonics)
-    nlsystem_lp = nlsp.HammersteinGroupModel_lp(nonlinear_functions=nonlinear_functions_power,
+    # nlsystem = nlsp.HammersteinGroupModel_up(nonlinear_functions=nonlinear_functions_power,
+    #                                           filter_irs=filter_spec_tofind,
+    #                                           max_harmonics=max_harmonics)
+    nlsystem = nlsp.HammersteinGroupModel_lp(nonlinear_functions=nonlinear_functions_power,
                                               filter_irs=filter_spec_tofind,
                                               max_harmonics=max_harmonics,
                                               filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
                                               attenuation=0.01)
-    nlsystem = nlsp.HammersteinGroupModel(nonlinear_functions=nonlinear_functions_power,
-                                              filter_irs=filter_spec_tofind)
+    # nlsystem = nlsp.HammersteinGroupModel(nonlinear_functions=nonlinear_functions_power,
+    #                                           filter_irs=filter_spec_tofind)
     nlsystem.SetInput(input_sweep)
-    nlsystem_up.SetInput(input_sweep)
-    nlsystem_lp.SetInput(input_sweep)
 
     # system identification of the nonlinear system
-    found_filter_spec_up = nlsp.nonlinearconvolution_powerseries_filter(input_sweep,nlsystem.GetOutput(),[sweep_start_freq,
-                                                                                                     sweep_stop_freq,
-                                                                                                     branches])
-    found_filter_spec_lp = nlsp.nonlinearconvolution_powerseries_filter(input_sweep,nlsystem.GetOutput(),[sweep_start_freq,
-                                                                                                     sweep_stop_freq,
-                                                                                                     branches])
     found_filter_spec = nlsp.nonlinearconvolution_powerseries_filter(input_sweep,nlsystem.GetOutput(),[sweep_start_freq,
                                                                                                      sweep_stop_freq,
                                                                                                      branches])
 
     # construct hammerstein group model from identified parameters
     hgm_up = nlsp.HammersteinGroupModel_up(nonlinear_functions=nonlinear_functions_power,
-                                              filter_irs=found_filter_spec_up,
+                                              filter_irs=found_filter_spec,
                                               max_harmonics=max_harmonics)
     hgm_lp = nlsp.HammersteinGroupModel_lp(nonlinear_functions=nonlinear_functions_power,
-                                              filter_irs=found_filter_spec_lp,
+                                              filter_irs=found_filter_spec,
                                               max_harmonics=max_harmonics,
                                               filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
                                               attenuation=0.01)
@@ -60,21 +52,21 @@ def sweep_evaluation_power():
             nlsp.mean_squared_error_range(input_sweep,hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
             nlsp.mean_squared_error_range(nlsystem.GetOutput(),hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
     print "SNR of nl model: %r and identified system: %r and btw nl and iden system,upsample: %r" \
-          %(nlsp.signal_to_noise_ratio_range(input_sweep,nlsystem_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+          %(nlsp.signal_to_noise_ratio_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
             nlsp.signal_to_noise_ratio_range(input_sweep,hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.signal_to_noise_ratio_range(nlsystem_up.GetOutput(),hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+            nlsp.signal_to_noise_ratio_range(nlsystem.GetOutput(),hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
     print "MSE of nl model: %r and identified system: %r and btw nl and iden system,upsample: %r" \
-          %(nlsp.mean_squared_error_range(input_sweep,nlsystem_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+          %(nlsp.mean_squared_error_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
             nlsp.mean_squared_error_range(input_sweep,hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.mean_squared_error_range(nlsystem_up.GetOutput(),hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+            nlsp.mean_squared_error_range(nlsystem.GetOutput(),hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
     print "SNR of nl model: %r and identified system: %r and btw nl and iden system,lowpass: %r" \
-          %(nlsp.signal_to_noise_ratio_range(input_sweep,nlsystem_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+          %(nlsp.signal_to_noise_ratio_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
             nlsp.signal_to_noise_ratio_range(input_sweep,hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.signal_to_noise_ratio_range(nlsystem_lp.GetOutput(),hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+            nlsp.signal_to_noise_ratio_range(nlsystem.GetOutput(),hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
     print "MSE of nl model: %r and identified system: %r and btw nl and iden system,lowpass: %r" \
-          %(nlsp.mean_squared_error_range(input_sweep,nlsystem_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+          %(nlsp.mean_squared_error_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
             nlsp.mean_squared_error_range(input_sweep,hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.mean_squared_error_range(nlsystem_lp.GetOutput(),hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+            nlsp.mean_squared_error_range(nlsystem.GetOutput(),hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
 
 
     # plot.log()
@@ -98,13 +90,13 @@ input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=swe
 
 # Nonlinear functions
 nonlinear_functions_power = nlsp.nonlinearconvolution_powerseries_nlfunction(branches)
-nonlinear_functions_chebyshev = nlsp.nonlinearconvolution_chebyshev_nlfunction(branches)
+#nonlinear_functions_chebyshev = nlsp.nonlinearconvolution_chebyshev_nlfunction(branches)
 #nonlinear_functions_power = [nlsp.function_factory.power_series(1),]*branches
 #nonlinear_functions_chebyshev = [nlsp.function_factory.chebyshev1_polynomial(1),]*branches
 
 # Filter Specifications
-#filter_spec_tofind = nlsp.log_bpfilter(sweep_start_freq,sweep_stop_freq,branches,input_sweep)
-filter_spec_tofind = [sumpf.modules.ImpulseGenerator(samplingrate=input_sweep.GetSamplingRate(),length=len(input_sweep)).GetSignal(),]*branches
+filter_spec_tofind = nlsp.log_bpfilter(sweep_start_freq,sweep_stop_freq,branches,input_sweep)
+# filter_spec_tofind = [sumpf.modules.ImpulseGenerator(samplingrate=input_sweep.GetSamplingRate(),length=len(input_sweep)).GetSignal(),]*branches
 
 # Max harmonics
 max_harmonics = [1,2,3,4,5]

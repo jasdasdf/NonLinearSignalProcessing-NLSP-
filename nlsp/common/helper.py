@@ -151,3 +151,35 @@ def cut_spectrum(inputspectrum,freq_range):
     input_spectrum = sumpf.Spectrum(channels=tuple(channels_ip), resolution=inputspectrum.GetResolution(),
                                   labels=inputspectrum.GetLabels())
     return input_spectrum
+
+def relabel(input,labels):
+    """
+    Helper function to change the label of Sumpf signals and spectrums
+    :param input: the tuple of signal or spectrum
+    :param labels: the string which replaces the label of signal or spectrum
+    :return: the relabelled signal or spectrum
+    """
+    if isinstance(input, list) != True:
+        ip = []
+        ip.append(input)
+    else:
+        ip = input
+    if isinstance(labels, list) != True:
+        label = []
+        label.append(labels)
+    else:
+        label = labels
+    outputs = []
+    for inputs,labels in zip(ip, label):
+        if isinstance(inputs, sumpf.Signal):
+            relabler = sumpf.modules.RelabelSignal(input=inputs,labels=(labels,)).GetOutput()
+        elif isinstance(inputs, sumpf.Spectrum):
+            relabler = sumpf.modules.RelabelSpectrum(input=inputs,labels=(labels,)).GetOutput()
+        else:
+            print "The given input is not of Signal or Spectrum class"
+        outputs.append(relabler)
+    if len(outputs) == 1:
+        outputs = outputs[0]
+    else:
+        outputs = outputs
+    return outputs

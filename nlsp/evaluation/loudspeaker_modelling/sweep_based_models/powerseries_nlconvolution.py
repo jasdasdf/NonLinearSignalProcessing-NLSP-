@@ -6,11 +6,11 @@ import _common as nlspcommon
 def loudspeakerevaluation():
 
     # load loudspeaker measurings
-    load = sumpf.modules.SignalFile(filename=common.get_filename("Visaton BF45", "Sweep18", 1),
+    load = sumpf.modules.SignalFile(filename=common.get_filename("Visaton BF45", "Sweep20", 1),
                                     format=sumpf.modules.SignalFile.WAV_FLOAT)
     excitation = sumpf.modules.SplitSignal(data=load.GetSignal(), channels=[0]).GetOutput()
     response = sumpf.modules.SplitSignal(data=load.GetSignal(), channels=[1]).GetOutput()
-    load_music = sumpf.modules.SignalFile(filename=common.get_filename("Visaton BF45", "Speech2", 1),
+    load_music = sumpf.modules.SignalFile(filename=common.get_filename("Visaton BF45", "Speech3", 1),
                                           format=sumpf.modules.SignalFile.WAV_FLOAT)
     music_excitation = sumpf.modules.SplitSignal(data=load_music.GetSignal(),channels=[0]).GetOutput()
     music_response = sumpf.modules.SplitSignal(data=load_music.GetSignal(),channels=[1]).GetOutput()

@@ -1,5 +1,6 @@
 import sumpf
 import nlsp
+import common.plot as plot
 
 def nonlinearconvolution_powerseries_filter(input_sweep, output_sweep, prop):
     """
@@ -45,7 +46,7 @@ def nonlinearconvolution_powerseries_filter(input_sweep, output_sweep, prop):
                                                              stop_frequency=sweep_stop_freq).GetOutput()
     tf_sweep = sumpf.modules.MultiplySpectrums(spectrum1=inversed_ip, spectrum2=op_spectrum).GetOutput()
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
-    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=sweep_length/2).GetOutput()
+    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=300).GetOutput()
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
 
@@ -58,6 +59,7 @@ def nonlinearconvolution_powerseries_filter(input_sweep, output_sweep, prop):
                                                                ip_signal.GetSamplingRate()).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.GetLabels()))
+    plot.plot(ir_merger.GetOutput())
     tf_harmonics_all = sumpf.modules.FourierTransform(signal=ir_merger.GetOutput()).GetSpectrum()
     harmonics_tf = []
     for i in range(len(tf_harmonics_all.GetChannels())):
@@ -119,7 +121,7 @@ def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, prop):
                                                              stop_frequency=sweep_stop_freq).GetOutput()
     tf_sweep = sumpf.modules.MultiplySpectrums(spectrum1=inversed_ip, spectrum2=op_spectrum).GetOutput()
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
-    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=sweep_length/10).GetOutput()
+    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=300).GetOutput()
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
 

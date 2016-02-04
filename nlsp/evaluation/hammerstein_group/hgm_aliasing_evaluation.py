@@ -44,29 +44,29 @@ def sweep_evaluation_power():
 
     # print the mean square error value
     print "SNR of nl model: %r and identified system: %r and btw nl and iden system,simple: %r" \
-          %(nlsp.signal_to_noise_ratio_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.signal_to_noise_ratio_range(input_sweep,hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.signal_to_noise_ratio_range(nlsystem.GetOutput(),hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+          %(nlsp.signal_to_noise_ratio_freq_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(input_sweep,hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(nlsystem.GetOutput(),hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
     print "MSE of nl model: %r and identified system: %r and btw nl and iden system,simple: %r" \
-          %(nlsp.mean_squared_error_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.mean_squared_error_range(input_sweep,hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.mean_squared_error_range(nlsystem.GetOutput(),hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+          %(nlsp.signal_to_noise_ratio_freq_rangesignal_to_noise_ratio_freq_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(input_sweep,hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(nlsystem.GetOutput(),hgm.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
     print "SNR of nl model: %r and identified system: %r and btw nl and iden system,upsample: %r" \
-          %(nlsp.signal_to_noise_ratio_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.signal_to_noise_ratio_range(input_sweep,hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.signal_to_noise_ratio_range(nlsystem.GetOutput(),hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+          %(nlsp.signal_to_noise_ratio_freq_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(input_sweep,hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(nlsystem.GetOutput(),hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
     print "MSE of nl model: %r and identified system: %r and btw nl and iden system,upsample: %r" \
-          %(nlsp.mean_squared_error_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.mean_squared_error_range(input_sweep,hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.mean_squared_error_range(nlsystem.GetOutput(),hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+          %(nlsp.signal_to_noise_ratio_freq_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(input_sweep,hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(nlsystem.GetOutput(),hgm_up.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
     print "SNR of nl model: %r and identified system: %r and btw nl and iden system,lowpass: %r" \
-          %(nlsp.signal_to_noise_ratio_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.signal_to_noise_ratio_range(input_sweep,hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.signal_to_noise_ratio_range(nlsystem.GetOutput(),hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+          %(nlsp.signal_to_noise_ratio_freq_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(input_sweep,hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(nlsystem.GetOutput(),hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
     print "MSE of nl model: %r and identified system: %r and btw nl and iden system,lowpass: %r" \
-          %(nlsp.mean_squared_error_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.mean_squared_error_range(input_sweep,hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
-            nlsp.mean_squared_error_range(nlsystem.GetOutput(),hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
+          %(nlsp.signal_to_noise_ratio_freq_range(input_sweep,nlsystem.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(input_sweep,hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]),
+            nlsp.signal_to_noise_ratio_freq_range(nlsystem.GetOutput(),hgm_lp.GetOutput(),[sweep_start_freq+100,sweep_stop_freq-100]))
 
 
     # plot.log()

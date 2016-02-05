@@ -1,8 +1,9 @@
+import numpy
 import sumpf
 import nlsp
 import common.plot as plot
 
-class NLConvolution_Power(object):
+class NLConvolution(object):
 
     def __init__(self,input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0, branches=5):
         if input_sweep is None:
@@ -55,6 +56,8 @@ class NLConvolution_Power(object):
             tf_harmonics =  sumpf.modules.SplitSpectrum(data=self.__merge_tf, channels=[i]).GetOutput()
             self.__harmonics_ir.append(sumpf.modules.InverseFourierTransform(tf_harmonics).GetSignal())
             self.__harmonics_spec.append(tf_harmonics)
+
+    def GetPower_filter_1(self):
         Volterra_tf = []
         Volterra_tf.append(self.__harmonics_spec[0] + (3)*self.__harmonics_spec[2] +(5)*self.__harmonics_spec[4])
         Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=self.__harmonics_spec[1],factor=2j).GetOutput() +
@@ -65,7 +68,9 @@ class NLConvolution_Power(object):
         for kernel in Volterra_tf:
             ift = sumpf.modules.InverseFourierTransform(spectrum=kernel).GetSignal()
             self.__harmonic_kernel_1.append(ift)
+        return self.__harmonic_kernel_1
 
+    def GetPower_filter_2(self):
         Volterra_tf = []
         Volterra_tf.append(self.__harmonics_spec[0] + (3/4)*self.__harmonics_spec[2] +(5/8)*self.__harmonics_spec[4])
         Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=self.__harmonics_spec[1],factor=-1j/2).GetOutput() +
@@ -76,6 +81,33 @@ class NLConvolution_Power(object):
         for kernel in Volterra_tf:
             ift = sumpf.modules.InverseFourierTransform(spectrum=kernel).GetSignal()
             self.__harmonic_kernel_2.append(ift)
+        return self.__harmonic_kernel_2
 
-    def GetKernel(self):
-        return self.__harmonic_kernel_1
+    def GetPower_filter_auto(self):
+        spec = []
+        spec_c = []
+        for order in range(1,self.__branches+1):
+            def chebyshev(n):
+                if n == 0:
+                    return (1.0,)
+                elif n == 1:
+                    return (0.0, 1.0)
+                else:
+                    return tuple(numpy.subtract(numpy.multiply((0.0,) + chebyshev(n - 1), 2.0), chebyshev(n - 2) + (0.0, 0.0)))
+            print order,chebyshev(order)
+            weighted = []
+            for i, factor in enumerate(chebyshev(order)[1:]):
+                # print order,i,factor
+                if factor != 0.0:
+                    weighted.append(self.__harmonics_spec[i] * factor)
+            result = weighted[0]
+            for s in weighted[1:]:
+                result += s
+            spec.append(result)
+        for kernel in spec:
+            ift = sumpf.modules.InverseFourierTransform(spectrum=kernel).GetSignal()
+            spec_c.append(ift)
+        return spec_c
+
+    def GetCheby_filter(self):
+        return self.__harmonics_ir

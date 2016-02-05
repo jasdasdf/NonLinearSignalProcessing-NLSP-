@@ -2,4 +2,4 @@ from .nlconvolution_powerseries import nonlinearconvolution_powerseries_nlfuncti
 
 from .nlconvolution_chebyshev import nonlinearconvolution_chebyshev_nlfunction,nonlinearconvolution_chebyshev_filter
 
-
+from .nl_convolution import NLConvolution

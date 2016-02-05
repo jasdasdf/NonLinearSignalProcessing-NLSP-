@@ -1,7 +1,6 @@
 import sumpf
 import nlsp
 import common.plot as plot
-import _common as common
 
 def nonlinearconvolution_chebyshev_filter(input_sweep, output_sweep, prop):
     """

@@ -92,6 +92,8 @@ def simplevslpvsup_sweep_evaluation():
                                                    stop_frequency=sweep_stop_freq).GetSignal()
     up_sweep_signal = sumpf.modules.ResampleSignal(signal=ip_sweep_signal,
                                                    samplingrate=ip_sweep_signal.GetSamplingRate()*2).GetOutput()
+    branch = nlsp.HammersteinModel(input_signal=up_sweep_signal,
+                                   nonlin_func=nlsp.function_factory.power_series(1))
     branch_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=up_sweep_signal,
                                                              nonlin_func=nlsp.function_factory.power_series(1),
                                                              max_harm=1)
@@ -101,10 +103,12 @@ def simplevslpvsup_sweep_evaluation():
                                                              filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100))
     energy_full_lp = nlsp.calculateenergy_freq(branch_lp.GetOutput())
     energy_full_up = nlsp.calculateenergy_freq(branch_up.GetOutput())
+    energy_full = nlsp.calculateenergy_freq(branch.GetOutput())
     energy_limit_lp = nlsp.calculateenergy_betweenfreq_freq(branch_lp.GetOutput(),[sweep_stop_freq,sampling_rate])
     energy_limit_up = nlsp.calculateenergy_betweenfreq_freq(branch_up.GetOutput(),[sweep_stop_freq,sampling_rate])
-    print "Energy before compensation, full, lp:%r, up:%r" %(energy_full_lp,energy_full_up)
-    print "Energy before compensation, limit, lp:%r, up:%r" %(energy_limit_lp,energy_limit_up)
+    energy_limit = nlsp.calculateenergy_betweenfreq_freq(branch.GetOutput(),[sweep_stop_freq,sampling_rate])
+    print "Energy before compensation, full, lp:%r, up:%r, simple:%r" %(energy_full_lp,energy_full_up,energy_full)
+    print "Energy before compensation, limit, lp:%r, up:%r, simple:%r" %(energy_limit_lp,energy_limit_up,energy_limit)
     branch_up.SetMaximumHarmonic(2)
     branch_lp.SetMaximumHarmonic(2)
     energy_full_lp = nlsp.calculateenergy_freq(branch_lp.GetOutput())
@@ -146,14 +150,38 @@ def lowpass_evaluation():
         plot.plot(input_spec,show=False)
         plot.plot(chebyshev_spec,show=True)
 
+def harmonics_evaluation():
+    for i in range(1,degree+1):
+        ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,start_frequency=sweep_start_freq,
+                                                       stop_frequency=sweep_stop_freq).GetSignal()
+        branch_simple = nlsp.HammersteinModel(input_signal=ip_sweep_signal,
+                                              nonlin_func=nlsp.function_factory.power_series(i))
+        branch_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sweep_signal,
+                                                                    nonlin_func=nlsp.function_factory.power_series(i),
+                                                                    max_harm=i)
+        branch_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
+                                                                  nonlin_func=nlsp.function_factory.power_series(i),
+                                                                  max_harm=i)
+        # plot.log()
+        # plot.plot(ip_harmonics,show=False)
+        # plot.plot(ip_harmonics_up,show=False)
+        # plot.plot(ip_harmonics_lp,show=True)
+        print nlsp.harmonicsvsall_energyratio(branch_simple.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
+        print nlsp.harmonicsvsall_energyratio(branch_lp.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
+        print nlsp.harmonicsvsall_energyratio(branch_up.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
+        print
+        print
+
+
 sampling_rate = 48000
 sweep_start_freq = 20.0
 sweep_stop_freq = 20000.0
 degree = 5
 puretone_freq = 10000
-length = 2**15
+length = 2**20
 
-simplevslpvsup_snrandmse_evaluation()
+# simplevslpvsup_snrandmse_evaluation()
 # simplevslpvsup_puretone_evaluation()
 # simplevslpvsup_sweep_evaluation()
 # lowpass_evaluation()
+harmonics_evaluation()

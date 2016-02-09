@@ -1,4 +1,5 @@
 import math
+import numpy
 import sumpf
 import nlsp
 
@@ -183,3 +184,15 @@ def relabel(input,labels):
     else:
         outputs = outputs
     return outputs
+
+def harmonicsvsall_energyratio(output_nlsystem,input,nl_order,sweep_start_freq,sweep_stop_freq,max_harm):
+    harmonics = nlsp.get_sweep_harmonics_spectrum(input,output_nlsystem,sweep_start_freq,sweep_stop_freq,max_harm)
+    all_energy = nlsp.calculateenergy_betweenfreq_time(harmonics,[sweep_start_freq+50,sweep_stop_freq-50])
+    harm_energy = []
+    for i in range(0,nl_order):
+        harm_energy.append(all_energy[i])
+    if nl_order % 2 == 0: # even
+        harm_energy = harm_energy[1::2]
+    else: # odd
+        harm_energy = harm_energy[0::2]
+    return numpy.divide(numpy.sum(all_energy),numpy.sum(harm_energy))

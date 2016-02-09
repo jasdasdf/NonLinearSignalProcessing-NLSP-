@@ -1,6 +1,5 @@
 import sumpf
 import nlsp
-import _common as common
 
 def test_nonlinearfunction():
     """
@@ -16,10 +15,10 @@ def test_nonlinearfunction():
     hmodel.SetNLFunction(nonlin_func=nlsp.function_factory.power_series(5))
     hmodel_1 = nlsp.HammersteinModel(input_signal=ip_sweep_signal.GetSignal(),
                                    nonlin_func=nlsp.function_factory.power_series(5))
-    energy = common.calculateenergy_freq(hmodel.GetOutput())
-    energy_1 = common.calculateenergy_freq(hmodel_1.GetOutput())
+    energy = nlsp.calculateenergy_freq(hmodel.GetOutput())
+    energy_1 = nlsp.calculateenergy_freq(hmodel_1.GetOutput())
     hmodel_2 = nlsp.NonlinearFunction.power_series(5,signal=ip_sweep_signal.GetSignal())
-    energy_2 = common.calculateenergy_freq(hmodel_2.GetOutput())
+    energy_2 = nlsp.calculateenergy_freq(hmodel_2.GetOutput())
     energy = map(int,energy)
     energy_1 = map(int,energy_1)
     energy_2 = map(int,energy_2)

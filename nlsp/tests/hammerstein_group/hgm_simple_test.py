@@ -1,8 +1,6 @@
 import numpy
 import sumpf
 import nlsp
-import _common as common
-import common.plot as plot
 
 def test_puretone():
     """
@@ -24,7 +22,7 @@ def test_puretone():
         Test_Model_Hammerstein = nlsp.HammersteinModel(input_signal=ip_sine_signal,
                                                        nonlin_func=nlsp.function_factory.power_series(harm))
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
-        h.append(common.find_frequencies(Test_Model_outputsignal))
+        h.append(nlsp.find_frequencies(Test_Model_outputsignal))
     Test_model_freq = sorted(list(set([item for sublist in h for item in sublist])))
     imp = sumpf.modules.ImpulseGenerator(samplingrate=s_rate, length=length).GetSignal()
     hammerstein_group = nlsp.HammersteinGroupModel(input_signal=ip_sine_signal,
@@ -34,7 +32,7 @@ def test_puretone():
                                                    nlsp.function_factory.power_series(max_harm[3]),
                                                    nlsp.function_factory.power_series(max_harm[4])),
                                                    filter_irs=(imp,)*len(max_harm))
-    Test_groupmodel_freq = common.find_frequencies(hammerstein_group.GetOutput())
+    Test_groupmodel_freq = nlsp.find_frequencies(hammerstein_group.GetOutput())
     assert Test_groupmodel_freq == Test_model_freq
 
 def test_aliasing():
@@ -57,7 +55,7 @@ def test_aliasing():
         Test_Model_Hammerstein = nlsp.HammersteinModel(input_signal=ip_sine_signal,
                                                        nonlin_func=nlsp.function_factory.power_series(harm))
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
-        h.append(common.find_frequencies(Test_Model_outputsignal))
+        h.append(nlsp.find_frequencies(Test_Model_outputsignal))
     Test_model_freq = sorted(list(set([item for sublist in h for item in sublist])))
     imp = sumpf.modules.ImpulseGenerator(samplingrate=s_rate, length=length).GetSignal()
     hammerstein_group = nlsp.HammersteinGroupModel(input_signal=ip_sine_signal,
@@ -67,9 +65,9 @@ def test_aliasing():
                                                    nlsp.function_factory.power_series(max_harm[3]),
                                                    nlsp.function_factory.power_series(max_harm[4])),
                                                    filter_irs=(imp,)*len(max_harm))
-    Test_groupmodel_energy_freq = common.calculateenergy_atparticularfrequencies(hammerstein_group.GetOutput(),
+    Test_groupmodel_energy_freq = nlsp.calculateenergy_atparticularfrequencies(hammerstein_group.GetOutput(),
                                                                             frequencies=Test_model_freq)
-    Test_groupmodel_energy_all = common.calculateenergy_freq(hammerstein_group.GetOutput())
+    Test_groupmodel_energy_all = nlsp.calculateenergy_freq(hammerstein_group.GetOutput())
     assert numpy.sum(Test_groupmodel_energy_all) == numpy.sum(Test_groupmodel_energy_freq)
 
 def test_energy():
@@ -93,10 +91,10 @@ def test_energy():
                                                        nonlin_func=nlsp.function_factory.power_series(harm),
                                                        filter_impulseresponse=imp)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
-        e.append(numpy.multiply(common.calculateenergy_freq(Test_Model_outputsignal),2))
+        e.append(numpy.multiply(nlsp.calculateenergy_freq(Test_Model_outputsignal),2))
     hammerstein_group = nlsp.HammersteinGroupModel(input_signal=ip_sine_signal,
                                                    nonlinear_functions=(nlsp.function_factory.power_series(max_harm[0]),
                                                                         )*len(max_harm),
                                                    filter_irs=(imp,)*len(max_harm))
-    e_g = common.calculateenergy_freq(hammerstein_group.GetOutput())
+    e_g = nlsp.calculateenergy_freq(hammerstein_group.GetOutput())
     assert float(numpy.sum(e_g)) <= float(numpy.sum(e))

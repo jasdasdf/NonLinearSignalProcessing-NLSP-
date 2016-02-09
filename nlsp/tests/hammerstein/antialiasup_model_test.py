@@ -1,7 +1,5 @@
 import sumpf
 import nlsp
-import _common as common
-import common.plot as plot
 import itertools
 import numpy
 
@@ -14,7 +12,7 @@ def test_connectors():
     s_rate = 48000
     length = s_rate
     model = nlsp.AliasCompensatingHammersteinModelUpandDown(nonlin_func=nlsp.function_factory.power_series(1),max_harm=1)
-    energy1 = common.calculateenergy_freq(model.GetOutput())
+    energy1 = nlsp.calculateenergy_freq(model.GetOutput())
     assert energy1 == [0]
     gen_sine = sumpf.modules.SineWaveGenerator(frequency=freq,
                                           phase=0.0,
@@ -22,23 +20,23 @@ def test_connectors():
                                           length=length).GetSignal()
     prp = sumpf.modules.ChannelDataProperties(signal_length=length,samplingrate=s_rate)
     model.SetInput(gen_sine)
-    energy2 = common.calculateenergy_freq(model.GetOutput())
+    energy2 = nlsp.calculateenergy_freq(model.GetOutput())
     assert energy2 != energy1
     model.SetInput(sumpf.Signal())
-    energy3 = common.calculateenergy_freq(model.GetOutput())
+    energy3 = nlsp.calculateenergy_freq(model.GetOutput())
     assert energy3 == energy1
     model.SetInput(gen_sine)
     model.SetNLFunction(nonlin_func=nlsp.function_factory.power_series(2))
-    energy4 = common.calculateenergy_freq(model.GetOutput())
+    energy4 = nlsp.calculateenergy_freq(model.GetOutput())
     assert energy4 != energy3
     model.SetFilterIR(sumpf.modules.InverseFourierTransform(sumpf.modules.FilterGenerator
                                                 (sumpf.modules.FilterGenerator.BUTTERWORTH(order=5),frequency=freq,
                                                 resolution=prp.GetResolution(),
                                                 length=prp.GetSpectrumLength()).GetSpectrum()).GetSignal())
-    energy5 = common.calculateenergy_freq(model.GetOutput())
+    energy5 = nlsp.calculateenergy_freq(model.GetOutput())
     assert energy5 != energy4
     model.SetMaximumHarmonic(2)
-    energy6 = common.calculateenergy_freq(model.GetOutput())
+    energy6 = nlsp.calculateenergy_freq(model.GetOutput())
     assert energy6 != energy5
 
 def test_linearity_of_model():
@@ -51,8 +49,8 @@ def test_linearity_of_model():
                                       length=48000).GetSignal()
     model = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=gen_sine,
                                                             nonlin_func=nlsp.function_factory.power_series(1),max_harm=1)
-    energy_ip = common.calculateenergy_freq(gen_sine)
-    energy_op = common.calculateenergy_freq(model.GetOutput())
+    energy_ip = nlsp.calculateenergy_freq(gen_sine)
+    energy_op = nlsp.calculateenergy_freq(model.GetOutput())
     assert int(energy_ip[0]) == int(energy_op[0])
 
 def test_aliasingtest():
@@ -78,8 +76,8 @@ def test_aliasingtest():
     Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
     Test_Model_outputspec = sumpf.modules.FourierTransform(Test_Model_outputsignal).GetSpectrum()
     Test_Model_HarmonicFreq = []
-    h = common.find_frequencies(Test_Model_outputsignal)
-    predicted_freq = common.predictoutputfreq_usingsamplingtheory(freq,max_harm,s_rate)
+    h = nlsp.find_frequencies(Test_Model_outputsignal)
+    predicted_freq = nlsp.predictoutputfreq_usingsamplingtheory(freq,max_harm,s_rate)
     assert predicted_freq == h
 
 def test_modelquality():
@@ -105,9 +103,9 @@ def test_modelquality():
         Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=sine_signal.GetSignal(),
                                                            nonlin_func=nlsp.function_factory.power_series(harm),max_harm=harm)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
-        e = common.calculateenergy_freq(Test_Model_outputsignal)
-        h = common.predictharmonics_usingupsampling([freq],harm,s_rate)
-        f = common.calculateenergy_atparticularfrequencies(Test_Model_outputsignal,h)
+        e = nlsp.calculateenergy_freq(Test_Model_outputsignal)
+        h = nlsp.predictharmonics_usingupsampling([freq],harm,s_rate)
+        f = nlsp.calculateenergy_atparticularfrequencies(Test_Model_outputsignal,h)
         quality = numpy.sum(f)/numpy.sum(e)
         assert quality == 1
 
@@ -129,6 +127,6 @@ def test_reliability():
     UPHModel = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sweep_signal.GetSignal(),
                                                              nonlin_func=nlsp.function_factory.power_series(1),max_harm=1)
     UPHModel.SetMaximumHarmonic(max_harm)
-    ip_energy = common.calculateenergy_freq(ip_sweep_signal.GetSignal())
-    op_energy = common.calculateenergy_freq(UPHModel.GetNLOutput())
+    ip_energy = nlsp.calculateenergy_freq(ip_sweep_signal.GetSignal())
+    op_energy = nlsp.calculateenergy_freq(UPHModel.GetNLOutput())
     assert numpy.multiply(ip_energy,max_harm**2) == op_energy

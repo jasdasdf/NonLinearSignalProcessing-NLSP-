@@ -12,7 +12,8 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
     """
     def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1), max_harm=1,
                  filter_impulseresponse=None,
-                 resampling_algorithm = sumpf.modules.ResampleSignal.SPECTRUM):
+                 resampling_algorithm=sumpf.modules.ResampleSignal.SPECTRUM,
+                 downsampling_position=1):
         """
         :param input_signal: the input signal instance to the Alias compensated Hammerstein model
         :param nonlin_func: the nonlinear function for the nonlinear block
@@ -30,6 +31,7 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
         self._upfilter = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
         self._downoutput = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
         self._attenuator = sumpf.modules.AmplifySignal()
+        self._downsampling_position = downsampling_position
 
         self.SetNLFunction = self._nonlin_function.SetNonlinearFunction
 
@@ -37,7 +39,10 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
         super(AliasCompensatingHammersteinModelUpandDown, self).__init__(input_signal=input_signal,
                                                                          nonlin_func=None,
                                                                          filter_impulseresponse=filter_impulseresponse)
-        self.GetOutput = self._downoutput.GetOutput
+        if self._downsampling_position == 1:
+            self.GetOutput = self._downoutput.GetOutput
+        else:
+            self.GetOutput = self._itransform.GetSignal
         self.GetNLOutput = self._nonlin_function.GetOutput
         self.GetMaximumHarmonic = self._GetMaximumHarmonic
 

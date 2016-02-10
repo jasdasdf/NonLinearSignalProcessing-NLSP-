@@ -3,11 +3,13 @@ import numpy
 import sumpf
 import nlsp
 
-def get_transfer_function(excitation, response):
+def get_transfer_function(excitation, response, start_freq=20.0, stop_freq=20000.0):
     """
     Calculate the transfer function of the system
     :param excitation: the input signal to the system
     :param response: the output signal of the system
+    :param start_freq: the start frequency of the input
+    :param stop_freq: the stop frequency of the input
     :return: the transfer function of the system
     """
     fft = sumpf.modules.FourierTransform(signal=excitation)
@@ -15,7 +17,8 @@ def get_transfer_function(excitation, response):
     fft.SetSignal(response)
     response_spectrum = fft.GetSpectrum()
     sumpf.destroy_connectors(fft)
-    rgi = sumpf.modules.RegularizedSpectrumInversion(spectrum=excitation_spectrum)
+    rgi = sumpf.modules.RegularizedSpectrumInversion(spectrum=excitation_spectrum,start_frequency=start_freq,
+                                                     stop_frequency=stop_freq)
     regularized = rgi.GetOutput()
     sumpf.destroy_connectors(rgi)
     if len(regularized.GetChannels()) == 1 and  len(response_spectrum.GetChannels()) != 1:
@@ -27,14 +30,16 @@ def get_transfer_function(excitation, response):
     sumpf.destroy_connectors(cls)
     return relabeled
 
-def get_impulse_response(excitation, response):
+def get_impulse_response(excitation, response, start_freq, stop_freq):
     """
     Calculate the impulse response of the system
     :param excitation: the input signal to the system
     :param response: the output signal of the system
+    :param start_freq: the start frequency
+    :param stop_freq: the stop frequency
     :return: the impulse response of the system
     """
-    transferfunction = get_transfer_function(excitation, response)
+    transferfunction = get_transfer_function(excitation, response, start_freq, stop_freq)
     ifft = sumpf.modules.InverseFourierTransform(spectrum=transferfunction)
     result = ifft.GetSignal()
     sumpf.destroy_connectors(ifft)
@@ -50,7 +55,7 @@ def get_sweep_harmonics_spectrum(excitation, response, sweep_start_freq, sweep_s
     :param max_harm: the maximum harmonics upto which the harmomics should be calculated
     :return: the sumpf spectrum of merged harmonic spectrums
     """
-    impulse_response = get_impulse_response(excitation,response)
+    impulse_response = get_impulse_response(excitation,response,sweep_start_freq,sweep_stop_freq)
     linear = sumpf.modules.CutSignal(signal=impulse_response,start=0,stop=len(impulse_response)/2).GetOutput()
     merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     merger.AddInput(linear)

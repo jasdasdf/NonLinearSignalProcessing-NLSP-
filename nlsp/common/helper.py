@@ -186,6 +186,16 @@ def relabel(input,labels):
     return outputs
 
 def harmonicsvsall_energyratio(output_nlsystem,input,nl_order,sweep_start_freq,sweep_stop_freq,max_harm):
+    """
+    Calculates the energy ratio between the desired and undesired harmonics in power series expansion
+    :param output_nlsystem: the output sweep of the nonlinear system
+    :param input: the input sweep to the nonlinear system
+    :param nl_order: the order of nonlinear system
+    :param sweep_start_freq: the sweep start frequency
+    :param sweep_stop_freq: the sweep stop frequency
+    :param max_harm: the maximum harmonics upto which the energy has to be compared
+    :return: the ratio between the energy of desired harmonics and all harmonics
+    """
     harmonics = nlsp.get_sweep_harmonics_spectrum(input,output_nlsystem,sweep_start_freq,sweep_stop_freq,max_harm)
     all_energy = nlsp.calculateenergy_betweenfreq_time(harmonics,[sweep_start_freq+50,sweep_stop_freq-50])
     harm_energy = []
@@ -195,4 +205,4 @@ def harmonicsvsall_energyratio(output_nlsystem,input,nl_order,sweep_start_freq,s
         harm_energy = harm_energy[1::2]
     else: # odd
         harm_energy = harm_energy[0::2]
-    return numpy.divide(numpy.sum(all_energy),numpy.sum(harm_energy))
+    return numpy.divide(numpy.sum(harm_energy),numpy.sum(all_energy))

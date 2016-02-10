@@ -162,15 +162,44 @@ def harmonics_evaluation():
         branch_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
                                                                   nonlin_func=nlsp.function_factory.power_series(i),
                                                                   max_harm=i)
-        # plot.log()
-        # plot.plot(ip_harmonics,show=False)
-        # plot.plot(ip_harmonics_up,show=False)
-        # plot.plot(ip_harmonics_lp,show=True)
-        print nlsp.harmonicsvsall_energyratio(branch_simple.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
-        print nlsp.harmonicsvsall_energyratio(branch_lp.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
-        print nlsp.harmonicsvsall_energyratio(branch_up.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
+        harm_simple = nlsp.get_sweep_harmonics_spectrum(ip_sweep_signal,branch_simple.GetOutput(),sweep_start_freq,sweep_stop_freq,degree)
+        harm_lp = nlsp.get_sweep_harmonics_spectrum(ip_sweep_signal,branch_lp.GetOutput(),sweep_start_freq,sweep_stop_freq,degree)
+        harm_up = nlsp.get_sweep_harmonics_spectrum(ip_sweep_signal,branch_up.GetOutput(),sweep_start_freq,sweep_stop_freq,degree)
+        print nlsp.calculateenergy_freq(harm_simple)
+        print nlsp.calculateenergy_freq(harm_lp)
+        print nlsp.calculateenergy_freq(harm_up)
         print
         print
+        # print nlsp.harmonicsvsall_energyratio(branch_simple.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
+        # print nlsp.harmonicsvsall_energyratio(branch_lp.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
+        # print nlsp.harmonicsvsall_energyratio(branch_up.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
+        # print
+        # print
+
+def higher_nonlinearity_evaluation():
+    max_harm = 2
+    nl_degree = 3
+    ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,start_frequency=sweep_start_freq,
+                                                   stop_frequency=sweep_stop_freq).GetSignal()
+    model_simple = nlsp.HammersteinModel(input_signal=ip_sweep_signal,
+                                          nonlin_func=nlsp.function_factory.power_series(nl_degree))
+    model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sweep_signal,
+                                                                nonlin_func=nlsp.function_factory.power_series(nl_degree),
+                                                                max_harm=max_harm)
+    model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
+                                                              nonlin_func=nlsp.function_factory.power_series(nl_degree),
+                                                              max_harm=max_harm)
+    simple_ip = model_simple.GetOutput()
+    up_ip = model_up.GetOutput()
+    lp_ip = model_lp.GetOutput()
+    model_up.SetMaximumHarmonic(nl_degree)
+    model_lp.SetMaximumHarmonic(nl_degree)
+    simple_ref = model_simple.GetOutput()
+    up_ref = model_up.GetOutput()
+    lp_ref = model_lp.GetOutput()
+    print nlsp.signal_to_noise_ratio_freq_range(simple_ip,simple_ref,[sweep_start_freq,sweep_stop_freq])
+    print nlsp.signal_to_noise_ratio_freq_range(up_ip,up_ref,[sweep_start_freq,sweep_stop_freq])
+    print nlsp.signal_to_noise_ratio_freq_range(lp_ip,lp_ref,[sweep_start_freq,sweep_stop_freq])
 
 
 sampling_rate = 48000
@@ -178,10 +207,11 @@ sweep_start_freq = 20.0
 sweep_stop_freq = 20000.0
 degree = 5
 puretone_freq = 10000
-length = 2**20
+length = 2**18
 
-# simplevslpvsup_snrandmse_evaluation()
-# simplevslpvsup_puretone_evaluation()
-# simplevslpvsup_sweep_evaluation()
-# lowpass_evaluation()
+simplevslpvsup_snrandmse_evaluation()
+simplevslpvsup_puretone_evaluation()
+simplevslpvsup_sweep_evaluation()
+lowpass_evaluation()
 harmonics_evaluation()
+higher_nonlinearity_evaluation()

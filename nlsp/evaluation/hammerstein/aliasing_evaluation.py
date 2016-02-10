@@ -201,13 +201,60 @@ def higher_nonlinearity_evaluation():
     print nlsp.signal_to_noise_ratio_freq_range(up_ip,up_ref,[sweep_start_freq,sweep_stop_freq])
     print nlsp.signal_to_noise_ratio_freq_range(lp_ip,lp_ref,[sweep_start_freq,sweep_stop_freq])
 
+def wgn_evaluation():
+    degree = 3
+    wgn = sumpf.modules.NoiseGenerator(sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0),
+                                       samplingrate=sampling_rate,
+                                       length=length)
+    prp = sumpf.modules.ChannelDataProperties()
+    prp.SetSignal(wgn.GetSignal())
+    filter = sumpf.modules.RectangleFilterGenerator(resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
+    ref = nlsp.HammersteinModel(input_signal=wgn.GetSignal(),nonlin_func=nlsp.function_factory.power_series(degree),
+                                  filter_impulseresponse=sumpf.modules.InverseFourierTransform(filter).GetSignal()).GetOutput()
+    model_simple = nlsp.HammersteinModel(input_signal=wgn.GetSignal(),
+                                          nonlin_func=nlsp.function_factory.power_series(degree))
+    model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=wgn.GetSignal(),
+                                                                nonlin_func=nlsp.function_factory.power_series(degree),
+                                                                max_harm=degree)
+    model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=wgn.GetSignal(),
+                                                              nonlin_func=nlsp.function_factory.power_series(degree),
+                                                              max_harm=degree)
+    print nlsp.signal_to_noise_ratio_time(model_simple.GetOutput(),ref)
+    print nlsp.signal_to_noise_ratio_time(model_up.GetOutput(),ref)
+    print nlsp.signal_to_noise_ratio_time(model_lp.GetOutput(),ref)
+
+def linearity_evaluation():
+    max_harm = 3
+    nl_degree = 3
+    sweep_start_freq = 20.0
+    sweep_stop_freq = 4000.0
+    ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,start_frequency=sweep_start_freq,
+                                                   stop_frequency=sweep_stop_freq).GetSignal()
+    model_simple = nlsp.HammersteinModel(input_signal=ip_sweep_signal,
+                                          nonlin_func=nlsp.function_factory.power_series(nl_degree))
+    model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sweep_signal,
+                                                                nonlin_func=nlsp.function_factory.power_series(nl_degree),
+                                                                max_harm=max_harm)
+    model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
+                                                              nonlin_func=nlsp.function_factory.power_series(nl_degree),
+                                                              max_harm=max_harm)
+    simple_ref = model_simple.GetOutput()
+    up_ip = model_up.GetOutput()
+    lp_ip = model_lp.GetOutput()
+    print nlsp.signal_to_noise_ratio_time(simple_ref,simple_ref)
+    print nlsp.signal_to_noise_ratio_time(up_ip,simple_ref)
+    print nlsp.signal_to_noise_ratio_time(lp_ip,simple_ref)
+    plot.log()
+    plot.plot(sumpf.modules.FourierTransform(model_simple.GetOutput()).GetSpectrum(),show=False)
+    plot.plot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),show=False)
+    plot.plot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),show=True)
 
 sampling_rate = 48000
 sweep_start_freq = 20.0
-sweep_stop_freq = 20000.0
+sweep_stop_freq = 24000.0
 degree = 5
 puretone_freq = 10000
-length = 2**18
+length = 2**13
 
 simplevslpvsup_snrandmse_evaluation()
 simplevslpvsup_puretone_evaluation()
@@ -215,3 +262,5 @@ simplevslpvsup_sweep_evaluation()
 lowpass_evaluation()
 harmonics_evaluation()
 higher_nonlinearity_evaluation()
+wgn_evaluation()
+linearity_evaluation()

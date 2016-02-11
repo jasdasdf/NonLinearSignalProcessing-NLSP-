@@ -259,3 +259,16 @@ def nl_branches(function,branches):
     for i in range(1,branches+1):
         nl.append(function(branches))
     return nl
+
+def add_noise(signal,distribution):
+    """
+    Helper function to add signal and noise
+    :param signal: the input signal
+    :param distribution: the distribution of noise, should be a method of sumpf.modules.NoiseGenerator
+    :return: the added noise and input signal
+    """
+    noise = sumpf.modules.NoiseGenerator(distribution=distribution,
+                                         samplingrate=signal.GetSamplingRate(),
+                                         length=len(signal)).GetSignal()
+    signal_and_noise = sumpf.modules.AddSignals(signal1=signal, signal2=noise).GetOutput()
+    return signal_and_noise

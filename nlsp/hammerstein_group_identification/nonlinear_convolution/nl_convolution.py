@@ -5,7 +5,8 @@ import common.plot as plot
 
 class NLConvolution(object):
 
-    def __init__(self,input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0, branches=5):
+    def __init__(self,input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0, sweep_length=None,
+                 branches=5):
         if input_sweep is None:
             self.__input = sumpf.Signal()
         else:
@@ -18,7 +19,10 @@ class NLConvolution(object):
         self.__start_freq = sweep_start_freq
         self.__stop_freq = sweep_stop_freq
         self.__branches = branches
-        self.__length = len(self.__input)
+        if sweep_length is None:
+            self.__length = len(self.__input)
+        else:
+            self.__length = sweep_length
         self.__harmonics_spec = []
         self.__harmonics_ir = []
         self.__harmonic_kernel_1 = []

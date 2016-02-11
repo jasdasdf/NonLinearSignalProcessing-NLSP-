@@ -2,6 +2,7 @@ import math
 import numpy
 import sumpf
 import nlsp
+import common.plot as plot
 
 def get_transfer_function(excitation, response, start_freq=20.0, stop_freq=20000.0):
     """
@@ -123,6 +124,28 @@ def log_bpfilter(start_freq,stop_freq,branches,input):
         filter_spec.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
     return filter_spec
 
+def create_bpfilter(frequencies,input):
+    """
+    Generates bandpass filters with given frequencies.
+    :param frequencies: the tuple of frequencies
+    :param input: the input signal to get the filter parameters
+    :return: a tuple of filter spectrums, and the list of frequencies
+    """
+    ip_prp = sumpf.modules.ChannelDataProperties()
+    ip_prp.SetSignal(input)
+    filter_spec = []
+    for freq in frequencies:
+        spec =  (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                                            frequency=freq,
+                                            resolution=ip_prp.GetResolution(),
+                                            length=ip_prp.GetSpectrumLength()).GetSpectrum())*\
+                (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                                            frequency=freq/2,transform=True,
+                                            resolution=ip_prp.GetResolution(),
+                                            length=ip_prp.GetSpectrumLength()).GetSpectrum())
+        filter_spec.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
+    return filter_spec
+
 def append_zeros(signal, length=None):
     """
     Appends zeros until the signal has the given length. If no length is given,
@@ -190,6 +213,19 @@ def relabel(input,labels):
         outputs = outputs
     return outputs
 
+def relabelandplot(input,label,show=True):
+    """
+    Relabel the input signal or spectrum and plot
+    :param input: the input signal or spectrum
+    :param label: the label text
+    :param show: True or False
+    :return: plots the given input with label
+    """
+    relabelled = nlsp.relabel(input,label)
+    if isinstance(relabelled, sumpf.Spectrum):
+        plot.log()
+    plot.plot(relabelled,show=show)
+
 def harmonicsvsall_energyratio(output_nlsystem,input,nl_order,sweep_start_freq,sweep_stop_freq,max_harm):
     """
     Calculates the energy ratio between the desired and undesired harmonics in power series expansion
@@ -211,3 +247,15 @@ def harmonicsvsall_energyratio(output_nlsystem,input,nl_order,sweep_start_freq,s
     else: # odd
         harm_energy = harm_energy[0::2]
     return numpy.divide(numpy.sum(harm_energy),numpy.sum(all_energy))
+
+def nl_branches(function,branches):
+    """
+    Generates array of nonlinear functions for hammerstein group model
+    :param function: the nonlinear function
+    :param branches: number of branches
+    :return: the array of nonlinear functions
+    """
+    nl = []
+    for i in range(1,branches+1):
+        nl.append(function(branches))
+    return nl

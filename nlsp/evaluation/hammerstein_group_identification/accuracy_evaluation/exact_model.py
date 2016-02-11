@@ -30,8 +30,8 @@ def hgmwithfilter_sweepip_evaluation():
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
-        nlsp.relabelandplot(ref_nlsystem.GetOutput(),"Reference Output",True)
-        nlsp.relabelandplot(iden_nlsystem.GetOutput(),"Identified Output",True)
+        nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
+        nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
         plot.log()
         for i,foundspec in enumerate(found_filter_spec):
             nlsp.relabelandplot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),str(i+1)+str(" filter,input"),False)
@@ -65,8 +65,8 @@ def hgmwithoverlapfilter_sweepip_evaluation():
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
-        nlsp.relabelandplot(ref_nlsystem.GetOutput(),"Reference Output",True)
-        nlsp.relabelandplot(iden_nlsystem.GetOutput(),"Identified Output",True)
+        nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
+        nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
         plot.log()
         for i,foundspec in enumerate(found_filter_spec):
             nlsp.relabelandplot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),str(i+1)+str(" filter,input"),False)
@@ -94,8 +94,8 @@ def linearmodel_evaluation():
                                                   filter_irs=identification.GetPower_filter_1(),
                                                   max_harmonics=range(1,branches+1))
     if Plot is True:
-        nlsp.relabelandplot(ref_nlsystem.GetOutput(),"Reference Output",True)
-        nlsp.relabelandplot(iden_nlsystem.GetOutput(),"Identified Output",True)
+        nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
+        nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
     print "SNR between Reference and Identified output with overlapping filters: %r" %nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
@@ -104,7 +104,7 @@ sweep_start_freq = 20.0
 sweep_stop_freq = 20000.0
 branches = 5
 sweep_length = 2**15
-Plot = False
+Plot = True
 
 hgmwithfilter_sweepip_evaluation()
 hgmwithoverlapfilter_sweepip_evaluation()

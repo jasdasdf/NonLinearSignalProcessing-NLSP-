@@ -11,7 +11,7 @@ class HammersteinGroupModel(object):
     """
 
     def __init__(self, input_signal=None, nonlinear_functions=(nlsp.function_factory.power_series(1),),
-                 filter_irs=None, branch_class=nlsp.HammersteinModel):
+                 filter_irs=None, max_harmonics=None):
         """
         :param signal: the input signal
         :param nonlinear_functions: the tuple of nonlinear functions of hammerstein group models
@@ -29,8 +29,6 @@ class HammersteinGroupModel(object):
             self.__filter_irs = (sumpf.modules.ImpulseGenerator(length=len(input_signal)).GetSignal(),)
         else:
             self.__filter_irs = filter_irs
-        self.__branch_class = branch_class
-
         if len(self.__nlfunctions) == len(self.__filter_irs):
             self.__branches = len(self.__nlfunctions)
         else:

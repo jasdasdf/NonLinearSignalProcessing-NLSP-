@@ -9,7 +9,7 @@ class HammersteinGroupModel_lp(object):
     """
 
     def __init__(self, input_signal=None, nonlinear_functions=(nlsp.function_factory.power_series(1),),
-                 filter_irs=None, max_harmonics=(1,),
+                 filter_irs=None, max_harmonics=None,
                  filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=20),
                  attenuation=0.0001):
         """
@@ -31,13 +31,16 @@ class HammersteinGroupModel_lp(object):
             self.__filter_irs = (sumpf.modules.ImpulseGenerator(length=len(input_signal)).GetSignal(),)
         else:
             self.__filter_irs = filter_irs
-        self.__max_harmonics = max_harmonics
         self.__filterfunction = filterfunction
         self.__attenuation = attenuation
-        if len(self.__nlfunctions) == len(self.__filter_irs) == len(self.__max_harmonics):
+        if len(self.__nlfunctions) == len(self.__filter_irs):
             self.__branches = len(self.__nlfunctions)
         else:
             print "the given arguments dont have same length"
+        if max_harmonics is None:
+            self.__max_harmonics = range(1,self.__branches+1)
+        else:
+            self.__max_harmonics = max_harmonics
         self.hmodels = []
         self.__sums = [None] * self.__branches
 

@@ -23,7 +23,8 @@ def hgmwithfilter_sweepip_evaluation():
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
-    identification = nlsp.NLConvolution(input_sweep,ref_nlsystem.GetOutput(),sweep_start_freq,sweep_stop_freq,branches)
+    identification = nlsp.NLConvolution(input_sweep,ref_nlsystem.GetOutput(),sweep_start_freq,sweep_stop_freq,
+                                        len(input_sweep),branches)
     found_filter_spec = identification.GetPower_filter_1()
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_sweep,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
@@ -57,7 +58,8 @@ def hgmwithoverlapfilter_sweepip_evaluation():
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
-    identification = nlsp.NLConvolution(input_sweep,ref_nlsystem.GetOutput(),sweep_start_freq,sweep_stop_freq,branches)
+    identification = nlsp.NLConvolution(input_sweep,ref_nlsystem.GetOutput(),sweep_start_freq,sweep_stop_freq,
+                                        len(input_sweep),branches)
     found_filter_spec = identification.GetPower_filter_1()
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_sweep,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
@@ -86,7 +88,8 @@ def linearmodel_evaluation():
                                                samplingrate=sampling_rate, length=sweep_length).GetSignal()
     ref_nlsystem = sumpf.modules.AmplifySignal(factor=amplification)
     ref_nlsystem.SetInput(input_sweep)
-    identification = nlsp.NLConvolution(input_sweep,ref_nlsystem.GetOutput(),sweep_start_freq,sweep_stop_freq,branches)
+    identification = nlsp.NLConvolution(input_sweep,ref_nlsystem.GetOutput(),sweep_start_freq,sweep_stop_freq,
+                                        len(input_sweep),branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_sweep,
                                                   nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                   filter_irs=identification.GetPower_filter_1(),

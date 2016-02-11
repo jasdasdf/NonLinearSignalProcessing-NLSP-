@@ -1,7 +1,6 @@
 import sumpf
 import nlsp
 import common
-import _common as nlspcommon
 
 def loudspeakerevaluation():
 
@@ -62,10 +61,10 @@ def loudspeakerevaluation():
     # common.plot.plot(sumpf.modules.FourierTransform(music_response).GetSpectrum(),show=True)
 
     # plot the sweep prediction outputs
-    # common.plot.log()
-    # model.SetInput(excitation)
-    # common.plot.plot(sumpf.modules.FourierTransform(response).GetSpectrum(),show=False)
-    # common.plot.plot(sumpf.modules.FourierTransform(model.GetOutput()).GetSpectrum(),show=True)
+    common.plot.log()
+    model.SetInput(excitation)
+    common.plot.plot(sumpf.modules.FourierTransform(response).GetSpectrum(),show=False)
+    common.plot.plot(sumpf.modules.FourierTransform(model.GetOutput()).GetSpectrum(),show=True)
 
 branches = 5
 loudspeakerevaluation()

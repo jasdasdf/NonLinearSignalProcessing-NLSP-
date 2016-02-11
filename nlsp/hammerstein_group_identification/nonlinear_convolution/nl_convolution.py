@@ -62,6 +62,10 @@ class NLConvolution(object):
             self.__harmonics_spec.append(tf_harmonics)
 
     def GetPower_filter_1(self):
+        if len(self.__harmonics_spec) != 5:
+            self.__harmonics_spec.extend([sumpf.modules.ConstantSpectrumGenerator(value=0.0,
+                                                                                  resolution=self.__harmonics_spec[0].GetResolution(),
+                                                                                  length=len(self.__harmonics_spec[0])).GetSpectrum()]*(5-len(self.__harmonics_spec)))
         Volterra_tf = []
         Volterra_tf.append(self.__harmonics_spec[0] + (3)*self.__harmonics_spec[2] +(5)*self.__harmonics_spec[4])
         Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=self.__harmonics_spec[1],factor=2j).GetOutput() +
@@ -72,7 +76,7 @@ class NLConvolution(object):
         for kernel in Volterra_tf:
             ift = sumpf.modules.InverseFourierTransform(spectrum=kernel).GetSignal()
             self.__harmonic_kernel_1.append(ift)
-        return self.__harmonic_kernel_1
+        return self.__harmonic_kernel_1[:self.__branches]
 
     def GetPower_filter_2(self):
         Volterra_tf = []

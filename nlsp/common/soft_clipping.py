@@ -4,7 +4,7 @@ class NLClipSignal(object):
     """
     Class to clip the signal nonlinearly
     The input signal is clipped nonlinearly based on the power parameter. The lower the power parameter the higher
-    the clipping effect will be.
+    the function of clipping is f(x) = (1-(abs(x)/power))*x
     """
     def __init__(self, signal=None, thresholds=(-1,1), power=1.0):
         """

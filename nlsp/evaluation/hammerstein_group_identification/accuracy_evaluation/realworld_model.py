@@ -3,6 +3,20 @@ import nlsp
 import common
 import head_specific
 
+def split_signals():
+
+    loudspeaker = "Visaton BF45"
+    sample = ["Sweep16","Sweep18","Sweep20","Speech1","Speech2","Speech3","Music1","Noise18","Noise20"]
+
+    for signal in sample:
+        # load loudspeaker measurings
+        load_sweep = sumpf.modules.SignalFile(filename=common.get_filename(loudspeaker,signal, 1),
+                                        format=sumpf.modules.SignalFile.WAV_FLOAT)
+        excitation = sumpf.modules.SplitSignal(data=load_sweep.GetSignal(), channels=[0]).GetOutput()
+        save = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/test_signals/%s"%signal,
+                                      signal=excitation,format=sumpf.modules.SignalFile.NUMPY_NPZ)
+
+
 def loudspeakermodel_evaluation():
     loudspeaker = "Visaton BF45"
     sweep = "Sweep20"
@@ -73,4 +87,5 @@ def loudspeakermodel_evaluation():
 
 branches = 5
 Plot = True
-loudspeakermodel_evaluation()
+split_signals()
+# loudspeakermodel_evaluation()

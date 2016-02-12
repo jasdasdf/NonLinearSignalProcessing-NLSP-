@@ -59,8 +59,8 @@ def differentbranches_evaluation():
                                                                                      iden_nlsystem.GetOutput(),[sweep_start_freq,sweep_stop_freq]),branches)
 
 def computationtime_evaluation():
-    branch = range(2,6)
-    length = [2**15,2**16,2**17,2**18,2**19]
+    branch = reversed(range(2,6))
+    length = reversed([2**15,2**16,2**17,2**18,2**19])
     for branches,sweep_length in itertools.product(branch,length):
         simulation_time_start = time.clock()
         input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=sweep_length,
@@ -97,6 +97,6 @@ branches = 5
 sweep_length = 2**16
 Plot = False
 
-differentlength_evaluation()
-differentbranches_evaluation()
+# differentlength_evaluation()
+# differentbranches_evaluation()
 computationtime_evaluation()

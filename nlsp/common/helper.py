@@ -46,7 +46,7 @@ def get_impulse_response(excitation, response, start_freq, stop_freq):
     sumpf.destroy_connectors(ifft)
     return result
 
-def get_sweep_harmonics_spectrum(excitation, response, sweep_start_freq, sweep_stop_freq, max_harm):
+def get_sweep_harmonics_spectrum(excitation, response, sweep_start_freq, sweep_stop_freq, sweep_duration, max_harm):
     """
     Calculate the spectrum of the harmonics of sweep based on farina method
     :param excitation: the excitation sweep of the system
@@ -56,6 +56,8 @@ def get_sweep_harmonics_spectrum(excitation, response, sweep_start_freq, sweep_s
     :param max_harm: the maximum harmonics upto which the harmomics should be calculated
     :return: the sumpf spectrum of merged harmonic spectrums
     """
+    if sweep_duration is None:
+        sweep_duration = len(excitation)/excitation.GetSamplingRate()
     impulse_response = get_impulse_response(excitation,response,sweep_start_freq,sweep_stop_freq)
     linear = sumpf.modules.CutSignal(signal=impulse_response,start=0,stop=len(impulse_response)/2).GetOutput()
     merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
@@ -64,13 +66,13 @@ def get_sweep_harmonics_spectrum(excitation, response, sweep_start_freq, sweep_s
         harmonics = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=impulse_response, harmonic_order=i,
                                                               sweep_start_frequency=sweep_start_freq,
                                                               sweep_stop_frequency=sweep_stop_freq,
-                                                              sweep_duration=len(excitation)/excitation.GetSamplingRate()).GetHarmonicImpulseResponse()
+                                                              sweep_duration=sweep_duration).GetHarmonicImpulseResponse()
         merger.AddInput(sumpf.Signal(channels=harmonics.GetChannels(),
                                         samplingrate=excitation.GetSamplingRate(), labels=harmonics.GetLabels()))
     harmonics_spec = sumpf.modules.FourierTransform(merger.GetOutput()).GetSpectrum()
     return harmonics_spec
 
-def get_sweep_harmonics_ir(excitation, response, sweep_start_freq, sweep_stop_freq, max_harm):
+def get_sweep_harmonics_ir(excitation, response, sweep_start_freq, sweep_stop_freq, sweep_duration, max_harm):
     """
     Calculate the harmonics of the sweep based on nonconvolution
     :param excitation: the excitation sweep of the system
@@ -80,15 +82,11 @@ def get_sweep_harmonics_ir(excitation, response, sweep_start_freq, sweep_stop_fr
     :param max_harm: the maximum harmonics upto which the harmomics should be calculated
     :return: the sumpf signal of merged harmonic spectrums
     """
-    impulse_response = get_impulse_response(excitation,response)
-    linear = sumpf.modules.CutSignal(signal=impulse_response,start=0,stop=len(impulse_response)/2).GetOutput()
-    merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
-    merger.AddInput(linear)
-    for i in range(2,max_harm+1):
-        harmonics = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=impulse_response,harmonic_order=i,sweep_start_frequency=sweep_start_freq,
-                                                  sweep_stop_frequency=sweep_stop_freq,sweep_duration=len(excitation)).GetHarmonicImpulseResponse()
-        merger.AddInput(harmonics)
-    return merger.GetOutput()
+    if sweep_duration is None:
+        sweep_duration = len(excitation)/excitation.GetSamplingRate()
+    harmonics_spec = nlsp.get_sweep_harmonics_spectrum(excitation,response,sweep_start_freq,sweep_stop_freq,sweep_duration,max_harm)
+    harmonics_ir = sumpf.modules.InverseFourierTransform(harmonics_spec).GetSignal()
+    return harmonics_ir
 
 def log_bpfilter(start_freq,stop_freq,branches,input):
     """
@@ -226,7 +224,7 @@ def relabelandplot(input,label,show=True):
         plot.log()
     plot.plot(relabelled,show=show)
 
-def harmonicsvsall_energyratio(output_nlsystem,input,nl_order,sweep_start_freq,sweep_stop_freq,max_harm):
+def harmonicsvsall_energyratio(output_nlsystem,input,nl_order,sweep_start_freq,sweep_stop_freq,sweep_duration,max_harm):
     """
     Calculates the energy ratio between the desired and undesired harmonics in power series expansion
     :param output_nlsystem: the output sweep of the nonlinear system
@@ -237,7 +235,9 @@ def harmonicsvsall_energyratio(output_nlsystem,input,nl_order,sweep_start_freq,s
     :param max_harm: the maximum harmonics upto which the energy has to be compared
     :return: the ratio between the energy of desired harmonics and all harmonics
     """
-    harmonics = nlsp.get_sweep_harmonics_spectrum(input,output_nlsystem,sweep_start_freq,sweep_stop_freq,max_harm)
+    if sweep_duration is None:
+        sweep_duration = len(input)/input.GetSamplingRate()
+    harmonics = nlsp.get_sweep_harmonics_spectrum(input,output_nlsystem,sweep_start_freq,sweep_stop_freq,sweep_duration,max_harm)
     all_energy = nlsp.calculateenergy_betweenfreq_time(harmonics,[sweep_start_freq+50,sweep_stop_freq-50])
     harm_energy = []
     for i in range(0,nl_order):
@@ -272,3 +272,18 @@ def add_noise(signal,distribution):
                                          length=len(signal)).GetSignal()
     signal_and_noise = sumpf.modules.AddSignals(signal1=signal, signal2=noise).GetOutput()
     return signal_and_noise
+
+def plot_array(input_array,label_array=None):
+    """
+    Helper function to plot array
+    :param input_array: the input array of signal or spectrum
+    :param label_array: the array of labels
+    :return: the plot of the input array with labels
+    """
+    if label_array is None:
+        label_array = []
+        for input in input_array:
+            label_array.append(str(input.GetLabels()))
+    for input,label in zip(input_array,label_array):
+        nlsp.relabelandplot(input,label,False)
+    plot.show()

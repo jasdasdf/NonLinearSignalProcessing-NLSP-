@@ -119,3 +119,12 @@ class NLConvolution(object):
 
     def GetCheby_filter(self):
         return self.__harmonics_ir
+
+    def GetHarmonicsIR(self):
+        return self.__harmonics_ir
+
+    def GetHarmonicsTF(self):
+        return self.__harmonics_spec
+
+    def GetFullIR(self):
+        return self.__itransform.GetSignal()

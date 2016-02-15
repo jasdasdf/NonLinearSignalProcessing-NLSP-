@@ -30,11 +30,11 @@ def loudspeakermodel_evaluation(input_sweep,input_sample,branches,Plot,iden_meth
     # identify kernel using nonlinear convolution method
     sweep_start_freq, sweep_stop_freq, sweep_duration = head_specific.get_sweep_properties(excitation)
     sweep_duration = sweep_duration * excitation.GetSamplingRate()
-    found_filter_spec = iden_method(excitation,response,sweep_start_freq,sweep_stop_freq,
+    found_filter_spec, nl_functions = iden_method(excitation,response,sweep_start_freq,sweep_stop_freq,
                                         sweep_duration,branches)
 
     # use identified kernel in nl convolution hammerstein model
-    ls_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
+    ls_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl_functions,
                                        filter_irs=found_filter_spec,max_harmonics=range(1,branches+1))
 
     # load sample to evaluate the loudspeaker model
@@ -42,7 +42,6 @@ def loudspeakermodel_evaluation(input_sweep,input_sample,branches,Plot,iden_meth
                                           format=sumpf.modules.SignalFile.WAV_FLOAT)
     sample_excitation = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[0]).GetOutput()
     sample_response = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[1]).GetOutput()
-    print len(sample_response),len(excitation)
     if len(sample_excitation) > len(excitation):
         sample_excitation = sumpf.modules.CutSignal(signal=sample_excitation,start=0,stop=len(excitation)).GetOutput()
         sample_response = sumpf.modules.CutSignal(signal=sample_response,start=0,stop=len(excitation)).GetOutput()
@@ -96,11 +95,11 @@ def distortionbox_evaluation(input_sweep,input_sample,branches,Plot,iden_method)
     # identify kernel using nonlinear convolution method
     sweep_start_freq, sweep_stop_freq, sweep_duration = head_specific.get_sweep_properties(excitation)
     sweep_duration = sweep_duration * excitation.GetSamplingRate()
-    found_filter_spec = iden_method(excitation,response,sweep_start_freq,sweep_stop_freq,
+    found_filter_spec, nl_functions = iden_method(excitation,response,sweep_start_freq,sweep_stop_freq,
                                         sweep_duration,branches)
 
     # use identified kernel in nl convolution hammerstein model
-    ls_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nlsp.nonlinearconvolution_powerseries_nlfunction(branches),
+    ls_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl_functions,
                                        filter_irs=found_filter_spec,max_harmonics=range(1,branches+1))
 
     # load sample to evaluate the loudspeaker model
@@ -109,7 +108,6 @@ def distortionbox_evaluation(input_sweep,input_sample,branches,Plot,iden_method)
     sample_response = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/Measurements/Distortion box/Recording 1/output/%s"%sample,
                                           format=sumpf.modules.SignalFile.NUMPY_NPZ).GetSignal()
     sample_response = sumpf.modules.SplitSignal(sample_response,channels=[1]).GetOutput()
-    print len(sample_response),len(excitation)
     if len(sample_excitation) > len(excitation):
         sample_excitation = sumpf.modules.CutSignal(signal=sample_excitation,start=0,stop=len(excitation)).GetOutput()
         sample_response = sumpf.modules.CutSignal(signal=sample_response,start=0,stop=len(excitation)).GetOutput()

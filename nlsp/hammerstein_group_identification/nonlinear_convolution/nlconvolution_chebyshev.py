@@ -2,7 +2,8 @@ import sumpf
 import nlsp
 import common.plot as plot
 
-def nonlinearconvolution_chebyshev_filter(input_sweep, output_sweep, prop):
+def nonlinearconvolution_chebyshev(input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0,
+                                           sweep_length=None,branches=5):
     """
     Function to find the filter impulse response of the hammerstein group model using Chebyshev
     Nonlinear convolution method.
@@ -23,14 +24,13 @@ def nonlinearconvolution_chebyshev_filter(input_sweep, output_sweep, prop):
     :param prop: a tuple of sweep start frequency, sweep stop frequency and number of branches
     :return: the impulse response of the filters of hammerstein group model
     """
-    if prop is None:
-        prop = [20.0, 20000.0, 5]
-    sweep_start_freq = prop[0]
-    sweep_stop_freq = prop[1]
-    sweep_length = len(input_sweep)
-    branch = prop[2]
-    print "chebyshev NL convolution type identification"
-    print "sweep_start:%f, stop:%f, length:%f, branch:%d" %(sweep_start_freq,sweep_stop_freq,sweep_length,branch)
+    sweep_start_freq = sweep_start_freq
+    sweep_stop_freq = sweep_stop_freq
+    if sweep_length is None:
+        sweep_length = len(input_sweep)
+    else:
+        sweep_length = sweep_length
+    branch = branches
 
     if isinstance(input_sweep ,(sumpf.Signal)):
         ip_signal = input_sweep
@@ -63,17 +63,5 @@ def nonlinearconvolution_chebyshev_filter(input_sweep, output_sweep, prop):
     for i in range(len(ir_merger.GetOutput().GetChannels())):
         ir_harmonics =  sumpf.modules.SplitSignal(data=ir_merger.GetOutput(), channels=[i]).GetOutput()
         Volterra_ir.append(ir_harmonics)
-    return Volterra_ir
-
-def nonlinearconvolution_chebyshev_nlfunction(branches):
-    """
-    This function returns the nonlinear function to the nonlinear blocks of the hammerstein group model.
-    In nonlinear convolution method the nonlinear function is defined by chebyshev series expansion, Hence it returns
-    the chebyshev series expansion functions.
-    The chebyshev series expansion is done by using nlsp function factory functions.
-    :return: the nonlinear functions to the hammerstein group model
-    """
-    nl_functions = []
-    for i in range(branches):
-        nl_functions.append(nlsp.function_factory.chebyshev1_polynomial(i+1))
-    return nl_functions
+    nl_func = nlsp.nl_branches(nlsp.function_factory.chebyshev1_polynomial,branches)
+    return Volterra_ir, nl_func

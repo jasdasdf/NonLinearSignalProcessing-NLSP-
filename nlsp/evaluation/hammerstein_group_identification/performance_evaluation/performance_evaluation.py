@@ -12,7 +12,7 @@ def differentlength_evaluation(input_signal,branches,Plot,iden_method):
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    length = [2**15,2**16,2**17,2**18,2**19,2**20]
+    length = [2**15,2**16,2**17,2**18]
     inputsignal = input_signal
     for signal_length in length:
         inputsignal.SetLength(signal_length)
@@ -20,13 +20,13 @@ def differentlength_evaluation(input_signal,branches,Plot,iden_method):
         signal_start_freq,signal_stop_freq,signal_length = inputsignal.GetProperties()
         filter_spec_tofind = nlsp.log_bpfilter(signal_start_freq,signal_stop_freq,branches,input_signal)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
+                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
-        found_filter_spec = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
+        found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
                                         signal_length,branches)
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
+                                                     nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         if Plot is True:
@@ -44,10 +44,10 @@ def differentbranches_evaluation(input_signal,branches,Plot,iden_method):
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
-        found_filter_spec = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
+        found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
                                         signal_length,branches)
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                     nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         if Plot is True:
@@ -59,7 +59,7 @@ def differentbranches_evaluation(input_signal,branches,Plot,iden_method):
 def computationtime_evaluation(input_signal,branches,Plot,iden_method):
     inputsignal = input_signal
     branch = reversed(range(2,branches))
-    length = reversed([2**15,2**16,2**17,2**18,2**19])
+    length = reversed([2**15,2**16,2**17,2**18])
     for branches,signal_length in itertools.product(branch,length):
         simulation_time_start = time.clock()
         inputsignal.SetLength(signal_length)
@@ -72,11 +72,11 @@ def computationtime_evaluation(input_signal,branches,Plot,iden_method):
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
         identification_time_start = time.clock()
-        found_filter_spec = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
+        found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
                                         signal_length,branches)
         identification_time_stop = time.clock()
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                     nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         iden_nlsystem.GetOutput()

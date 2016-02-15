@@ -21,10 +21,10 @@ def hgmwithfilter_evaluation(input_signal,branches,Plot,iden_method):
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
-    found_filter_spec = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
+    found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
                                         signal_length,branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
@@ -53,10 +53,10 @@ def hgmwithoverlapfilter_evaluation(input_signal,branches,Plot,iden_method):
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
-    found_filter_spec = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
+    found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
                                         signal_length,branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
@@ -82,10 +82,10 @@ def linearmodel_evaluation(input_signal,branches,Plot,iden_method):
     amplification = 1.0
     ref_nlsystem = sumpf.modules.AmplifySignal(factor=amplification)
     ref_nlsystem.SetInput(input_signal)
-    found_filter_spec = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
+    found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
                                         signal_length,branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                  nonlinear_functions=nl_functions,
                                                   filter_irs=found_filter_spec,
                                                   max_harmonics=range(1,branches+1))
     if Plot is True:

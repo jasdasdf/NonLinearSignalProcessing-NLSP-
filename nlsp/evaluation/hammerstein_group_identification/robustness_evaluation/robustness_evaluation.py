@@ -17,20 +17,20 @@ def robustness_noise_evaluation(input_signal_signal,branches,Plot,iden_method):
         input_signal = input_signal_signal.GetOutput()
         filter_spec_tofind = nlsp.log_bpfilter(signal_start_freq,signal_stop_freq,branches,input_signal)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
+                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
         ref_nlsystem_noise = nlsp.add_noise(ref_nlsystem.GetOutput(),sumpf.modules.NoiseGenerator.GaussianDistribution(mean,sd))
-        found_filter_spec = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
+        found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
                                         signal_length,branches)
-        noise_filter_spec = iden_method(input_signal,ref_nlsystem_noise,signal_start_freq,signal_stop_freq,
+        noise_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem_noise,signal_start_freq,signal_stop_freq,
                                         signal_length,branches)
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
+                                                     nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         noise_iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
+                                                     nonlinear_functions=nl_functions,
                                                      filter_irs=noise_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         if Plot is True:
@@ -59,10 +59,10 @@ def robustness_excitation_evaluation(input_signal,branches,Plot,iden_method):
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
-        found_filter_spec = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
+        found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
                                         signal_length,branches)
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=sample_signal,
-                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
+                                                     nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         ref_nlsystem_scaled = sumpf.modules.AmplifySignal(input=ref_nlsystem.GetOutput(),factor=sample_amp)

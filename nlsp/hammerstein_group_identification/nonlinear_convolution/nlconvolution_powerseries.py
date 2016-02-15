@@ -91,19 +91,21 @@ def nonlinearconvolution_powerseries_nlfunction(branches):
         nl_functions.append(nlsp.function_factory.power_series(i+1))
     return nl_functions
 
-def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, prop):
+def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0,
+                                           sweep_length=None,branches=5):
     """
     Fuction for debugging purpose
     :param input_sweep: the input sweep signal which is given to the nonlinear system
     :param output_sweep: the output signal which is observed from the nonlinear system
     :return: the impulse response of the filters of hammerstein group model
     """
-    if prop is None:
-        prop = [20.0, 20000.0, 5]
-    sweep_start_freq = prop[0]
-    sweep_stop_freq = prop[1]
-    sweep_length = len(input_sweep)
-    branch = prop[2]
+    sweep_start_freq = sweep_start_freq
+    sweep_stop_freq = sweep_stop_freq
+    if sweep_length is None:
+        sweep_length = len(input_sweep)
+    else:
+        sweep_length = sweep_length
+    branch = branches
     print "NL convolution powerseries type identification"
     print "sweep_start:%f, stop:%f, length:%f, branch:%d" %(sweep_start_freq,sweep_stop_freq,sweep_length,branch)
 
@@ -139,15 +141,19 @@ def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, prop):
     for i in range(len(tf_harmonics_all.GetChannels())):
         tf_harmonics =  sumpf.modules.SplitSpectrum(data=tf_harmonics_all, channels=[i]).GetOutput()
         harmonics_tf.append(tf_harmonics)
+    if len(harmonics_tf) != 5:
+            harmonics_tf.extend([sumpf.modules.ConstantSpectrumGenerator(value=0.0,
+                                                                                  resolution=harmonics_tf[0].GetResolution(),
+                                                                                  length=len(harmonics_tf[0])).GetSpectrum()]*(5-len(harmonics_tf)))
     Volterra_tf = []
-    Volterra_tf.append(harmonics_tf[0] + (3/4)*harmonics_tf[2] +(5/8)*harmonics_tf[4])
-    Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=harmonics_tf[1],factor=-1j/2).GetOutput() +
-             sumpf.modules.AmplifySpectrum(input=harmonics_tf[3],factor=-1j/2).GetOutput())
-    Volterra_tf.append((-1/4)*harmonics_tf[2] - (5/16)*harmonics_tf[4])
-    Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=harmonics_tf[3],factor=(1j/8)).GetOutput())
-    Volterra_tf.append((1/16)*harmonics_tf[4])
+    Volterra_tf.append(harmonics_tf[0] + (3/4.0)*harmonics_tf[2] +(5/8.0)*harmonics_tf[4])
+    Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=harmonics_tf[1],factor=-1j/2.0).GetOutput() +
+             sumpf.modules.AmplifySpectrum(input=harmonics_tf[3],factor=-1j/2.0).GetOutput())
+    Volterra_tf.append((-1/4.0)*harmonics_tf[2] - (5/16.0)*harmonics_tf[4])
+    Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=harmonics_tf[3],factor=(1j/8.0)).GetOutput())
+    Volterra_tf.append((1/16.0)*harmonics_tf[4])
     Volterra_ir = []
     for kernel in Volterra_tf:
         ift = sumpf.modules.InverseFourierTransform(spectrum=kernel).GetSignal()
         Volterra_ir.append(ift)
-    return Volterra_ir
+    return Volterra_ir[:branches]

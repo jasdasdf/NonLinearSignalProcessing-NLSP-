@@ -2,4 +2,6 @@ from .nlconvolution_powerseries import nonlinearconvolution_powerseries,nonlinea
 
 from .nlconvolution_chebyshev import nonlinearconvolution_chebyshev
 
+from .nlconvolution_cosine import nonlinearconvolution_chebyshev_cosine
+
 from .nl_convolution import NLConvolution

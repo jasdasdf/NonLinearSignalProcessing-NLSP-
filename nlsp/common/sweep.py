@@ -1,4 +1,6 @@
 import sumpf
+import math
+import common.plot as plot
 
 class SweepGenerator(object):
     def __init__(self, sampling_rate=48000.0, length=2**16, start_frequency=20.0,
@@ -63,3 +65,13 @@ class SweepGenerator(object):
 #     sweep = sumpf.modules.CutSignal(signal=sweep_signal,start=0,
 #                                     stop=stop_sample).GetOutput()
 #     return sweep
+
+# def sweepgenerator(sampling_rate=48000.0, length=2**10, start_frequency=20.0, stop_frequency=3000.0):
+#     channel = []
+#     for i in range(0,length):
+#         channel.append(math.sin(2*math.pi*round((length*start_frequency)/math.log((stop_frequency/start_frequency),math.e))*
+#                                 (math.exp((start_frequency*i)/round(length*start_frequency/math.log((stop_frequency/start_frequency),math.e))))))
+#     signal = sumpf.Signal(channels=(channel,),samplingrate=sampling_rate,labels=("Sweep"))
+#     plot.plot(signal)
+#
+# sweepgenerator()

@@ -32,3 +32,5 @@ from soft_clipping import NLClipSignal
 
 from sweep import SweepGenerator
 
+from plots import *
+

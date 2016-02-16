@@ -41,7 +41,7 @@ def signal_to_noise_ratio_time(input_signalorspectrum, output_signalorspectrum):
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
     return snr
 
-def signal_to_noise_ratio_time_range(input_signalorspectrum, output_signalorspectrum, freq_range):
+def signal_to_noise_ratio_time_range(input_signalorspectrum, output_signalorspectrum, time_range):
     """
     Calculates the signal to noise ratio between two signals.
     This function calculates the signal to noise ratio in time domain. If the input is spectrum then it transforms it to
@@ -60,20 +60,20 @@ def signal_to_noise_ratio_time_range(input_signalorspectrum, output_signalorspec
         op.append(output_signalorspectrum)
     else:
         op = output_signalorspectrum
-    input_spec_m = []
-    output_spec_m = []
+    input_sig_m = []
+    output_sig_m = []
     for input_signalorspectrum,output_signalorspectrum in zip(ip,op):
-        if isinstance(input_signalorspectrum, sumpf.Signal):
-            input_spec = sumpf.modules.FourierTransform(signal=input_signalorspectrum).GetSpectrum()
+        if isinstance(input_signalorspectrum, sumpf.Spectrum):
+            input_sig = sumpf.modules.InverseFourierTransform(input_signalorspectrum).GetSignal()
         else:
-            input_spec = input_signalorspectrum
-        if isinstance(output_signalorspectrum, sumpf.Signal):
-            output_spec = sumpf.modules.FourierTransform(signal=output_signalorspectrum).GetSpectrum()
+            input_sig = input_signalorspectrum
+        if isinstance(output_signalorspectrum, sumpf.Spectrum):
+            output_sig = sumpf.modules.InverseFourierTransform(output_signalorspectrum).GetSignal()
         else:
-            output_spec = output_signalorspectrum
-        input_spec_m.append(nlsp.cut_spectrum(input_spec,freq_range))
-        output_spec_m.append(nlsp.cut_spectrum(output_spec,freq_range))
-    snr = nlsp.signal_to_noise_ratio_time(input_spec_m,output_spec_m)
+            output_sig = output_signalorspectrum
+        input_sig_m.append(sumpf.modules.CutSignal(signal=input_sig,start=time_range[0],stop=time_range[1]).GetOutput())
+        output_sig_m.append(sumpf.modules.CutSignal(signal=output_sig,start=time_range[0],stop=time_range[1]).GetOutput())
+    snr = nlsp.signal_to_noise_ratio_time(input_sig_m,output_sig_m)
     return snr
 
 def signal_to_noise_ratio_freq(input_signalorspectrum, output_signalorspectrum):

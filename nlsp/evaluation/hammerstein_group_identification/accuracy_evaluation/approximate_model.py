@@ -4,9 +4,9 @@
 
 import sumpf
 import nlsp
-import common.plot as plot
+import nlsp.common.plots as plot
 
-def hardclipping_evaluation(input_signal,branches,Plot,iden_method):
+def hardclipping_evaluation(input_signal,branches,iden_method,Plot,Save):
     """
     Evaluation of System Identification method by hard clipping system
     nonlinear system - virtual clipping systems which hard clips the signal amplitute which are not in the threshold range
@@ -25,12 +25,12 @@ def hardclipping_evaluation(input_signal,branches,Plot,iden_method):
                                                   filter_irs=found_filter_spec,
                                                   max_harmonics=range(1,branches+1))
     if Plot is True:
-        nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
-        nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
+        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True,save=Save,name="%s_hardclip"%str(iden_method))
     print "SNR between Reference and Identified output for hardclipping: %r" %nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
-def softclipping_evaluation(input_signal,branches,Plot,iden_method):
+def softclipping_evaluation(input_signal,branches,iden_method,Plot,Save):
     """
     Evaluation of System Identification method by soft clipping system
     nonlinear system - virtual clipping systems which soft clips the signal amplitute which are not in the threshold range
@@ -50,11 +50,11 @@ def softclipping_evaluation(input_signal,branches,Plot,iden_method):
                                                   filter_irs=found_filter_spec,
                                                   max_harmonics=range(1,branches+1))
     if Plot is True:
-        nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
-        nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
+        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True,save=Save,name="%s_softclip"%str(iden_method))
     print "SNR between Reference and Identified output for soft clipping: %r" %nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
-def doublehgm_same_evaluation(input_signal,branches,Plot,iden_method):
+def doublehgm_same_evaluation(input_signal,branches,iden_method,Plot,Save):
     """
     Evaluation of System Identification method by double hgm virtual nl system with same nonlinear degree and filters
     nonlinear system - two virtual hammerstein group model with power series polynomials as nl function and bandpass
@@ -77,12 +77,13 @@ def doublehgm_same_evaluation(input_signal,branches,Plot,iden_method):
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
-        nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput(2)).GetSpectrum(),"Reference Output",False)
-        nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
+        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput(2)).GetSpectrum(),"Reference Output",False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True,save=Save,name="%s_doublehgm-op"%str(iden_method))
         plot.log()
         for i,foundspec in enumerate(found_filter_spec):
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),str(i+1)+str(" filter,input"),False)
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),str(i+1)+str(" filter,identified"),False)
-        plot.show()
+            plot.relabelandplot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),str(i+1)+str(" filter,input"),False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),str(i+1)+str(" filter,identified"),False,save=Save,name="%s_doublehgm-filter"%str(iden_method))
+        if Save is not True:
+            plot.show()
     print "SNR between Reference and Identified output for double hgm: %r" %nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(2),
                                                                                              iden_nlsystem.GetOutput())

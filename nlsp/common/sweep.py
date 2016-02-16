@@ -11,7 +11,6 @@ class SweepGenerator(object):
         self.__stop_frequency = float(stop_frequency)
         self.__silence_duration = float(silence_duration)
         self.__fade_out = float(fade_out)
-        self.__signal_duration = self.__length/self.__sampling_rate
 
     def SetLength(self,length):
         self.__length = float(length)
@@ -49,29 +48,14 @@ class SweepGenerator(object):
             concatenated_sweep = cat.GetOutput()
             sumpf.destroy_connectors(cat)
         else:
+            print "normal sweep"
             concatenated_sweep = sumpf.modules.SweepGenerator(self.__start_frequency,self.__stop_frequency,
                                                               samplingrate=self.__sampling_rate,length=self.__length).GetSignal()
         self.__sweep_signal = sumpf.modules.AmplifySignal(concatenated_sweep)
         return self.__sweep_signal.GetOutput()
 
     def GetProperties(self):
-        sweep_duration = self.__signal_duration - self.__fade_out - self.__silence_duration
-        return self.__start_frequency, self.__stop_frequency, int(sweep_duration*self.__sampling_rate)
+        sweep_duration = (self.__length/self.__sampling_rate) - self.__fade_out - self.__silence_duration
+        return self.__start_frequency, self.__stop_frequency, (sweep_duration*self.__sampling_rate)
 
-#
-# def get_sweep_without_fadeoutandfadein(sweep_signal, silence_duration=0.03, fade_out=0.02):
-#     stop_sample = (sweep_signal.GetDuration() - fade_out - silence_duration)*sweep_signal.GetSamplingRate()
-#     print stop_sample,len(sweep_signal)
-#     sweep = sumpf.modules.CutSignal(signal=sweep_signal,start=0,
-#                                     stop=stop_sample).GetOutput()
-#     return sweep
 
-# def sweepgenerator(sampling_rate=48000.0, length=2**10, start_frequency=20.0, stop_frequency=3000.0):
-#     channel = []
-#     for i in range(0,length):
-#         channel.append(math.sin(2*math.pi*round((length*start_frequency)/math.log((stop_frequency/start_frequency),math.e))*
-#                                 (math.exp((start_frequency*i)/round(length*start_frequency/math.log((stop_frequency/start_frequency),math.e))))))
-#     signal = sumpf.Signal(channels=(channel,),samplingrate=sampling_rate,labels=("Sweep"))
-#     plot.plot(signal)
-#
-# sweepgenerator()

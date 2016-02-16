@@ -3,7 +3,7 @@ import nlsp
 import time
 import itertools
 
-def differentlength_evaluation(input_signal,branches,Plot,iden_method):
+def differentlength_evaluation(inputsignal,branches,iden_method,Plot,Save):
     """
     Evaluation of System Identification method by hgm virtual nl system
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and bandpass filters
@@ -13,7 +13,6 @@ def differentlength_evaluation(input_signal,branches,Plot,iden_method):
     expectation - utmost similarity between the two spectrums
     """
     length = [2**15,2**16,2**17,2**18]
-    inputsignal = input_signal
     for signal_length in length:
         inputsignal.SetLength(signal_length)
         input_signal = inputsignal.GetOutput()
@@ -35,10 +34,10 @@ def differentlength_evaluation(input_signal,branches,Plot,iden_method):
         print "SNR between Reference and Identified output : %r, input length: %r" %(nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
                                                                                      iden_nlsystem.GetOutput()),len(input_signal))
 
-def differentbranches_evaluation(input_signal,branches,Plot,iden_method):
+def differentbranches_evaluation(inputsignal,branches,iden_method,Plot,Save):
     for branches in range(2,branches+1):
-        input_signal = input_signal.GetOutput()
-        signal_start_freq,signal_stop_freq,signal_length = input_signal.GetProperties()
+        input_signal = inputsignal.GetOutput()
+        signal_start_freq,signal_stop_freq,signal_length = inputsignal.GetProperties()
         filter_spec_tofind = nlsp.log_bpfilter(signal_start_freq,signal_stop_freq,branches,input_signal)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
@@ -56,7 +55,7 @@ def differentbranches_evaluation(input_signal,branches,Plot,iden_method):
         print "SNR between Reference and Identified output : %r, with number of branches: %r" %(nlsp.signal_to_noise_ratio_freq_range(ref_nlsystem.GetOutput(),
                                                                                      iden_nlsystem.GetOutput(),[signal_start_freq,signal_stop_freq]),branches)
 
-def computationtime_evaluation(input_signal,branches,Plot,iden_method):
+def computationtime_evaluation(input_signal,branches,iden_method,Plot,Save):
     inputsignal = input_signal
     branch = reversed(range(2,branches))
     length = reversed([2**15,2**16,2**17,2**18])

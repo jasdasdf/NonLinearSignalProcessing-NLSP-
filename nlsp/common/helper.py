@@ -257,7 +257,7 @@ def nl_branches(function,branches):
     """
     nl = []
     for i in range(1,branches+1):
-        nl.append(function(branches))
+        nl.append(function(i))
     return nl
 
 def add_noise(signal,distribution):

@@ -2,7 +2,7 @@ import sumpf
 import nlsp
 import itertools
 
-def robustness_noise_evaluation(input_signal_signal,branches,Plot,iden_method):
+def robustness_noise_evaluation(input_signal_signal,branches,iden_method,Plot,Save):
     """
     Evaluation of System Identification method robustness by adding noise
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and bandpass filters
@@ -46,7 +46,7 @@ def robustness_noise_evaluation(input_signal_signal,branches,Plot,iden_method):
         print "SNR between Reference and Identified output with noise of sd %r and mean %r is %r" %(sd,mean,nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
                                                                                                  noise_iden_nlsystem.GetOutput()))
 
-def robustness_excitation_evaluation(input_signal,branches,Plot,iden_method):
+def robustness_excitation_evaluation(input_signal,branches,iden_method,Plot,Save):
     excitation_signal_amp = [0.5,1.0,2.0]
     sample_signal_amp = [0.5,1.0,2.0]
     signal_start_freq,signal_stop_freq,signal_length = input_signal.GetProperties()

@@ -42,4 +42,3 @@ branches = 3
 wgn_length = 2**8
 Plot = True
 
-hgmwithfilter_wgn_evaluation()

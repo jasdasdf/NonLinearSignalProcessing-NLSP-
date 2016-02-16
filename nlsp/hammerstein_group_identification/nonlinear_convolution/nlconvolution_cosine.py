@@ -34,7 +34,6 @@ def nonlinearconvolution_chebyshev_cosine(input_sweep, output_sweep, sweep_start
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=300).GetOutput()
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
-
     for i in range(branch-1):
         split_harm = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=ir_sweep,
                                                                harmonic_order=i+2,
@@ -44,16 +43,28 @@ def nonlinearconvolution_chebyshev_cosine(input_sweep, output_sweep, sweep_start
                                                                ip_signal.GetSamplingRate()).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.GetLabels()))
-    harmonics_ir = []
-    for i in range(len(ir_merger.GetOutput().GetChannels())):
-        ir_harmonics =  sumpf.modules.SplitSignal(data=ir_merger.GetOutput(), channels=[i]).GetOutput()
-        harmonics_ir.append(ir_harmonics)
-    constant = sumpf.modules.ConstantSignalGenerator(value=1.0,samplingrate=harmonics_ir[1].GetSamplingRate(),length=len(harmonics_ir[1])).GetSignal()
+    tf_harmonics_all = sumpf.modules.FourierTransform(signal=ir_merger.GetOutput()).GetSpectrum()
+    harmonics_tf = []
+    for i in range(len(tf_harmonics_all.GetChannels())):
+        tf_harmonics =  sumpf.modules.SplitSpectrum(data=tf_harmonics_all, channels=[i]).GetOutput()
+        harmonics_tf.append(tf_harmonics)
+    if len(harmonics_tf) != 5:
+            harmonics_tf.extend([sumpf.modules.ConstantSpectrumGenerator(value=0.0,
+                                                                                  resolution=harmonics_tf[0].GetResolution(),
+                                                                                  length=len(harmonics_tf[0])).GetSpectrum()]*(5-len(harmonics_tf)))
+    Volterra_tf = []
+    for i in range(len(tf_harmonics_all.GetChannels())):
+        tf_harmonics =  sumpf.modules.SplitSpectrum(data=tf_harmonics_all, channels=[i]).GetOutput()
+        harmonics_tf.append(tf_harmonics)
+    Volterra_tf.append(harmonics_tf[0] + (3/4.0)*harmonics_tf[2] +(10/16.0)*harmonics_tf[4])
+    Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=harmonics_tf[1],factor=1/2.0).GetOutput() +
+             sumpf.modules.AmplifySpectrum(input=harmonics_tf[3],factor=1/2.0).GetOutput())
+    Volterra_tf.append((3/4.0)*harmonics_tf[2] + (5/16.0)*harmonics_tf[4])
+    Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=harmonics_tf[3],factor=(1/8.0)).GetOutput())
+    Volterra_tf.append((1/16.0)*harmonics_tf[4])
     Volterra_ir = []
-    Volterra_ir.append(harmonics_ir[0])
-    Volterra_ir.append((1/2.0)*(harmonics_ir[1]+sumpf.modules.AmplifySignal(input=constant,factor=1.0).GetOutput()))
-    Volterra_ir.append((1/4.0)*(harmonics_ir[2]+3.0*Volterra_ir[0]))
-    Volterra_ir.append((1/8.0)*(harmonics_ir[3]+8.0*Volterra_ir[1]-sumpf.modules.AmplifySignal(input=constant,factor=-1.0).GetOutput()))
-    Volterra_ir.append((1/16.0)*(harmonics_ir[4]+20*Volterra_ir[2]-5*Volterra_ir[0]))
+    for kernel in Volterra_tf:
+        ift = sumpf.modules.InverseFourierTransform(spectrum=kernel).GetSignal()
+        Volterra_ir.append(ift)
     nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
-    return Volterra_ir, nl_func
+    return Volterra_ir[:branches],nl_func

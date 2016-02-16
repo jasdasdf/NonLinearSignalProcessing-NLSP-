@@ -55,8 +55,7 @@ def nonlinearconvolution_powerseries(input_sweep, output_sweep, sweep_start_freq
                                                                harmonic_order=i+2,
                                                                sweep_start_frequency=sweep_start_freq,
                                                                sweep_stop_frequency=sweep_stop_freq,
-                                                               sweep_duration=sweep_length/
-                                                               ip_signal.GetSamplingRate()).GetHarmonicImpulseResponse()
+                                                               sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.GetLabels()))
     tf_harmonics_all = sumpf.modules.FourierTransform(signal=ir_merger.GetOutput()).GetSpectrum()
@@ -121,8 +120,7 @@ def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, sweep_star
                                                                harmonic_order=i+2,
                                                                sweep_start_frequency=sweep_start_freq,
                                                                sweep_stop_frequency=sweep_stop_freq,
-                                                               sweep_duration=sweep_length/
-                                                               ip_signal.GetSamplingRate()).GetHarmonicImpulseResponse()
+                                                               sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.GetLabels()))
     tf_harmonics_all = sumpf.modules.FourierTransform(signal=ir_merger.GetOutput()).GetSpectrum()
@@ -130,10 +128,6 @@ def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, sweep_star
     for i in range(len(tf_harmonics_all.GetChannels())):
         tf_harmonics =  sumpf.modules.SplitSpectrum(data=tf_harmonics_all, channels=[i]).GetOutput()
         harmonics_tf.append(tf_harmonics)
-    if len(harmonics_tf) != 5:
-            harmonics_tf.extend([sumpf.modules.ConstantSpectrumGenerator(value=0.0,
-                                                                                  resolution=harmonics_tf[0].GetResolution(),
-                                                                                  length=len(harmonics_tf[0])).GetSpectrum()]*(5-len(harmonics_tf)))
     Volterra_tf = []
     Volterra_tf.append(harmonics_tf[0] + (3/4.0)*harmonics_tf[2] +(5/8.0)*harmonics_tf[4])
     Volterra_tf.append(sumpf.modules.AmplifySpectrum(input=harmonics_tf[1],factor=-1j/2.0).GetOutput() +

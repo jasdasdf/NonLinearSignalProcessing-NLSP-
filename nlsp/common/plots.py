@@ -5,7 +5,7 @@ import nlsp
 import matplotlib.pyplot as pyplot
 import os
 
-max_freq = 30000.0
+max_freq = 40000.0
 scale_log = False
 axis = pyplot.subplot(111)
 
@@ -72,7 +72,7 @@ def plot(data, legend=True, show=True, save=False, name=None):
     axis.set_xlabel("Frequeny [Hz]", fontsize="x-large")
     pyplot.xticks(fontsize="large")
     pyplot.yticks(fontsize="large")
-    pyplot.ylim((0.01, 2000.0))
+    pyplot.ylim((0.01, 1000.0))
     if save is True:
         location = "C:/Users/diplomand.8/OneDrive/Pictures/"
         fig = os.path.join(location,name)
@@ -101,7 +101,7 @@ def plot_groupdelayandmagnitude(data, show=True, save=False, name=None):
                 pyplot.loglog(x_data, d.GetMagnitude()[i], label=d.GetLabels()[i])
                 pyplot.subplot(2,1,2)
                 pyplot.title("Group delay")
-                pyplot.loglog(x_data, d.GetGroupDelay()[i], label=d.GetLabels()[i])
+                pyplot.semilogx(x_data, d.GetGroupDelay()[i], label=d.GetLabels()[i])
     if save is True:
         location = "C:/Users/diplomand.8/OneDrive/Pictures/"
         fig = os.path.join(location,name)

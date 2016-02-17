@@ -17,6 +17,7 @@ def differentlength_evaluation(inputsignal,branches,iden_method,Plot,Save):
         inputsignal.SetLength(signal_length)
         input_signal = inputsignal.GetOutput()
         signal_start_freq,signal_stop_freq,signal_length = inputsignal.GetProperties()
+        print signal_start_freq,signal_stop_freq,signal_length
         filter_spec_tofind = nlsp.log_bpfilter(signal_start_freq,signal_stop_freq,branches,input_signal)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),

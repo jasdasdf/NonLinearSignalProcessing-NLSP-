@@ -68,6 +68,6 @@ def robustness_excitation_evaluation(input_signal,branches,iden_method,Plot,Save
         ref_nlsystem_scaled = sumpf.modules.AmplifySignal(input=ref_nlsystem.GetOutput(),factor=sample_amp)
         if Plot is True:
             nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem_scaled.GetOutput()).GetSpectrum(),"Reference Output Scaled",False)
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",False)
+            nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
         print "SNR between Scaled Reference(amp:%r) and Identified(amp:%r) output: %r" %(excitation_amp,sample_amp,nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
                                                                                                  iden_nlsystem.GetOutput()))

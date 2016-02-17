@@ -15,6 +15,7 @@ def hgmwithfilter_evaluation(input_signal,branches,iden_method,Plot,Save):
     expectation - utmost similarity between the two spectrums
     """
     signal_start_freq,signal_stop_freq,signal_length = input_signal.GetProperties()
+    print signal_start_freq,signal_stop_freq,signal_length
     input_signal = input_signal.GetOutput()
     filter_spec_tofind = nlsp.log_bpfilter(signal_start_freq,signal_stop_freq,branches,input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
@@ -27,8 +28,8 @@ def hgmwithfilter_evaluation(input_signal,branches,iden_method,Plot,Save):
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
-    # nlsp.plot_groupdelayandmagnitude(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),show=False)
-    # nlsp.plot_groupdelayandmagnitude(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),show=True)
+    nlsp.plot_groupdelayandmagnitude(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),show=False)
+    nlsp.plot_groupdelayandmagnitude(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),show=True)
     if Plot is True:
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False,save=Save,name="filter")
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
@@ -37,8 +38,8 @@ def hgmwithfilter_evaluation(input_signal,branches,iden_method,Plot,Save):
             nlsp.relabelandplot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),str(i+1)+str(" filter,identified"),False)
         plot.show()
     print signal_length,len(ref_nlsystem.GetOutput())
-    print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.signal_to_noise_ratio_time_range(ref_nlsystem.GetOutput(),
-                                                                                             iden_nlsystem.GetOutput(),[0,len(ref_nlsystem.GetOutput())])
+    print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
+                                                                                             iden_nlsystem.GetOutput())
 
 def hgmwithoverlapfilter_evaluation(input_signal,branches,iden_method,Plot,Save):
     """

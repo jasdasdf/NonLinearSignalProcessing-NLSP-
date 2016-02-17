@@ -46,7 +46,7 @@ def nonlinearconvolution_chebyshev(input_sweep, output_sweep, sweep_start_freq=2
                                                              stop_frequency=input_sweep.GetSamplingRate()/2).GetOutput()
     tf_sweep = sumpf.modules.MultiplySpectrums(spectrum1=inversed_ip, spectrum2=op_spectrum).GetOutput()
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
-    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=300).GetOutput()
+    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
 
@@ -55,8 +55,7 @@ def nonlinearconvolution_chebyshev(input_sweep, output_sweep, sweep_start_freq=2
                                                                harmonic_order=i+2,
                                                                sweep_start_frequency=sweep_start_freq,
                                                                sweep_stop_frequency=sweep_stop_freq,
-                                                               sweep_duration=sweep_length/
-                                                               ip_signal.GetSamplingRate()).GetHarmonicImpulseResponse()
+                                                               sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.GetLabels()))
     Volterra_ir = []

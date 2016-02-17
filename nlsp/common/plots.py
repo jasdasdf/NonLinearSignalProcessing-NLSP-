@@ -58,6 +58,7 @@ def plot(data, legend=True, show=True, save=False, name=None):
             #				pyplot.plot(x_data[0:len(x_data) // 2], d.GetPhase()[i][0:len(x_data) // 2], label=d.GetLabels()[i])
             #				pyplot.plot(x_data, d.GetGroupDelay()[i], label=d.GetLabels()[i])
         pyplot.xlim((0.0, max_freq))
+        axis.set_xlabel("Frequeny [Hz]", fontsize="x-large")
     else:
         for d in data:
             # create x_data
@@ -67,12 +68,11 @@ def plot(data, legend=True, show=True, save=False, name=None):
             # plot
             for i in range(len(d.GetChannels())):
                 pyplot.plot(x_data, d.GetChannels()[i], label=d.GetLabels()[i])
+        axis.set_xlabel("Time [s]", fontsize="x-large")
     if legend:
         pyplot.legend(loc="best", fontsize="x-large")
-    axis.set_xlabel("Frequeny [Hz]", fontsize="x-large")
     pyplot.xticks(fontsize="large")
     pyplot.yticks(fontsize="large")
-    pyplot.ylim((0.01, 1000.0))
     if save is True:
         location = "C:/Users/diplomand.8/OneDrive/Pictures/"
         fig = os.path.join(location,name)

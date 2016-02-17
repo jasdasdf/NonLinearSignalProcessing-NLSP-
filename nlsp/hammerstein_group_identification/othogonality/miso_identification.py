@@ -1,7 +1,6 @@
 import numpy
 import sumpf
 import nlsp
-# import common.plot as plot
 
 def wgn_hgm_decorrelate(input,branches,total_branches):
     k_matrix = numpy.zeros((total_branches,total_branches))
@@ -35,6 +34,7 @@ def wgn_hgm_decorrelate(input,branches,total_branches):
 
 def wgn_hgm_identification(input_wgn,output_wgn,branches):
     l = []
+    C = []
     for branch in range(1,branches+1):
         # decorrelate = nlsp.NonlinearFunction.hermite_polynomial(branch,input_wgn)
         decorrelate,k_matrix,mu_matrix = wgn_hgm_decorrelate(input_wgn,branch,branches)
@@ -45,22 +45,14 @@ def wgn_hgm_identification(input_wgn,output_wgn,branches):
         L = sumpf.modules.DivideSpectrums(spectrum1=num, spectrum2=den).GetOutput()
         kernel = sumpf.modules.InverseFourierTransform(L).GetSignal()
         signal = sumpf.Signal(channels=kernel.GetChannels(),samplingrate=input_wgn.GetSamplingRate(),labels=kernel.GetLabels())
+        C.append(signal)
         l.append(sumpf.modules.FourierTransform(signal).GetSpectrum())
-    print k_matrix
-    print mu_matrix
-    print l
-    # A = []
-    # for row in range(0,branches):
-    #     for column in range(0,branches):
-    #         temp = sumpf.modules.AmplifySpectrum(input=l[row],factor=k_matrix[row][column]).GetOutput()
-    #         A.append(temp)
-    # for a in range(0,len(A)):
-    #     print A[a]
-    # return A
+    B = []
+    for row in range(0,branches):
+        A = sumpf.modules.ConstantSpectrumGenerator(value=0.0,resolution=l[0].GetResolution(),length=len(l[0])).GetSpectrum()
+        for column in range(0,branches):
+            temp = sumpf.modules.AmplifySpectrum(input=l[column],factor=k_matrix[row][column]).GetOutput()
+            A = A + temp
+        B.append(sumpf.modules.InverseFourierTransform(A + mu_matrix[row]).GetSignal())
 
-# signal = sumpf.modules.SineWaveGenerator(frequency=1.0,samplingrate=48000.0,length=48000).GetSignal()
-# order = 5
-# for n in range(1,order+1):
-#     decorr_signal = wgn_hgm_decorrelate(signal,n)
-#     plot.plot(decorr_signal,show=False)
-# plot.show()
+    return C

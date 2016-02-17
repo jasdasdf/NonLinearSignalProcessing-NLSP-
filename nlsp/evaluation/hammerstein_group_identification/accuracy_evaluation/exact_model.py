@@ -27,8 +27,8 @@ def hgmwithfilter_evaluation(input_signal,branches,iden_method,Plot,Save):
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
-    nlsp.plot_groupdelayandmagnitude(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),show=False)
-    nlsp.plot_groupdelayandmagnitude(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),show=True)
+    # nlsp.plot_groupdelayandmagnitude(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),show=False)
+    # nlsp.plot_groupdelayandmagnitude(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),show=True)
     if Plot is True:
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False,save=Save,name="filter")
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)

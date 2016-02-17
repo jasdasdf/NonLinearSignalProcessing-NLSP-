@@ -50,4 +50,4 @@ def get_sweep(length):
 
 def get_sweep_properties(sweep_signal):
 	sweep_duration = sweep_signal.GetDuration() - fade_out - silence_duration
-	return start_frequency, stop_frequency, sweep_duration
+	return start_frequency, stop_frequency, sweep_duration*sampling_rate

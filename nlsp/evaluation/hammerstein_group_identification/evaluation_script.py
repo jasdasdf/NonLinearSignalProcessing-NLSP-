@@ -5,12 +5,11 @@ import common.plot as plot
 sampling_rate = 48000.0
 sweep_start_freq = 20.0
 sweep_stop_freq = 20000.0
-sweep_length = 2**18
+sweep_length = 2**10
 silence_duration = 0.0
 fade_out = 0.0
 branches = 5
-iden_method = [nlsp.nonlinearconvolution_chebyshev_cosine,nlsp.nonlinearconvolution_powerseries,nlsp.nonlinearconvolution_powerseries_debug,
-               nlsp.nonlinearconvolution_chebyshev]
+iden_method = [nlsp.nonlinearconvolution_powerseries]
 Plot = False
 Save = False
 

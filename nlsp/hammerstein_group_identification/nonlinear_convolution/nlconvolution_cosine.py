@@ -39,8 +39,7 @@ def nonlinearconvolution_chebyshev_cosine(input_sweep, output_sweep, sweep_start
                                                                harmonic_order=i+2,
                                                                sweep_start_frequency=sweep_start_freq,
                                                                sweep_stop_frequency=sweep_stop_freq,
-                                                               sweep_duration=sweep_length/
-                                                               ip_signal.GetSamplingRate()).GetHarmonicImpulseResponse()
+                                                               sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.GetLabels()))
     tf_harmonics_all = sumpf.modules.FourierTransform(signal=ir_merger.GetOutput()).GetSpectrum()

@@ -49,7 +49,7 @@ def nonlinearconvolution_powerseries(input_sweep, output_sweep, sweep_start_freq
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
-
+    print sweep_length
     for i in range(branch-1):
         split_harm = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=ir_sweep,
                                                                harmonic_order=i+2,

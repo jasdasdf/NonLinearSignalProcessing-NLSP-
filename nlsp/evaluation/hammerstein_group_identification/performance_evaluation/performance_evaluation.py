@@ -57,7 +57,7 @@ def differentbranches_evaluation(inputsignal,branches,iden_method,Plot,Save):
 
 def computationtime_evaluation(input_signal,branches,iden_method,Plot,Save):
     inputsignal = input_signal
-    branch = reversed(range(2,branches))
+    branch = reversed(range(2,branches+1))
     length = reversed([2**15,2**16,2**17,2**18])
     for branches,signal_length in itertools.product(branch,length):
         simulation_time_start = time.clock()

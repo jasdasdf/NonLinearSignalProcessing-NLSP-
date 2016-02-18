@@ -1,4 +1,5 @@
-from .nlconvolution_powerseries import nonlinearconvolution_powerseries,nonlinearconvolution_powerseries_debug
+from .nlconvolution_powerseries import nonlinearconvolution_powerseries,nonlinearconvolution_powerseries_debug,\
+    nonlinearconvolution_powerseries_novak
 
 from .nlconvolution_chebyshev import nonlinearconvolution_chebyshev
 

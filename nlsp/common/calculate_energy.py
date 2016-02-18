@@ -1,6 +1,8 @@
 import sumpf
 import nlsp
 import numpy
+import math
+import pandas
 
 def calculateenergy_time(input):
     """
@@ -95,3 +97,26 @@ def calculateenergy_betweenfreq_time(input,frequency_range):
     spec = nlsp.cut_spectrum(ip,frequency_range)
     energy = nlsp.calculateenergy_time(spec)
     return energy
+
+def exponential_energy(input):
+    if isinstance(input,(sumpf.Signal)):
+        ip = sumpf.modules.FourierTransform(signal=input).GetSpectrum()
+    else:
+        ip = input
+    dummy = 0.0001
+    while True:
+        dummy = dummy + 0.0001
+        low = 1 * (dummy**1)
+        high = 1 * (dummy**(len(input)-1))
+        if low > 1 and high > 10000:
+            break
+    energy_allchannels = []
+    for c in ip.GetChannels():
+        energy_singlechannel = []
+        c = reversed(c)
+        for i,s in enumerate(c):
+            # energy_singlechannel.append((abs(s)**2)*(1*(dummy**i)))
+            energy_singlechannel.append((abs(s)**6))
+        #energy_allchannels.append(numpy.average(energy_singlechannel,weights=range(1,len(energy_singlechannel)+1).reverse()))
+        energy_allchannels.append(numpy.sum(energy_singlechannel))
+    return energy_allchannels

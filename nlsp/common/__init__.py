@@ -24,7 +24,7 @@ from predict_aliasing import predictoutputfreq_usingsamplingtheory
 
 from predict_harmonics import predictharmonics_usingupsampling
 
-from snr import signal_to_noise_ratio_freq_range,signal_to_noise_ratio_time_range,signal_to_noise_ratio_time,signal_to_noise_ratio_freq
+from snr import signal_to_noise_ratio_freq_range,signal_to_noise_ratio_time_range,signal_to_noise_ratio_time,signal_to_noise_ratio_freq,snr_exponential
 
 from mse import mean_squared_error_freq,mean_squared_error_freq_range,mean_squared_error_time_range,mean_squared_error_time
 
@@ -33,4 +33,6 @@ from soft_clipping import NLClipSignal
 from sweep import SweepGenerator
 
 from plots import *
+
+from calculate_energy import exponential_energy
 

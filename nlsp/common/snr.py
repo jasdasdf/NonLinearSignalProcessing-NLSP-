@@ -108,8 +108,8 @@ def signal_to_noise_ratio_freq(input_signalorspectrum, output_signalorspectrum):
                 observed = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[0]).GetOutput()
                 identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
             noise = observed - identified
-            noise_energy = nlsp.calculateenergy_time(noise)
-            input_energy =  nlsp.calculateenergy_time(observed)
+            noise_energy = nlsp.calculateenergy_freq(noise)
+            input_energy =  nlsp.calculateenergy_freq(observed)
             snr.append(10*math.log10(input_energy[0]/noise_energy[0]))
         else:
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
@@ -148,4 +148,35 @@ def signal_to_noise_ratio_freq_range(input_signalorspectrum, output_signalorspec
         input_spec_m.append(nlsp.cut_spectrum(input_spec,freq_range))
         output_spec_m.append(nlsp.cut_spectrum(output_spec,freq_range))
     snr = nlsp.signal_to_noise_ratio_freq(input_spec_m,output_spec_m)
+    return snr
+
+def snr_exponential(input_signalorspectrum,output_signalorspectrum):
+    if isinstance(input_signalorspectrum, list) != True:
+        observed_l = []
+        observed_l.append(input_signalorspectrum)
+    else:
+        observed_l = input_signalorspectrum
+    if isinstance(output_signalorspectrum, list) != True:
+        identified_l = []
+        identified_l.append(output_signalorspectrum)
+    else:
+        identified_l = output_signalorspectrum
+    snr = []
+    for observed,identified in zip(observed_l,identified_l):
+        if isinstance(observed,(sumpf.Signal,sumpf.Spectrum)) and isinstance(observed,(sumpf.Signal,sumpf.Spectrum)):
+            if isinstance(observed,sumpf.Signal):
+                observed = sumpf.modules.FourierTransform(observed).GetSpectrum()
+            if isinstance(identified,sumpf.Signal):
+                identified = sumpf.modules.FourierTransform(identified).GetSpectrum()
+            if len(observed) != len(identified):
+                merged_spectrum = sumpf.modules.MergeSpectrums(spectrums=[observed,identified],
+                                                   on_length_conflict=sumpf.modules.MergeSpectrums.FILL_WITH_ZEROS).GetOutput()
+                observed = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[0]).GetOutput()
+                identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
+            noise = observed - identified
+            noise_energy = nlsp.exponential_energy(noise)
+            input_energy =  nlsp.exponential_energy(observed)
+            snr.append(20*math.log10(input_energy[0]/noise_energy[0]))
+        else:
+            print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
     return snr

@@ -148,7 +148,7 @@ class SweepGenerator(SignalGenerator):
         elif self.__function == SweepGenerator.ExponentialFarina:
             k = T / math.log((fT / f0), math.e)
         elif self.__function == SweepGenerator.ExponentialNovak:
-            k = round((T * f0)/ math.log((fT / f0), math.e))
+            k = (1 / f0)* round((T * f0)/ math.log((fT / f0), math.e))
         elif self.__function == SweepGenerator.Linear:
             k = (fT - f0) / T
         self.__increase_rate = k
@@ -176,8 +176,8 @@ class SweepGenerator(SignalGenerator):
         @param f0: the start frequency in Hz
         @param k: the increase rate of the sweep
         """
-        e = math.exp((f0 * t) / L) - 1
-        x = 2.0 * math.pi * L * e
+        e = math.exp(t / L) - 1
+        x = 2.0 * math.pi * f0 * L * e
         return math.sin(x)
 
     @staticmethod

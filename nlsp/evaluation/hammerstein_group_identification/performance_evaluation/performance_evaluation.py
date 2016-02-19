@@ -2,6 +2,7 @@ import sumpf
 import nlsp
 import time
 import itertools
+import nlsp.common.plots as plot
 
 def differentlength_evaluation(inputsignal,branches,iden_method,Plot,Save):
     """
@@ -30,9 +31,9 @@ def differentlength_evaluation(inputsignal,branches,iden_method,Plot,Save):
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         if Plot is True:
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
-        print "SNR between Reference and Identified output : %r, input length: %r" %(nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
+            plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
+            plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
+        print "SNR between Reference and Identified output : %r, input length: %r" %(nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                      iden_nlsystem.GetOutput()),len(input_signal))
 
 def differentbranches_evaluation(inputsignal,branches,iden_method,Plot,Save):
@@ -51,10 +52,10 @@ def differentbranches_evaluation(inputsignal,branches,iden_method,Plot,Save):
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         if Plot is True:
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
-        print "SNR between Reference and Identified output : %r, with number of branches: %r" %(nlsp.signal_to_noise_ratio_freq_range(ref_nlsystem.GetOutput(),
-                                                                                     iden_nlsystem.GetOutput(),[signal_start_freq,signal_stop_freq]),branches)
+            plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
+            plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
+        print "SNR between Reference and Identified output : %r, with number of branches: %r" %(nlsp.snr(ref_nlsystem.GetOutput(),
+                                                                                     iden_nlsystem.GetOutput()),branches)
 
 def computationtime_evaluation(input_signal,branches,iden_method,Plot,Save):
     inputsignal = input_signal

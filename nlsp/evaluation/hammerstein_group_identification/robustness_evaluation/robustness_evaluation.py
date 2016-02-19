@@ -1,6 +1,7 @@
 import sumpf
 import nlsp
 import itertools
+import nlsp.common.plots as plot
 
 def robustness_noise_evaluation(input_signal_signal,branches,iden_method,Plot,Save):
     """
@@ -34,16 +35,12 @@ def robustness_noise_evaluation(input_signal_signal,branches,iden_method,Plot,Sa
                                                      filter_irs=noise_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         if Plot is True:
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",False)
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(noise_iden_nlsystem.GetOutput()).GetSpectrum(),"Noise Identified Output",False)
-            for i,foundspec in enumerate(found_filter_spec):
-                nlsp.relabelandplot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),str(i+1)+str(" filter,identified"),False)
-                nlsp.relabelandplot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),str(i+1)+str(" filter,input"),False)
-                nlsp.relabelandplot(sumpf.modules.FourierTransform(noise_filter_spec[i]).GetSpectrum(),str(i+1)+str(" filter,identified,noise"),False)
-        print "SNR between Reference and Identified output without noise: %r" %nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
+            nlsp.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
+            nlsp.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",False)
+            nlsp.relabelandplotphase(sumpf.modules.FourierTransform(noise_iden_nlsystem.GetOutput()).GetSpectrum(),"Noise Identified Output",True)
+        print "SNR between Reference and Identified output without noise: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                                  iden_nlsystem.GetOutput())
-        print "SNR between Reference and Identified output with noise of sd %r and mean %r is %r" %(sd,mean,nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
+        print "SNR between Reference and Identified output with noise of sd %r and mean %r is %r" %(sd,mean,nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                                  noise_iden_nlsystem.GetOutput()))
 
 def robustness_excitation_evaluation(input_signal,branches,iden_method,Plot,Save):
@@ -67,7 +64,7 @@ def robustness_excitation_evaluation(input_signal,branches,iden_method,Plot,Save
                                                      max_harmonics=range(1,branches+1))
         ref_nlsystem_scaled = sumpf.modules.AmplifySignal(input=ref_nlsystem.GetOutput(),factor=sample_amp)
         if Plot is True:
-            nlsp.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem_scaled.GetOutput()).GetSpectrum(),"Reference Output Scaled",False)
+            nlsp.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem_scaled.GetOutput()).GetSpectrum(),"Reference Output Scaled",False)
             nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
-        print "SNR between Scaled Reference(amp:%r) and Identified(amp:%r) output: %r" %(excitation_amp,sample_amp,nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
+        print "SNR between Scaled Reference(amp:%r) and Identified(amp:%r) output: %r" %(excitation_amp,sample_amp,nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                                  iden_nlsystem.GetOutput()))

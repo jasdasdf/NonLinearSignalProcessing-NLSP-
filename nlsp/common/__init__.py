@@ -12,7 +12,7 @@ from helper import get_impulse_response, get_sweep_harmonics_ir, get_sweep_harmo
 
 from helper import cut_spectrum, relabel, nl_branches, add_noise, plot_array
 
-from helper import harmonicsvsall_energyratio,relabelandplot,create_bpfilter
+from helper import harmonicsvsall_energyratio,relabelandplot,create_bpfilter,binomial
 
 from calculate_aliasing import calculate_aliasing_percentage
 
@@ -24,13 +24,13 @@ from predict_aliasing import predictoutputfreq_usingsamplingtheory
 
 from predict_harmonics import predictharmonics_usingupsampling
 
-from snr import signal_to_noise_ratio_freq_range,signal_to_noise_ratio_time_range,signal_to_noise_ratio_time,signal_to_noise_ratio_freq,snr_exponential
+from snr import signal_to_noise_ratio_freq_range,signal_to_noise_ratio_time_range,signal_to_noise_ratio_time,signal_to_noise_ratio_freq,snr
 
 from mse import mean_squared_error_freq,mean_squared_error_freq_range,mean_squared_error_time_range,mean_squared_error_time
 
 from soft_clipping import NLClipSignal
 
-from sweep import SweepGenerator
+from sweep import WindowedSweepGenerator
 
 from plots import *
 

@@ -150,7 +150,7 @@ def signal_to_noise_ratio_freq_range(input_signalorspectrum, output_signalorspec
     snr = nlsp.signal_to_noise_ratio_freq(input_spec_m,output_spec_m)
     return snr
 
-def snr_exponential(input_signalorspectrum,output_signalorspectrum):
+def snr(input_signalorspectrum,output_signalorspectrum):
     if isinstance(input_signalorspectrum, list) != True:
         observed_l = []
         observed_l.append(input_signalorspectrum)
@@ -173,10 +173,13 @@ def snr_exponential(input_signalorspectrum,output_signalorspectrum):
                                                    on_length_conflict=sumpf.modules.MergeSpectrums.FILL_WITH_ZEROS).GetOutput()
                 observed = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[0]).GetOutput()
                 identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
-            noise = observed - identified
-            noise_energy = nlsp.exponential_energy(noise)
-            input_energy =  nlsp.exponential_energy(observed)
-            snr.append(20*math.log10(input_energy[0]/noise_energy[0]))
+            noise = (observed - identified)/identified
+            # nlsp.common.plots.relabelandplotphase(noise,"noise",show=False)
+            # nlsp.common.plots.relabelandplotphase(identified,"identified",show=False)
+            # nlsp.common.plots.relabelandplotphase(observed,"observed",show=True)
+            noise_energy = nlsp.calculateenergy_betweenfreq_freq(noise,[100,19000])
+            input_energy = nlsp.calculateenergy_betweenfreq_freq(observed,[100,19000])
+            snr.append(10*math.log10(input_energy[0]/noise_energy[0]))
         else:
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
     return snr

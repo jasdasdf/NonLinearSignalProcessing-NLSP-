@@ -25,9 +25,9 @@ def hardclipping_evaluation(input_signal,branches,iden_method,Plot,Save):
                                                   filter_irs=found_filter_spec,
                                                   max_harmonics=range(1,branches+1))
     if Plot is True:
-        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
-        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True,save=Save,name="%s_hardclip"%str(iden_method))
-    print "SNR between Reference and Identified output for hardclipping: %r" %nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+    print "SNR between Reference and Identified output for hardclipping: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
 def softclipping_evaluation(input_signal,branches,iden_method,Plot,Save):
@@ -50,9 +50,9 @@ def softclipping_evaluation(input_signal,branches,iden_method,Plot,Save):
                                                   filter_irs=found_filter_spec,
                                                   max_harmonics=range(1,branches+1))
     if Plot is True:
-        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
-        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True,save=Save,name="softclip")
-    print "SNR between Reference and Identified output for soft clipping: %r" %nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(),
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+    print "SNR between Reference and Identified output for soft clipping: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 def doublehgm_same_evaluation(input_signal,branches,iden_method,Plot,Save):
     """
@@ -77,13 +77,7 @@ def doublehgm_same_evaluation(input_signal,branches,iden_method,Plot,Save):
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
-        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput(2)).GetSpectrum(),"Reference Output",False)
-        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True,save=Save,name="_doublehgm-op")
-        plot.log()
-        for i,foundspec in enumerate(found_filter_spec):
-            plot.relabelandplot(sumpf.modules.FourierTransform(foundspec).GetSpectrum(),str(i+1)+str(" filter,input"),False)
-            plot.relabelandplot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),str(i+1)+str(" filter,identified"),False,save=Save,name="doublehgm-filter")
-        if Save is not True:
-            plot.show()
-    print "SNR between Reference and Identified output for double hgm: %r" %nlsp.signal_to_noise_ratio_time(ref_nlsystem.GetOutput(2),
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput(2)).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+    print "SNR between Reference and Identified output for double hgm: %r" %nlsp.snr(ref_nlsystem.GetOutput(2),
                                                                                              iden_nlsystem.GetOutput())

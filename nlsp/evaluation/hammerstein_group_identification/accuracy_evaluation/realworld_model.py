@@ -28,7 +28,10 @@ def loudspeakermodel_evaluation(input_sweep,input_sample,branches,iden_method,Pl
     response = sumpf.modules.SplitSignal(data=load_sweep.GetSignal(), channels=[1]).GetOutput()
 
     # identify kernel using nonlinear convolution method
-    found_filter_spec, nl_functions = iden_method(excitation,response)
+    sweep_start_freq, sweep_stop_freq, sweep_duration = head_specific.get_sweep_properties(excitation)
+    found_filter_spec, nl_functions = iden_method(excitation,response,sweep_start_freq,sweep_stop_freq,
+                                        sweep_duration,branches)
+
     # use identified kernel in nl convolution hammerstein model
     ls_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl_functions,
                                        filter_irs=found_filter_spec,max_harmonics=range(1,branches+1))
@@ -63,7 +66,7 @@ def loudspeakermodel_evaluation(input_sweep,input_sample,branches,iden_method,Pl
                                       signal=sample_response,format=sumpf.modules.SignalFile.WAV_FLOAT)
     inp = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/recordings/NLconvolution/loudspeaker/input",
                                       signal=sample_excitation,format=sumpf.modules.SignalFile.WAV_FLOAT)
-    print "Loudspeaker, SNR between Reference and Identified output Sample: %r" %nlsp.signal_to_noise_ratio_time(sample_response,
+    print "Loudspeaker, SNR between Reference and Identified output Sample: %r" %nlsp.snr(sample_response,
                                                                                              model_up_highpass_signal)
     if Plot is True:
         # plot the loudspeaker op against identified op
@@ -75,7 +78,7 @@ def loudspeakermodel_evaluation(input_sweep,input_sample,branches,iden_method,Pl
         nlsp.relabelandplot(sumpf.modules.FourierTransform(ls_model.GetOutput()).GetSpectrum(),"identified_sweep_spectrum",False)
         nlsp.relabelandplot(sumpf.modules.FourierTransform(response).GetSpectrum(),"reference_sweep_spectrum",True)
 
-    print "Loudspeaker, SNR between Reference and Identified output Sweep: %r" %nlsp.signal_to_noise_ratio_time(response,ls_model.GetOutput())
+    print "Loudspeaker, SNR between Reference and Identified output Sweep: %r" %nlsp.snr(response,ls_model.GetOutput())
 
 def distortionbox_evaluation(input_sweep,input_sample,branches,iden_method,Plot,Save):
     loudspeaker = "Distortion box"
@@ -87,8 +90,11 @@ def distortionbox_evaluation(input_sweep,input_sample,branches,iden_method,Plot,
     response = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/Measurements/Distortion box/Recording 1/output/%s"%sweep,
                                           format=sumpf.modules.SignalFile.NUMPY_NPZ).GetSignal()
     response = sumpf.modules.SplitSignal(response,channels=[1]).GetOutput()
+
     # identify kernel using nonlinear convolution method
-    found_filter_spec, nl_functions = iden_method(excitation,response)
+    sweep_start_freq, sweep_stop_freq, sweep_duration = head_specific.get_sweep_properties(excitation)
+    found_filter_spec, nl_functions = iden_method(excitation,response,sweep_start_freq,sweep_stop_freq,
+                                        sweep_duration,branches)
 
     # use identified kernel in nl convolution hammerstein model
     ls_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl_functions,
@@ -126,7 +132,7 @@ def distortionbox_evaluation(input_sweep,input_sample,branches,iden_method,Plot,
                                       signal=sample_response,format=sumpf.modules.SignalFile.WAV_FLOAT)
     inp = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/recordings/NLconvolution/distortionbox/input",
                                       signal=sample_excitation,format=sumpf.modules.SignalFile.WAV_FLOAT)
-    print "Distortion box, SNR between Reference and Identified output Sample: %r" %nlsp.signal_to_noise_ratio_time(sample_response,
+    print "Distortion box, SNR between Reference and Identified output Sample: %r" %nlsp.snr(sample_response,
                                                                                              model_up_highpass_signal)
     if Plot is True:
         # plot the loudspeaker op against identified op
@@ -138,4 +144,4 @@ def distortionbox_evaluation(input_sweep,input_sample,branches,iden_method,Plot,
         nlsp.relabelandplot(sumpf.modules.FourierTransform(ls_model.GetOutput()).GetSpectrum(),"identified_sweep_spectrum",False)
         nlsp.relabelandplot(sumpf.modules.FourierTransform(response).GetSpectrum(),"reference_sweep_spectrum",True)
 
-    print "Distortion box, SNR between Reference and Identified output Sweep: %r" %nlsp.signal_to_noise_ratio_time(response,ls_model.GetOutput())
+    print "Distortion box, SNR between Reference and Identified output Sweep: %r" %nlsp.snr(response,ls_model.GetOutput())

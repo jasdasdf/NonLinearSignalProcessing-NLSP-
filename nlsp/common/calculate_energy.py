@@ -116,7 +116,7 @@ def exponential_energy(input):
         c = reversed(c)
         for i,s in enumerate(c):
             # energy_singlechannel.append((abs(s)**2)*(1*(dummy**i)))
-            energy_singlechannel.append((abs(s)**6))
+            energy_singlechannel.append((abs(s)**2))
         #energy_allchannels.append(numpy.average(energy_singlechannel,weights=range(1,len(energy_singlechannel)+1).reverse()))
         energy_allchannels.append(numpy.sum(energy_singlechannel))
     return energy_allchannels

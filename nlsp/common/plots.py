@@ -85,7 +85,7 @@ def plot(data, legend=True, show=True, save=False, name=None):
             _show()
 
 
-def plot_groupdelayandmagnitude(data, show=True, save=False, name=None):
+def plot_groupdelayandmagnitude(data, legend=True, show=True, save=False, name=None):
     if not isinstance(data, collections.Iterable):
         data = [data]
     if isinstance(data[0], sumpf.Spectrum):
@@ -96,12 +96,16 @@ def plot_groupdelayandmagnitude(data, show=True, save=False, name=None):
                 x_data.append(i * d.GetResolution())
             # plot
             for i in range(len(d.GetMagnitude())):
-                pyplot.subplot(2,1,1)
+                ax = pyplot.subplot(2,1,1)
                 pyplot.title("Frequency")
                 pyplot.loglog(x_data, d.GetMagnitude()[i], label=d.GetLabels()[i])
-                pyplot.subplot(2,1,2)
+                pyplot.subplot(2,1,2,sharex=ax)
                 pyplot.title("Group delay")
                 pyplot.semilogx(x_data, d.GetGroupDelay()[i], label=d.GetLabels()[i])
+    if legend:
+        pyplot.legend(loc="best", fontsize="x-large")
+    pyplot.xticks(fontsize="large")
+    pyplot.yticks(fontsize="large")
     if save is True:
         location = "C:/Users/diplomand.8/OneDrive/Pictures/"
         fig = os.path.join(location,name)
@@ -125,6 +129,19 @@ def relabelandplot(input,label,show=True,save=False,name=None):
     if isinstance(relabelled, sumpf.Spectrum):
         log()
     plot(relabelled,show=show,save=save,name=name)
+
+def relabelandplotphase(input,label,show=True,save=False,name=None):
+    """
+    Relabel the input signal or spectrum and plot
+    :param input: the input signal or spectrum
+    :param label: the label text
+    :param show: True or False
+    :return: plots the given input with label
+    """
+    relabelled = nlsp.relabel(input,label)
+    if isinstance(relabelled, sumpf.Spectrum):
+        log()
+    plot_groupdelayandmagnitude(relabelled,show=show)
 
 
 def plot_array(input_array,label_array=None,save=False,name=None):

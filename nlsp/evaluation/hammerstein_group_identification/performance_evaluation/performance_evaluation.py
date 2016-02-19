@@ -12,7 +12,7 @@ def differentlength_evaluation(inputsignal,branches,iden_method,Plot,Save):
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    length = [2**15,2**16,2**17,2**18]
+    length = [2**17,2**18,2**19]
     for signal_length in length:
         inputsignal.SetLength(signal_length)
         input_signal = inputsignal.GetOutput()
@@ -59,7 +59,7 @@ def differentbranches_evaluation(inputsignal,branches,iden_method,Plot,Save):
 def computationtime_evaluation(input_signal,branches,iden_method,Plot,Save):
     inputsignal = input_signal
     branch = reversed(range(2,branches+1))
-    length = reversed([2**15,2**16,2**17,2**18])
+    length = reversed([2**17,2**18,2**19])
     for branches,signal_length in itertools.product(branch,length):
         simulation_time_start = time.clock()
         inputsignal.SetLength(signal_length)

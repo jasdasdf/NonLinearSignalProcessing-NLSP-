@@ -2,15 +2,17 @@ import sumpf
 import math
 import common.plot as plot
 
-class SweepGenerator(object):
+class WindowedSweepGenerator(object):
     def __init__(self, sampling_rate=48000.0, length=2**16, start_frequency=20.0,
-                 stop_frequency=20000.0, silence_duration=0.03, fade_out=0.02):
+                 stop_frequency=20000.0, silence_duration=0.03, fade_out=0.02,
+                 function=sumpf.modules.SweepGenerator.Exponential):
         self.__sampling_rate = float(sampling_rate)
         self.__length = float(length)
         self.__start_frequency = float(start_frequency)
         self.__stop_frequency = float(stop_frequency)
         self.__silence_duration = float(silence_duration)
         self.__fade_out = float(fade_out)
+        self.__function = function
 
     def SetLength(self,length):
         self.__length = float(length)
@@ -30,7 +32,7 @@ class SweepGenerator(object):
             sumpf.destroy_connectors(slg)
             swg = sumpf.modules.SweepGenerator(start_frequency=self.__start_frequency,
                                                stop_frequency=self.__stop_frequency,
-                                               function=sumpf.modules.SweepGenerator.Exponential,
+                                               function=self.__function,
                                                interval=(0, -fade_length),
                                                samplingrate=self.__sampling_rate,
                                                length=sweep_length)
@@ -50,7 +52,8 @@ class SweepGenerator(object):
         else:
             print "normal sweep"
             concatenated_sweep = sumpf.modules.SweepGenerator(self.__start_frequency,self.__stop_frequency,
-                                                              samplingrate=self.__sampling_rate,length=self.__length).GetSignal()
+                                                              samplingrate=self.__sampling_rate,
+                                                              length=self.__length,function=self.__function).GetSignal()
         self.__sweep_signal = sumpf.modules.AmplifySignal(concatenated_sweep)
         return self.__sweep_signal.GetOutput()
 

@@ -1,5 +1,6 @@
 import math
 import numpy
+import random
 import sumpf
 import nlsp
 import common.plot as plot
@@ -88,7 +89,7 @@ def get_sweep_harmonics_ir(excitation, response, sweep_start_freq, sweep_stop_fr
     harmonics_ir = sumpf.modules.InverseFourierTransform(harmonics_spec).GetSignal()
     return harmonics_ir
 
-def log_bpfilter(start_freq,stop_freq,branches,input):
+def log_bpfilter(start_freq,stop_freq,branches,input,amplify=False):
     """
     Generates logarithmically seperated band pass filters between start and stop frequencies.
     :param start_freq: the start frequency of the bandpass filter
@@ -119,6 +120,8 @@ def log_bpfilter(start_freq,stop_freq,branches,input):
                                             frequency=freq/2,transform=True,
                                             resolution=ip_prp.GetResolution(),
                                             length=ip_prp.GetSpectrumLength()).GetSpectrum())
+        if amplify is True:
+            spec = sumpf.modules.AmplifySpectrum(input=spec,factor=random.randint(10,100)).GetOutput()
         filter_spec.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
     return filter_spec
 
@@ -287,3 +290,10 @@ def plot_array(input_array,label_array=None):
     for input,label in zip(input_array,label_array):
         nlsp.relabelandplot(input,label,False)
     plot.show()
+
+def binomial(x, y):
+    try:
+        binom = math.factorial(x) // math.factorial(y) // math.factorial(x - y)
+    except ValueError:
+        binom = 0
+    return binom

@@ -3,38 +3,8 @@ import sumpf
 import nlsp
 import common.plot as plot
 
-def simplevslpvsup_snrandmse_evaluation():
-    for i in range(1,degree+1):
-        input_sweep = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,
-                                                   start_frequency=sweep_start_freq,
-                                                   stop_frequency=sweep_stop_freq).GetSignal()
-        branch_simple = nlsp.HammersteinModel(input_signal=input_sweep,
-                                              nonlin_func=nlsp.function_factory.power_series(i))
-        branch_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input_sweep,
-                                                                    nonlin_func=nlsp.function_factory.power_series(i),
-                                                                    max_harm=i)
-        branch_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_sweep,
-                                                                  nonlin_func=nlsp.function_factory.power_series(i),
-                                                                  max_harm=i)
-        print "Order: %r" %i
-        print "SNR of simple h. branch: %r" %nlsp.signal_to_noise_ratio_time_range(input_sweep, branch_simple.GetOutput(),
-                                                                              [50,19900])
-        print "SNR of upsample h. branch: %r" %nlsp.signal_to_noise_ratio_time_range(input_sweep, branch_up.GetOutput(),
-                                                                              [50,19900])
-        print "SNR of lowpass h. branch: %r" %nlsp.signal_to_noise_ratio_time_range(input_sweep, branch_lp.GetOutput(),
-                                                                              [50,19900])
-        print "MSE of simple h. branch: %r" %nlsp.mean_squared_error_time_range(input_sweep, branch_simple.GetOutput(),
-                                                                              [50,19900])
-        print "MSE of upsample h. branch: %r" %nlsp.mean_squared_error_time_range(input_sweep, branch_up.GetOutput(),
-                                                                              [50,19900])
-        print "MSE of lowpass h. branch: %r" %nlsp.mean_squared_error_time_range(input_sweep, branch_lp.GetOutput(),
-                                                                              [50,19900])
-        plot.log()
-        plot.plot(sumpf.modules.FourierTransform(branch_simple.GetOutput()).GetSpectrum(),show=False)
-        plot.plot(sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum(),show=True)
-        plot.plot(sumpf.modules.FourierTransform(branch_up.GetOutput()).GetSpectrum(),show=True)
 
-def simplevslpvsup_puretone_evaluation():
+def puretone_evaluation():
     """
     Evaluation of alias compensation of hammerstein branch using pure tones.
     Puretone of certain frequency is given to different hammerstein branches with different Aliasing compensation.
@@ -42,6 +12,7 @@ def simplevslpvsup_puretone_evaluation():
     We observe the lowpass aliasing compensation completely filters out the signal harmonics even when they are in the
     baseband freq.
     """
+    print "puretone evaluation"
     for i in range(1,degree+1):
         input_tone = sumpf.modules.SineWaveGenerator(frequency=puretone_freq,
                                                      phase=0.0,
@@ -55,31 +26,27 @@ def simplevslpvsup_puretone_evaluation():
         branch_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_tone,
                                                                   nonlin_func=nlsp.function_factory.power_series(i),
                                                                   max_harm=i)
+        print "Pure tone evaluation"
         print "Order: %r" %i
-        print "SNR of simple h. branch: %r" %nlsp.signal_to_noise_ratio_freq_range(input_tone, branch_simple.GetOutput(),
-                                                                              [sweep_start_freq,sweep_stop_freq])
-        print "SNR of upsample h. branch: %r" %nlsp.signal_to_noise_ratio_freq_range(input_tone, branch_up.GetOutput(),
-                                                                              [sweep_start_freq,sweep_stop_freq])
-        print "SNR of lowpass h. branch: %r" %nlsp.signal_to_noise_ratio_freq_range(input_tone, branch_lp.GetOutput(),
-                                                                              [sweep_start_freq,sweep_stop_freq])
-        print "MSE of simple h. branch: %r" %nlsp.mean_squared_error_freq_range(input_tone, branch_simple.GetOutput(),
-                                                                              [sweep_start_freq,sweep_stop_freq])
-        print "MSE of upsample h. branch: %r" %nlsp.mean_squared_error_freq_range(input_tone, branch_up.GetOutput(),
-                                                                              [sweep_start_freq,sweep_stop_freq])
-        print "MSE of lowpass h. branch: %r" %nlsp.mean_squared_error_freq_range(input_tone, branch_lp.GetOutput(),
-                                                                              [sweep_start_freq,sweep_stop_freq])
-        plot.log()
-        branch_simple_spectrum = nlsp.relabel(sumpf.modules.FourierTransform(branch_simple.GetOutput()).GetSpectrum(),
-                                              "%d Simple Hammerstein Branch"%i)
-        plot.plot(branch_simple_spectrum,show=False)
-        branch_up_spectrum = nlsp.relabel(sumpf.modules.FourierTransform(branch_up.GetOutput()).GetSpectrum(),
-                                              "%d Upsampling Hammerstein Branch"%i)
-        plot.plot(branch_up_spectrum,show=False)
-        branch_lp_spectrum = nlsp.relabel(sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum(),
-                                              "%d Lowpass Hammerstein Branch"%i)
-        plot.plot(branch_lp_spectrum,show=True)
+        print "SNR of simple h. branch: %r" %nlsp.snr(input_tone, branch_simple.GetOutput())
+        print "SNR of upsample h. branch: %r" %nlsp.snr(input_tone, branch_up.GetOutput())
+        print "SNR of lowpass h. branch: %r" %nlsp.snr(input_tone, branch_lp.GetOutput())
+        print "MSE of simple h. branch: %r" %nlsp.mean_squared_error_time(input_tone, branch_simple.GetOutput())
+        print "MSE of upsample h. branch: %r" %nlsp.mean_squared_error_time(input_tone, branch_up.GetOutput())
+        print "MSE of lowpass h. branch: %r" %nlsp.mean_squared_error_time(input_tone, branch_lp.GetOutput())
+        if Plot is True:
+            plot.log()
+            branch_simple_spectrum = nlsp.relabel(sumpf.modules.FourierTransform(branch_simple.GetOutput()).GetSpectrum(),
+                                                  "%d Simple Hammerstein Branch"%i)
+            plot.plot(branch_simple_spectrum,show=False)
+            branch_up_spectrum = nlsp.relabel(sumpf.modules.FourierTransform(branch_up.GetOutput()).GetSpectrum(),
+                                                  "%d Upsampling Hammerstein Branch"%i)
+            plot.plot(branch_up_spectrum,show=False)
+            branch_lp_spectrum = nlsp.relabel(sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum(),
+                                                  "%d Lowpass Hammerstein Branch"%i)
+            plot.plot(branch_lp_spectrum,show=True)
 
-def simplevslpvsup_sweep_evaluation():
+def sweep_evaluation():
     """
     Evaluation of alias compensation of hammerstein branch using sweep.
     Sweep(20 to 20000Hz) of sampling rate 48000 samples/sec is upsampled to 96000 samples/sec and given to upsampling
@@ -88,10 +55,9 @@ def simplevslpvsup_sweep_evaluation():
     The energy of the desired band and undesired band should be equal for both upsampling and lowpass filtering alias
     compensation.
     """
-    ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,start_frequency=sweep_start_freq,
-                                                   stop_frequency=sweep_stop_freq).GetSignal()
-    up_sweep_signal = sumpf.modules.ResampleSignal(signal=ip_sweep_signal,
-                                                   samplingrate=ip_sweep_signal.GetSamplingRate()*2).GetOutput()
+    print "sweep evaluation"
+    up_sweep_signal = sumpf.modules.ResampleSignal(signal=input_sweep_signal,
+                                                   samplingrate=input_sweep_signal.GetSamplingRate()*2).GetOutput()
     branch = nlsp.HammersteinModel(input_signal=up_sweep_signal,
                                    nonlin_func=nlsp.function_factory.power_series(1))
     branch_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=up_sweep_signal,
@@ -117,149 +83,173 @@ def simplevslpvsup_sweep_evaluation():
     energy_limit_up = nlsp.calculateenergy_betweenfreq_freq(branch_up.GetOutput(),[sweep_stop_freq,sampling_rate])
     print "Energy after compensation, full, lp:%r, up:%r" %(energy_full_lp,energy_full_up)
     print "Energy after compensation, limit, lp:%r, up:%r" %(energy_limit_lp,energy_limit_up)
-    plot.log()
-    lp_spec = sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum()
-    up_spec = sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum()
-    plot.plot(nlsp.relabel(lp_spec,"Lowpass Alias compensation spectrum"),show=False)
-    plot.plot(nlsp.relabel(up_spec,"Upsampling Alias compensation spectrum"),show=True)
+    if Plot is True:
+        plot.log()
+        lp_spec = sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum()
+        up_spec = sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum()
+        plot.plot(nlsp.relabel(lp_spec,"Lowpass Alias compensation spectrum"),show=False)
+        plot.plot(nlsp.relabel(up_spec,"Upsampling Alias compensation spectrum"),show=True)
 
 def lowpass_evaluation():
+    print "lowpass evaluation"
     for order in range(1,degree+1):
-        ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,start_frequency=sweep_start_freq,
-                                                       stop_frequency=sweep_stop_freq).GetSignal()
-        branch_lp_butter = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
+        branch_lp_butter = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_sweep_signal,
                                                                  nonlin_func=nlsp.function_factory.power_series(1),
                                                                  max_harm=order,
                                                                  filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=10))
-        branch_lp_cheby1 = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
+        branch_lp_cheby1 = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_sweep_signal,
                                                                  nonlin_func=nlsp.function_factory.power_series(1),
                                                                  max_harm=order,
                                                                  filterfunction=sumpf.modules.FilterGenerator.CHEBYCHEV1(order=10,ripple=6.0))
-        branch_lp_bessel = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
-                                                                 nonlin_func=nlsp.function_factory.power_series(1),
-                                                                 max_harm=order,
-                                                                 filterfunction=sumpf.modules.FilterGenerator.BESSEL(order=30))
         butter_spec = nlsp.relabel(sumpf.modules.FourierTransform(branch_lp_butter.GetOutput()).GetSpectrum(),
                                    "butterworth lp branch")
         chebyshev_spec = nlsp.relabel(sumpf.modules.FourierTransform(branch_lp_cheby1.GetOutput()).GetSpectrum(),
                                    "chebyshev lp branch")
-        input_spec = nlsp.relabel(sumpf.modules.FourierTransform(ip_sweep_signal).GetSpectrum(),
+        input_spec = nlsp.relabel(sumpf.modules.FourierTransform(input_sweep_signal).GetSpectrum(),
                                    "input spec")
-        plot.log()
-        plot.plot(butter_spec,show=False)
-        plot.plot(input_spec,show=False)
-        plot.plot(chebyshev_spec,show=True)
+        if Plot is True:
+            plot.log()
+            plot.plot(butter_spec,show=False)
+            plot.plot(input_spec,show=False)
+            plot.plot(chebyshev_spec,show=True)
 
 def harmonics_evaluation():
+    print "harmonics evaluation"
     for i in range(1,degree+1):
-        ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,start_frequency=sweep_start_freq,
-                                                       stop_frequency=sweep_stop_freq).GetSignal()
-        branch_simple = nlsp.HammersteinModel(input_signal=ip_sweep_signal,
+        branch_simple = nlsp.HammersteinModel(input_signal=input_sweep_signal,
                                               nonlin_func=nlsp.function_factory.power_series(i))
-        branch_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sweep_signal,
+        branch_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input_sweep_signal,
                                                                     nonlin_func=nlsp.function_factory.power_series(i),
                                                                     max_harm=i)
-        branch_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
+        branch_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_sweep_signal,
                                                                   nonlin_func=nlsp.function_factory.power_series(i),
                                                                   max_harm=i)
-        harm_simple = nlsp.get_sweep_harmonics_spectrum(ip_sweep_signal,branch_simple.GetOutput(),sweep_start_freq,sweep_stop_freq,degree)
-        harm_lp = nlsp.get_sweep_harmonics_spectrum(ip_sweep_signal,branch_lp.GetOutput(),sweep_start_freq,sweep_stop_freq,degree)
-        harm_up = nlsp.get_sweep_harmonics_spectrum(ip_sweep_signal,branch_up.GetOutput(),sweep_start_freq,sweep_stop_freq,degree)
+        harm_simple = nlsp.get_sweep_harmonics_spectrum(input_sweep_signal,branch_simple.GetOutput(),sweep_start_freq,
+                                                        sweep_stop_freq,length,degree)
+        harm_lp = nlsp.get_sweep_harmonics_spectrum(input_sweep_signal,branch_lp.GetOutput(),sweep_start_freq,
+                                                        sweep_stop_freq,length,degree)
+        harm_up = nlsp.get_sweep_harmonics_spectrum(input_sweep_signal,branch_up.GetOutput(),sweep_start_freq,
+                                                        sweep_stop_freq,length,degree)
+        print "degree %r" %i
         print nlsp.calculateenergy_freq(harm_simple)
         print nlsp.calculateenergy_freq(harm_lp)
         print nlsp.calculateenergy_freq(harm_up)
         print
         print
-        # print nlsp.harmonicsvsall_energyratio(branch_simple.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
-        # print nlsp.harmonicsvsall_energyratio(branch_lp.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
-        # print nlsp.harmonicsvsall_energyratio(branch_up.GetOutput(),ip_sweep_signal,i,sweep_start_freq,sweep_stop_freq,degree)
-        # print
-        # print
+        print nlsp.harmonicsvsall_energyratio(branch_simple.GetOutput(),input_sweep_signal,i,sweep_start_freq,
+                                              sweep_stop_freq,length,degree)
+        print nlsp.harmonicsvsall_energyratio(branch_lp.GetOutput(),input_sweep_signal,i,sweep_start_freq,
+                                              sweep_stop_freq,length,degree)
+        print nlsp.harmonicsvsall_energyratio(branch_up.GetOutput(),input_sweep_signal,i,sweep_start_freq,
+                                              sweep_stop_freq,length,degree)
+        print
+        print
 
 def higher_nonlinearity_evaluation():
-    max_harm = 2
-    nl_degree = 3
-    ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,start_frequency=sweep_start_freq,
-                                                   stop_frequency=sweep_stop_freq).GetSignal()
-    model_simple = nlsp.HammersteinModel(input_signal=ip_sweep_signal,
-                                          nonlin_func=nlsp.function_factory.power_series(nl_degree))
-    model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sweep_signal,
-                                                                nonlin_func=nlsp.function_factory.power_series(nl_degree),
-                                                                max_harm=max_harm)
-    model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
-                                                              nonlin_func=nlsp.function_factory.power_series(nl_degree),
-                                                              max_harm=max_harm)
-    simple_ip = model_simple.GetOutput()
-    up_ip = model_up.GetOutput()
-    lp_ip = model_lp.GetOutput()
-    model_up.SetMaximumHarmonic(nl_degree)
-    model_lp.SetMaximumHarmonic(nl_degree)
-    simple_ref = model_simple.GetOutput()
-    up_ref = model_up.GetOutput()
-    lp_ref = model_lp.GetOutput()
-    print nlsp.signal_to_noise_ratio_freq_range(simple_ip,simple_ref,[sweep_start_freq,sweep_stop_freq])
-    print nlsp.signal_to_noise_ratio_freq_range(up_ip,up_ref,[sweep_start_freq,sweep_stop_freq])
-    print nlsp.signal_to_noise_ratio_freq_range(lp_ip,lp_ref,[sweep_start_freq,sweep_stop_freq])
+    print "higher nonlinearity evaluation"
+    for i in range(1,degree+1):
+        max_harm = i
+        nl_degree = i +1
+        model_simple = nlsp.HammersteinModel(input_signal=input_sweep_signal,
+                                              nonlin_func=nlsp.function_factory.power_series(nl_degree))
+        model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input_sweep_signal,
+                                                                    nonlin_func=nlsp.function_factory.power_series(nl_degree),
+                                                                    max_harm=max_harm)
+        model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_sweep_signal,
+                                                                  nonlin_func=nlsp.function_factory.power_series(nl_degree),
+                                                                  max_harm=max_harm)
+        simple_ip = model_simple.GetOutput()
+        up_ip = model_up.GetOutput()
+        lp_ip = model_lp.GetOutput()
+        model_up.SetMaximumHarmonic(nl_degree)
+        model_lp.SetMaximumHarmonic(nl_degree)
+        simple_ref = model_simple.GetOutput()
+        up_ref = model_up.GetOutput()
+        lp_ref = model_lp.GetOutput()
+        print "degree %r, maxharm %r" %(nl_degree,max_harm)
+        print nlsp.snr(simple_ip,simple_ref)
+        print nlsp.snr(up_ip,up_ref)
+        print nlsp.snr(lp_ip,lp_ref)
 
 def wgn_evaluation():
-    degree = 3
-    wgn = sumpf.modules.NoiseGenerator(sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0),
-                                       samplingrate=sampling_rate,
-                                       length=length)
-    prp = sumpf.modules.ChannelDataProperties()
-    prp.SetSignal(wgn.GetSignal())
-    filter = sumpf.modules.RectangleFilterGenerator(resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
-    ref = nlsp.HammersteinModel(input_signal=wgn.GetSignal(),nonlin_func=nlsp.function_factory.power_series(degree),
-                                  filter_impulseresponse=sumpf.modules.InverseFourierTransform(filter).GetSignal()).GetOutput()
-    model_simple = nlsp.HammersteinModel(input_signal=wgn.GetSignal(),
-                                          nonlin_func=nlsp.function_factory.power_series(degree))
-    model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=wgn.GetSignal(),
-                                                                nonlin_func=nlsp.function_factory.power_series(degree),
-                                                                max_harm=degree)
-    model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=wgn.GetSignal(),
-                                                              nonlin_func=nlsp.function_factory.power_series(degree),
-                                                              max_harm=degree)
-    print nlsp.signal_to_noise_ratio_time(model_simple.GetOutput(),ref)
-    print nlsp.signal_to_noise_ratio_time(model_up.GetOutput(),ref)
-    print nlsp.signal_to_noise_ratio_time(model_lp.GetOutput(),ref)
+    degree = 5
+    print "wgn evaluation"
+    for degree in range(1,degree+1):
+        wgn = sumpf.modules.NoiseGenerator(sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0),
+                                           samplingrate=sampling_rate,
+                                           length=length)
+        prp = sumpf.modules.ChannelDataProperties()
+        prp.SetSignal(wgn.GetSignal())
+        filter = sumpf.modules.RectangleFilterGenerator(resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
+        ref = nlsp.HammersteinModel(input_signal=wgn.GetSignal(),nonlin_func=nlsp.function_factory.power_series(degree),
+                                      filter_impulseresponse=sumpf.modules.InverseFourierTransform(filter).GetSignal()).GetOutput()
+        model_simple = nlsp.HammersteinModel(input_signal=wgn.GetSignal(),
+                                              nonlin_func=nlsp.function_factory.power_series(degree))
+        model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=wgn.GetSignal(),
+                                                                    nonlin_func=nlsp.function_factory.power_series(degree),
+                                                                    max_harm=degree)
+        model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=wgn.GetSignal(),
+                                                                  nonlin_func=nlsp.function_factory.power_series(degree),
+                                                                  max_harm=degree)
+        print "degree %r" %degree
+        print nlsp.snr(model_simple.GetOutput(),ref)
+        print nlsp.snr(model_up.GetOutput(),ref)
+        print nlsp.snr(model_lp.GetOutput(),ref)
+        print
+        print
 
 def linearity_evaluation():
-    max_harm = 3
-    nl_degree = 3
-    sweep_start_freq = 20.0
-    sweep_stop_freq = 4000.0
-    ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,start_frequency=sweep_start_freq,
-                                                   stop_frequency=sweep_stop_freq).GetSignal()
-    model_simple = nlsp.HammersteinModel(input_signal=ip_sweep_signal,
-                                          nonlin_func=nlsp.function_factory.power_series(nl_degree))
-    model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sweep_signal,
-                                                                nonlin_func=nlsp.function_factory.power_series(nl_degree),
-                                                                max_harm=max_harm)
-    model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
-                                                              nonlin_func=nlsp.function_factory.power_series(nl_degree),
-                                                              max_harm=max_harm)
-    simple_ref = model_simple.GetOutput()
-    up_ip = model_up.GetOutput()
-    lp_ip = model_lp.GetOutput()
-    print nlsp.signal_to_noise_ratio_time(simple_ref,simple_ref)
-    print nlsp.signal_to_noise_ratio_time(up_ip,simple_ref)
-    print nlsp.signal_to_noise_ratio_time(lp_ip,simple_ref)
-    plot.log()
-    plot.plot(sumpf.modules.FourierTransform(model_simple.GetOutput()).GetSpectrum(),show=False)
-    plot.plot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),show=False)
-    plot.plot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),show=True)
+    print "linearity evaluation"
+    for i in range(1,degree+1):
+        max_harm = i
+        nl_degree = i
+        sweep_start_freq = 20.0
+        sweep_stop_freq = 4000.0
+        ip_sweep_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length,start_frequency=sweep_start_freq,
+                                                       stop_frequency=sweep_stop_freq).GetSignal()
+        model_simple = nlsp.HammersteinModel(input_signal=ip_sweep_signal,
+                                              nonlin_func=nlsp.function_factory.power_series(nl_degree))
+        model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sweep_signal,
+                                                                    nonlin_func=nlsp.function_factory.power_series(nl_degree),
+                                                                    max_harm=max_harm)
+        model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sweep_signal,
+                                                                  nonlin_func=nlsp.function_factory.power_series(nl_degree),
+                                                                  max_harm=max_harm)
+        simple_ref = model_simple.GetOutput()
+        up_ip = model_up.GetOutput()
+        lp_ip = model_lp.GetOutput()
+        print "degree %r" %i
+        print nlsp.snr(simple_ref,simple_ref)
+        print nlsp.snr(up_ip,simple_ref)
+        print nlsp.snr(lp_ip,simple_ref)
+        print
+        print
+        if Plot is True:
+            plot.log()
+            plot.plot(sumpf.modules.FourierTransform(model_simple.GetOutput()).GetSpectrum(),show=False)
+            plot.plot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),show=False)
+            plot.plot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),show=True)
 
 sampling_rate = 48000
 sweep_start_freq = 20.0
-sweep_stop_freq = 24000.0
+sweep_stop_freq = 20000.0
 degree = 5
 puretone_freq = 10000
-length = 2**13
+length = 2**18
+Plot = False
+silence_duration = 0.02
+fade_out = 0.02
+fade_in = 0.02
 
-simplevslpvsup_snrandmse_evaluation()
-simplevslpvsup_puretone_evaluation()
-simplevslpvsup_sweep_evaluation()
-lowpass_evaluation()
+input_signal = nlsp.WindowedSweepGenerator(sampling_rate=sampling_rate, length=length, start_frequency=sweep_start_freq,
+                                   stop_frequency=sweep_stop_freq, silence_duration= silence_duration,fade_out= fade_out,
+                                           fade_in=fade_in)
+sweep_start_freq,sweep_stop_freq,length = input_signal.GetProperties()
+input_sweep_signal = input_signal.GetOutput()
+
+# lowpass_evaluation()
+puretone_evaluation()
+sweep_evaluation()
 harmonics_evaluation()
 higher_nonlinearity_evaluation()
 wgn_evaluation()

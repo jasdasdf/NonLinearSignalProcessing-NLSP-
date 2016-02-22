@@ -61,7 +61,7 @@ def get_sweep_harmonics_spectrum(excitation, response, sweep_start_freq, sweep_s
         sweep_length = len(excitation)
     impulse_response = get_impulse_response(excitation,response,sweep_start_freq,sweep_stop_freq)
     linear = sumpf.modules.CutSignal(signal=impulse_response,start=0,stop=len(impulse_response)/4).GetOutput()
-    linear = nlsp.append_zeros(linear)
+    linear = nlsp.relabel(nlsp.append_zeros(linear),"1 hamonic")
     merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     merger.AddInput(linear)
     for i in range(2,max_harm+1):
@@ -69,6 +69,7 @@ def get_sweep_harmonics_spectrum(excitation, response, sweep_start_freq, sweep_s
                                                               sweep_start_frequency=sweep_start_freq,
                                                               sweep_stop_frequency=sweep_stop_freq,
                                                               sweep_duration=(sweep_length/excitation.GetSamplingRate())).GetHarmonicImpulseResponse()
+        harmonics = nlsp.relabel(harmonics,"%d harmonic"%i)
         merger.AddInput(sumpf.Signal(channels=harmonics.GetChannels(),
                                         samplingrate=excitation.GetSamplingRate(), labels=harmonics.GetLabels()))
     harmonics_spec = sumpf.modules.FourierTransform(merger.GetOutput()).GetSpectrum()
@@ -86,8 +87,20 @@ def get_sweep_harmonics_ir(excitation, response, sweep_start_freq, sweep_stop_fr
     """
     if sweep_length is None:
         sweep_length = len(excitation)
-    harmonics_spec = nlsp.get_sweep_harmonics_spectrum(excitation,response,sweep_start_freq,sweep_stop_freq,sweep_length,max_harm)
-    harmonics_ir = sumpf.modules.InverseFourierTransform(harmonics_spec).GetSignal()
+    impulse_response = get_impulse_response(excitation,response,sweep_start_freq,sweep_stop_freq)
+    linear = sumpf.modules.CutSignal(signal=impulse_response,start=0,stop=len(impulse_response)/4).GetOutput()
+    linear = nlsp.relabel(nlsp.append_zeros(linear),"1 hamonic")
+    merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+    merger.AddInput(linear)
+    for i in range(2,max_harm+1):
+        harmonics = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=impulse_response, harmonic_order=i,
+                                                              sweep_start_frequency=sweep_start_freq,
+                                                              sweep_stop_frequency=sweep_stop_freq,
+                                                              sweep_duration=(sweep_length/excitation.GetSamplingRate())).GetHarmonicImpulseResponse()
+        harmonics = nlsp.relabel(harmonics,"%d harmonic"%i)
+        merger.AddInput(sumpf.Signal(channels=harmonics.GetChannels(),
+                                        samplingrate=excitation.GetSamplingRate(), labels=harmonics.GetLabels()))
+    harmonics_ir = merger.GetOutput()
     return harmonics_ir
 
 def log_bpfilter(start_freq,stop_freq,branches,input,amplify=False):
@@ -183,7 +196,7 @@ def cut_spectrum(inputspectrum,freq_range):
                                   labels=inputspectrum.GetLabels())
     return input_spectrum
 
-def relabel(input,labels):
+def relabel(input,labels=None):
     """
     Helper function to change the label of Sumpf signals and spectrums
     :param input: the tuple of signal or spectrum

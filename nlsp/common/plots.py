@@ -117,7 +117,7 @@ def plot_groupdelayandmagnitude(data, legend=True, show=True, save=False, name=N
         if show:
             _show()
 
-def relabelandplot(input,label,show=True,save=False,name=None):
+def relabelandplot(input,label=None,show=True,save=False,name=None):
     """
     Relabel the input signal or spectrum and plot
     :param input: the input signal or spectrum
@@ -152,9 +152,7 @@ def plot_array(input_array,label_array=None,save=False,name=None):
     :return: the plot of the input array with labels
     """
     if label_array is None:
-        label_array = []
-        for input in input_array:
-            label_array.append(str(input.GetLabels()))
+        label_array = [None,] * len(input_array)
     for input,label in zip(input_array,label_array):
         relabelandplot(input,label,False,save,name)
     show()

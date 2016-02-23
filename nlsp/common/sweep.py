@@ -1,3 +1,4 @@
+import numpy
 import sumpf
 import math
 import common.plot as plot
@@ -74,3 +75,39 @@ class WindowedSweepGenerator(object):
         return self.__start_frequency, self.__stop_frequency, (sweep_duration*self.__sampling_rate)
 
 
+class NovakSweepGenerator(object):
+    def __init__(self, sampling_rate=48000.0, approx_length=2**16, start_frequency=20.0,
+                 stop_frequency=20000.0, silence_duration=0.03, fade_out=0.02, fade_in=0.02):
+
+        self.__sampling_rate = float(sampling_rate)
+        self.__approx_length = float(approx_length)
+        self.__start_frequency = float(start_frequency)
+        self.__stop_frequency = float(stop_frequency)
+        self.__silence_duration = float(silence_duration)
+        self.__fade_out = float(fade_out*self.__sampling_rate)
+        self.__fade_in = float(fade_in*self.__sampling_rate)
+
+    def SetLength(self,length):
+        self.__approx_length = float(length)
+
+    def GetOutput(self):
+        t = numpy.arange(0,round(self.__sampling_rate*self.GetLength()-1)/self.__sampling_rate,1/self.__sampling_rate)
+        s = numpy.sin(2*numpy.pi*self.__start_frequency*self._GetSweepParameter()*(numpy.exp(t/self._GetSweepParameter())-1))
+        if self.__fade_in > 0:
+            s[0:self.__fade_in] = s[0:self.__fade_in] * ((-numpy.cos(numpy.arange(self.__fade_in)/self.__fade_in*math.pi)+1) / 2)
+        if self.__fade_out > 0:
+            s[-self.__fade_out:] = s[-self.__fade_out:] *  ((numpy.cos(numpy.arange(self.__fade_out)/self.__fade_out*numpy.pi)+1) / 2)
+        return sumpf.Signal(channels=(s,),samplingrate=self.__sampling_rate,labels=("Sweep signal",))
+
+    def _GetSweepParameter(self):
+        L = 1/self.__start_frequency * round((self.__approx_length/self.__sampling_rate)*
+                                             self.__start_frequency/numpy.log(self.__stop_frequency/self.__start_frequency))
+        return L
+
+    def GetLength(self):
+        T_hat = self._GetSweepParameter()*numpy.log(self.__stop_frequency/self.__start_frequency)
+        return T_hat
+
+    def GetProperties(self):
+        sweep_duration = self.GetLength() - self.__fade_out - self.__silence_duration - self.__fade_in
+        return self.__start_frequency, self.__stop_frequency, (sweep_duration*self.__sampling_rate)

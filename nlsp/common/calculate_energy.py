@@ -120,3 +120,12 @@ def exponential_energy(input):
         #energy_allchannels.append(numpy.average(energy_singlechannel,weights=range(1,len(energy_singlechannel)+1).reverse()))
         energy_allchannels.append(numpy.sum(energy_singlechannel))
     return energy_allchannels
+
+def absolute(inputfreqspectrum):
+    channels = []
+    for c in inputfreqspectrum.GetChannels():
+        channel = []
+        for s in c:
+            channel.append(abs(s))
+        channels.append(tuple(channel))
+    return sumpf.Signal(channels=tuple(channels), labels=inputfreqspectrum.GetLabels())

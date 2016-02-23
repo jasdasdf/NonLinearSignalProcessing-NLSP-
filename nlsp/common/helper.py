@@ -174,6 +174,18 @@ def append_zeros(signal, length=None):
                           labels=signal.GetLabels())
     return result
 
+def get_mean(ip):
+    energy_allchannels = []
+    for c in ip.GetChannels():
+        energy_singlechannel = []
+        c = reversed(c)
+        for i,s in enumerate(c):
+            # energy_singlechannel.append((abs(s)**2)*(1*(dummy**i)))
+            energy_singlechannel.append(s)
+        #energy_allchannels.append(numpy.average(energy_singlechannel,weights=range(1,len(energy_singlechannel)+1).reverse()))
+        energy_allchannels.append(numpy.sum(energy_singlechannel))
+    return energy_allchannels
+
 def cut_spectrum(inputspectrum,freq_range):
     """
     Appends zero outside the desired frequency range of the spectrum

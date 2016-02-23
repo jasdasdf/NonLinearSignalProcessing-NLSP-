@@ -205,6 +205,9 @@ def nonlinearconvolution_powerseries_novak(input_sweep, output_sweep, sweep_star
             else:
                 A_matrix[m][n] = 0
     A_inverse = numpy.linalg.inv(A_matrix)
+    for row in range(0,len(A_inverse)):
+        if row % 2 != 0.0:
+            A_inverse[row] = A_inverse[row] * (0+1j)
     B = []
     for row in range(0,branches):
         A = sumpf.modules.ConstantSpectrumGenerator(value=0.0,resolution=harmonics_tf[0].GetResolution(),

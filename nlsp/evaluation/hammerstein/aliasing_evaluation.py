@@ -1,7 +1,7 @@
 import numpy
 import sumpf
 import nlsp
-import common.plot as plot
+import nlsp.common.plots as plot
 
 
 def puretone_evaluation():
@@ -115,7 +115,7 @@ def lowpass_evaluation():
 
 def harmonics_evaluation():
     print "harmonics evaluation"
-    for i in range(1,degree+1):
+    for i in range(3,degree+1):
         branch_simple = nlsp.HammersteinModel(input_signal=input_sweep_signal,
                                               nonlin_func=nlsp.function_factory.power_series(i))
         branch_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input_sweep_signal,
@@ -124,11 +124,11 @@ def harmonics_evaluation():
         branch_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_sweep_signal,
                                                                   nonlin_func=nlsp.function_factory.power_series(i),
                                                                   max_harm=i)
-        harm_simple = nlsp.get_sweep_harmonics_spectrum(input_sweep_signal,branch_simple.GetOutput(),sweep_start_freq,
+        harm_simple = nlsp.get_sweep_harmonics_ir(input_sweep_signal,branch_simple.GetOutput(),sweep_start_freq,
                                                         sweep_stop_freq,length,degree)
-        harm_lp = nlsp.get_sweep_harmonics_spectrum(input_sweep_signal,branch_lp.GetOutput(),sweep_start_freq,
+        harm_lp = nlsp.get_sweep_harmonics_ir(input_sweep_signal,branch_lp.GetOutput(),sweep_start_freq,
                                                         sweep_stop_freq,length,degree)
-        harm_up = nlsp.get_sweep_harmonics_spectrum(input_sweep_signal,branch_up.GetOutput(),sweep_start_freq,
+        harm_up = nlsp.get_sweep_harmonics_ir(input_sweep_signal,branch_up.GetOutput(),sweep_start_freq,
                                                         sweep_stop_freq,length,degree)
         print "degree %r" %i
         print nlsp.calculateenergy_freq(harm_simple)
@@ -144,37 +144,42 @@ def harmonics_evaluation():
                                               sweep_stop_freq,length,degree)
         print
         print
+        if Plot is True:
+            plot.plot(harm_simple)
+            plot.plot(harm_up)
+            plot.plot(harm_lp)
 
 def higher_nonlinearity_evaluation():
     print "higher nonlinearity evaluation"
-    for i in range(1,degree+1):
-        max_harm = i
-        nl_degree = i +1
-        model_simple = nlsp.HammersteinModel(input_signal=input_sweep_signal,
-                                              nonlin_func=nlsp.function_factory.power_series(nl_degree))
+    model_up_ref = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input_sweep_signal,
+                                                               nonlin_func=nlsp.function_factory.power_series(degree),
+                                                               max_harm=degree)
+    model_lp_ref = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_sweep_signal,
+                                                                 nonlin_func=nlsp.function_factory.power_series(degree),
+                                                                 max_harm=degree)
+    model_up_ref = model_up_ref.GetOutput()
+    model_lp_ref = model_lp_ref.GetOutput()
+    for factor in range(1,degree+1):
         model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input_sweep_signal,
-                                                                    nonlin_func=nlsp.function_factory.power_series(nl_degree),
-                                                                    max_harm=max_harm)
+                                                                    nonlin_func=nlsp.function_factory.power_series(degree),
+                                                                    max_harm=factor)
         model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_sweep_signal,
-                                                                  nonlin_func=nlsp.function_factory.power_series(nl_degree),
-                                                                  max_harm=max_harm)
-        simple_ip = model_simple.GetOutput()
-        up_ip = model_up.GetOutput()
-        lp_ip = model_lp.GetOutput()
-        model_up.SetMaximumHarmonic(nl_degree)
-        model_lp.SetMaximumHarmonic(nl_degree)
-        simple_ref = model_simple.GetOutput()
-        up_ref = model_up.GetOutput()
-        lp_ref = model_lp.GetOutput()
-        print "degree %r, maxharm %r" %(nl_degree,max_harm)
-        print nlsp.snr(simple_ip,simple_ref)
-        print nlsp.snr(up_ip,up_ref)
-        print nlsp.snr(lp_ip,lp_ref)
+                                                                  nonlin_func=nlsp.function_factory.power_series(degree),
+                                                                  max_harm=factor)
+        model_up = model_up.GetOutput()
+        model_lp = model_lp.GetOutput()
+        print "Upsampling HM, nonlinearity degree:%r, Alias compensation factor:%r, SNR:%r" %(degree,factor,nlsp.snr(model_up,model_up_ref))
+        print "Lowpass HM, nonlinearity degree:%r, Alias compensation factor:%r, SNR:%r" %(degree,factor,nlsp.snr(model_lp,model_lp_ref))
+        if Plot is True:
+            plot.relabelandplot(sumpf.modules.FourierTransform(model_up).GetSpectrum(),"Upsampling HM",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(model_up_ref).GetSpectrum(),"Upsampling HM Ref")
+            plot.relabelandplot(sumpf.modules.FourierTransform(model_lp).GetSpectrum(),"Lowpass HM",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(model_lp_ref).GetSpectrum(),"Lowpass HM Ref")
 
 def wgn_evaluation():
     degree = 5
     print "wgn evaluation"
-    for degree in range(1,degree+1):
+    for degree in range(3,degree+1):
         wgn = sumpf.modules.NoiseGenerator(sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0),
                                            samplingrate=sampling_rate,
                                            length=length)
@@ -197,10 +202,15 @@ def wgn_evaluation():
         print nlsp.snr(model_lp.GetOutput(),ref)
         print
         print
+        if Plot is True:
+            plot.relabelandplot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),"Upsampling HM",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(ref).GetSpectrum(),"Upsampling HM Ref")
+            plot.relabelandplot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),"Lowpass HM",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(ref).GetSpectrum(),"Lowpass HM Ref")
 
 def linearity_evaluation():
     print "linearity evaluation"
-    for i in range(1,degree+1):
+    for i in range(3,degree+1):
         max_harm = i
         nl_degree = i
         sweep_start_freq = 20.0
@@ -226,9 +236,9 @@ def linearity_evaluation():
         print
         if Plot is True:
             plot.log()
-            plot.plot(sumpf.modules.FourierTransform(model_simple.GetOutput()).GetSpectrum(),show=False)
-            plot.plot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),show=False)
-            plot.plot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),show=True)
+            plot.relabelandplot(sumpf.modules.FourierTransform(model_simple.GetOutput()).GetSpectrum(),"Reference",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),"Upsampling HM",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),"Lowpass HM",show=True)
 
 sampling_rate = 48000
 sweep_start_freq = 20.0

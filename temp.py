@@ -5,6 +5,7 @@
 import sumpf
 import nlsp
 import nlsp.common.plots as plot
+import numpy
 
 def hgmwithfilter_wgn_evaluation():
     """
@@ -40,7 +41,28 @@ def hgmwithfilter_wgn_evaluation():
 
 sampling_rate = 48000.0
 branches = 5
-wgn_length = 2**18
+wgn_length = 2**15
 Plot = True
 
-hgmwithfilter_wgn_evaluation()
+# hgmwithfilter_wgn_evaluation()
+
+
+def generateandevaluate():
+    start_freq = 10.0
+    stop_freq = 23000.0
+    sampling_rate = 48000.0
+    fade_out = 0.01
+    fade_in = 0.01
+    length = [2**16,2**18,2**20]
+    sweep = "262144"
+    sweep_gen = nlsp.NovakSweepGenerator(sampling_rate=sampling_rate, length=2**18, start_frequency=start_freq,
+                                     stop_frequency=stop_freq ,fade_out= fade_out,fade_in=fade_in)
+    excitation = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/recordings/inputs/%s"%sweep,
+                                          format=sumpf.modules.SignalFile.NUMPY_NPZ).GetSignal()
+    response = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/recordings/outputs/%s"%sweep,
+                                          format=sumpf.modules.SignalFile.NUMPY_NPZ).GetSignal()
+    response = sumpf.modules.SplitSignal(response,channels=[1]).GetOutput()
+    nlsp.plot(sumpf.modules.FourierTransform(excitation).GetSpectrum())
+    nlsp.plot(sumpf.modules.FourierTransform(response).GetSpectrum())
+
+generateandevaluate()

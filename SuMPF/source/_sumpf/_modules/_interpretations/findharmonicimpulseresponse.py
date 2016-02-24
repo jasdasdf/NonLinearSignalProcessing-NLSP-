@@ -146,7 +146,7 @@ class FindHarmonicImpulseResponse(object):
             else:
                 labels.append(l + affix)
         # crop to the impulse response of the wanted harmonic
-        cropped = self.__impulse_response[harmonic_start_sample:harmonic_stop_sample]
+        cropped = self.__impulse_response[harmonic_start_sample:harmonic_stop_sample-200]
         harmonic = sumpf.Signal(channels=cropped.GetChannels(), samplingrate=cropped.GetSamplingRate() / self.__harmonic_order, labels=tuple(labels))
         if len(harmonic) % 2 != 0:
             harmonic = sumpf.Signal(channels=tuple([c + (0.0,) for c in harmonic.GetChannels()]), samplingrate=harmonic.GetSamplingRate(), labels=harmonic.GetLabels())

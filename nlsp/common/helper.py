@@ -75,7 +75,7 @@ def get_sweep_harmonics_spectrum(excitation, response, sweep_start_freq, sweep_s
     harmonics_spec = sumpf.modules.FourierTransform(merger.GetOutput()).GetSpectrum()
     return harmonics_spec
 
-def get_sweep_harmonics_ir(excitation, response, sweep_start_freq, sweep_stop_freq, sweep_length, max_harm):
+def get_sweep_harmonics_ir(sweep_generator, response, max_harm=None):
     """
     Calculate the harmonics of the sweep based on nonconvolution
     :param excitation: the excitation sweep of the system
@@ -85,8 +85,14 @@ def get_sweep_harmonics_ir(excitation, response, sweep_start_freq, sweep_stop_fr
     :param max_harm: the maximum harmonics upto which the harmomics should be calculated
     :return: the sumpf signal of merged harmonic spectrums
     """
+    sweep_length = sweep_generator.GetLength()
+    excitation = sweep_generator.GetOutput()
+    sweep_start_freq = sweep_generator.GetStartFrequency()
+    sweep_stop_freq = sweep_generator.GetStopFrequency()
     if sweep_length is None:
         sweep_length = len(excitation)
+    if max_harm is None:
+        max_harm = 5
     impulse_response = get_impulse_response(excitation,response,sweep_start_freq,sweep_stop_freq)
     linear = sumpf.modules.CutSignal(signal=impulse_response,start=0,stop=len(impulse_response)/4).GetOutput()
     linear = nlsp.relabel(nlsp.append_zeros(linear),"1 hamonic")
@@ -323,3 +329,47 @@ def binomial(x, y):
     except ValueError:
         binom = 0
     return binom
+
+def get_nl_impulse_response(sweepgenerator,response):
+
+    sweep_start_freq = sweepgenerator.GetStartFrequency()
+    y = response.GetChannels()[0]
+    fs = response.GetSamplingRate()
+    try:
+        L = sweepgenerator.GetSweepParameter()
+    except:
+        L = len(sweepgenerator.GetOutput())/(math.log(sweepgenerator.GetStopFrequency()/sweepgenerator.GetStartFrequency()))
+    y = y - numpy.mean(y)
+    fft_len = int(2**numpy.ceil(numpy.log2(len(y))))
+    Y = numpy.fft.rfft(y,fft_len)/fs
+    f_osa = numpy.linspace(0, fs/2, num=fft_len/2+1)
+    SI = 2*numpy.sqrt(f_osa/L)*numpy.exp(1j*(2*numpy.pi*L*f_osa*(sweep_start_freq/f_osa +
+                                                                 numpy.log(f_osa/sweep_start_freq) - 1) + numpy.pi/4))
+    SI[0] = 0j
+    H = Y*SI
+    h = numpy.fft.irfft(H)
+    ir_sweep = sumpf.Signal(channels=(h,),samplingrate=fs,labels=("Sweep signal",))
+    return ir_sweep
+
+
+def get_sweep_harmonics_ir_novak(sweepgenerator, response, max_harm):
+
+    excitation = sweepgenerator.GetOutput()
+    sweep_start_freq = sweepgenerator.GetStartFrequency()
+    sweep_stop_freq = sweepgenerator.GetStopFrequency()
+    sweep_length = len(excitation)
+    impulse_response = get_nl_impulse_response(sweepgenerator,response)
+    linear = sumpf.modules.CutSignal(signal=impulse_response,start=0,stop=len(impulse_response)/4).GetOutput()
+    linear = nlsp.relabel(nlsp.append_zeros(linear),"1 hamonic")
+    merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+    merger.AddInput(linear)
+    for i in range(2,max_harm+1):
+        harmonics = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=impulse_response, harmonic_order=i,
+                                                              sweep_start_frequency=sweep_start_freq,
+                                                              sweep_stop_frequency=sweep_stop_freq,
+                                                              sweep_duration=(sweep_length/excitation.GetSamplingRate())).GetHarmonicImpulseResponse()
+        harmonics = nlsp.relabel(harmonics,"%d harmonic"%i)
+        merger.AddInput(sumpf.Signal(channels=harmonics.GetChannels(),
+                                        samplingrate=excitation.GetSamplingRate(), labels=harmonics.GetLabels()))
+    harmonics_ir = merger.GetOutput()
+    return harmonics_ir

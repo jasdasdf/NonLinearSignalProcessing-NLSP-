@@ -11,8 +11,8 @@ def robustness_noise_evaluation(input_signal_signal,branches,iden_method,Plot,Sa
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    noise_mean = [0,0.2,0.3]
-    noise_sd = [0.3,0.5,1.0]
+    noise_mean = [0,0.3]
+    noise_sd = [0.3,0.5]
     for mean,sd in itertools.product(noise_mean,noise_sd):
         signal_start_freq,signal_stop_freq,signal_length = input_signal_signal.GetProperties()
         input_signal = input_signal_signal.GetOutput()
@@ -44,8 +44,8 @@ def robustness_noise_evaluation(input_signal_signal,branches,iden_method,Plot,Sa
                                                                                                  noise_iden_nlsystem.GetOutput()))
 
 def robustness_excitation_evaluation(input_signal,branches,iden_method,Plot,Save):
-    excitation_signal_amp = [0.5,1.0,2.0]
-    sample_signal_amp = [0.5,1.0,2.0]
+    excitation_signal_amp = [0.5]
+    sample_signal_amp = [2.0]
     signal_start_freq,signal_stop_freq,signal_length = input_signal.GetProperties()
     input = input_signal.GetOutput()
     for excitation_amp,sample_amp in itertools.product(excitation_signal_amp,sample_signal_amp):

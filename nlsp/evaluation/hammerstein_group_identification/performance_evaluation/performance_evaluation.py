@@ -37,7 +37,7 @@ def differentlength_evaluation(inputsignal,branches,iden_method,Plot,Save):
                                                                                      iden_nlsystem.GetOutput()),len(input_signal))
 
 def differentbranches_evaluation(inputsignal,branches,iden_method,Plot,Save):
-    for branches in range(2,branches+3):
+    for branches in range(4,branches+2):
         input_signal = inputsignal.GetOutput()
         signal_start_freq,signal_stop_freq,signal_length = inputsignal.GetProperties()
         filter_spec_tofind = nlsp.log_bpfilter(signal_start_freq,signal_stop_freq,branches,input_signal)

@@ -173,12 +173,24 @@ def snr(input_signalorspectrum,output_signalorspectrum):
                                                    on_length_conflict=sumpf.modules.MergeSpectrums.FILL_WITH_ZEROS).GetOutput()
                 observed = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[0]).GetOutput()
                 identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
-            noise = (observed - identified)/identified
-            # nlsp.common.plots.relabelandplotphase(noise,"noise",show=False)
+
+            # nlsp.common.plots.relabelandplot(observed,show=False)
+            # nlsp.common.plots.relabelandplot(nlsp.absolute(observed),show=True)
+            # noise = nlsp.absolute(observed) - nlsp.absolute(identified)
+            observed = nlsp.cut_spectrum(observed,[100,19000])
+            identified = nlsp.cut_spectrum(identified,[100,19000])
+            noise =  observed - identified
+            noise2 = (identified - observed)/identified
+
+            # nlsp.common.plots.relabelandplotphase(noise,"noise1",show=False)
+            # nlsp.common.plots.relabelandplotphase(noise2,"noise2",show=False)
             # nlsp.common.plots.relabelandplotphase(identified,"identified",show=False)
             # nlsp.common.plots.relabelandplotphase(observed,"observed",show=True)
+            #
             noise_energy = nlsp.calculateenergy_betweenfreq_freq(noise,[100,19000])
-            input_energy = nlsp.calculateenergy_betweenfreq_freq(observed,[100,19000])
+            input_energy = nlsp.calculateenergy_betweenfreq_freq(identified,[100,19000])
+            print input_energy,noise_energy
+
             snr.append(10*math.log10(input_energy[0]/noise_energy[0]))
         else:
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"

@@ -221,12 +221,15 @@ def nonlinearconvolution_powerseries_farina_automatic(input_sweep, output_sweep,
     return B,nl_func
 
 
-def nonlinearconvolution_powerseries_novak(input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0,
-                                           sweep_length=None,branches=5):
-    ip_signal = input_sweep.GetOutput()
+def nonlinearconvolution_powerseries_novak(sweep_generator, output_sweep, branches=5):
+
+    sweep_length = sweep_generator.GetLength()
+    sweep_start_freq = sweep_generator.GetStartFrequency()
+    sweep_stop_freq = sweep_generator.GetStopFrequency()
+    ip_signal = sweep_generator.GetOutput()
     y = output_sweep.GetChannels()[0]
     fs = output_sweep.GetSamplingRate()
-    L = input_sweep._GetSweepParameter()
+    L = sweep_generator.GetSweepParameter()
     y = y - numpy.mean(y)
     fft_len = int(2**numpy.ceil(numpy.log2(len(y))))
     Y = numpy.fft.rfft(y,fft_len)/fs

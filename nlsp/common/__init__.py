@@ -39,3 +39,5 @@ from plots import *
 
 from calculate_energy import exponential_energy
 
+from find_harmonics import FindHarmonicImpulseResponse_Novak
+

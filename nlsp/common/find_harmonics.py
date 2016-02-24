@@ -1,25 +1,9 @@
-# SuMPF - Sound using a Monkeyforest-like processing framework
-# Copyright (C) 2012-2015 Jonas Schulte-Coerne
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program. If not, see <http://www.gnu.org/licenses/>.
-
 import math
+import numpy
 import sumpf
-import numpy    # the FindHarmonicImpulseResponse class needs NumPy for the fourier transforms, so importing this file shall fail, when NumPy is not available
 import nlsp
 
-class FindHarmonicImpulseResponse(object):
+class FindHarmonicImpulseResponse_Novak(object):
     """
     Calculates the impulse response of a harmonic from a given impulse response.
 
@@ -46,9 +30,7 @@ class FindHarmonicImpulseResponse(object):
     def __init__(self,
                  impulse_response=None,
                  harmonic_order=2,
-                 sweep_start_frequency=20.0,
-                 sweep_stop_frequency=20000.0,
-                 sweep_duration=None):
+                 sweep_generator=None):
         """
         @param impulse_response: the impulse response Signal, from which the impulse responses of the harmonics shall be cut out
         @param harmonic_order: the integer order of the harmonic, whose impulse response shall be determined
@@ -56,15 +38,21 @@ class FindHarmonicImpulseResponse(object):
         @param sweep_stop_frequency: the stop frequency of the exponential sweep, that has been used to measure the given impulse response
         @param sweep_duration: the time in seconds that it took the sweep to go from the start frequency to the stop frequency
         """
+        if sweep_generator is None:
+            self.__sweep_generator = nlsp.NovakSweepGenerator()
+        else:
+            self.__sweep_generator = sweep_generator
         if harmonic_order < 2:
             raise ValueError("The harmonic order has to be at least 2.")
         self.__impulse_response = impulse_response
         if impulse_response is None:
             self.__impulse_response = sumpf.modules.ImpulseGenerator().GetSignal()
         self.__harmonic_order = harmonic_order
-        self.__sweep_start_frequency = sweep_start_frequency
-        self.__sweep_stop_frequency = sweep_stop_frequency
-        self.__sweep_duration = sweep_duration
+        self.__sweep_start_frequency = self.__sweep_generator.GetStartFrequency()
+        self.__sweep_stop_frequency = self.__sweep_generator.GetStopFrequency()
+        self.__sweep_duration = self.__sweep_generator.GetLength()/self.__sweep_generator.GetOutput().GetSamplingRate()
+        self.__sweep_parameter = self.__sweep_generator.GetSweepParameter()
+        self.__sampling_rate = self.__impulse_response.GetSamplingRate()
 
     @sumpf.Input(sumpf.Signal, "GetHarmonicImpulseResponse")
     def SetImpulseResponse(self, impulse_response):
@@ -127,27 +115,61 @@ class FindHarmonicImpulseResponse(object):
         @retval : the harmonic impulse response as a Signal
         """
         # get the sample indices between the impulse response can be found
-        sweep_duration = self.__sweep_duration
-        if sweep_duration is None:
-            sweep_duration = self.__impulse_response.GetDuration()
-        sweep_rate = (self.__sweep_stop_frequency / self.__sweep_start_frequency) ** (1.0 / sweep_duration)
-        harmonic_start_time = self.__impulse_response.GetDuration() - math.log(self.__harmonic_order, sweep_rate)
-        harmonic_start_sample = sumpf.modules.DurationToLength(duration=harmonic_start_time, samplingrate=self.__impulse_response.GetSamplingRate(), even_length=False).GetLength()
-        harmonic_stop_sample = len(self.__impulse_response)
-        if self.__harmonic_order > 2:
-            harmonic_stop_time = self.__impulse_response.GetDuration() - math.log(self.__harmonic_order - 1, sweep_rate)
-            harmonic_stop_sample = sumpf.modules.DurationToLength(duration=harmonic_stop_time, samplingrate=self.__impulse_response.GetSamplingRate(), even_length=False).GetLength()
-        # prepare the labels
-        labels = []
-        affix = " (%s harmonic)" % sumpf.helper.counting_number(self.__harmonic_order)
-        for l in self.__impulse_response.GetLabels():
-            if l is None:
-                labels.append("Impulse Response" + affix)
-            else:
-                labels.append(l + affix)
-        # crop to the impulse response of the wanted harmonic
-        cropped = self.__impulse_response[harmonic_start_sample:harmonic_stop_sample-200]
-        harmonic = sumpf.Signal(channels=cropped.GetChannels(), samplingrate=cropped.GetSamplingRate() / self.__harmonic_order, labels=tuple(labels))
-        if len(harmonic) % 2 != 0:
-            harmonic = sumpf.Signal(channels=tuple([c + (0.0,) for c in harmonic.GetChannels()]), samplingrate=harmonic.GetSamplingRate(), labels=harmonic.GetLabels())
-        return harmonic
+        # sweep_duration = self.__sweep_duration
+        # if sweep_duration is None:
+        #     sweep_duration = self.__impulse_response.GetDuration()
+        # sweep_rate = (self.__sweep_stop_frequency / self.__sweep_start_frequency) ** (1.0 / sweep_duration)
+        # harmonic_start_time = self.__impulse_response.GetDuration() - math.log(self.__harmonic_order, sweep_rate)
+        # harmonic_start_sample = sumpf.modules.DurationToLength(duration=harmonic_start_time, samplingrate=self.__impulse_response.GetSamplingRate(), even_length=False).GetLength()
+        # harmonic_stop_sample = len(self.__impulse_response)
+        # if self.__harmonic_order > 2:
+        #     harmonic_stop_time = self.__impulse_response.GetDuration() - math.log(self.__harmonic_order - 1, sweep_rate)
+        #     harmonic_stop_sample = sumpf.modules.DurationToLength(duration=harmonic_stop_time, samplingrate=self.__impulse_response.GetSamplingRate(), even_length=False).GetLength()
+        # # prepare the labels
+        # labels = []
+        # affix = " (%s harmonic)" % sumpf.helper.counting_number(self.__harmonic_order)
+        # for l in self.__impulse_response.GetLabels():
+        #     if l is None:
+        #         labels.append("Impulse Response" + affix)
+        #     else:
+        #         labels.append(l + affix)
+        # # crop to the impulse response of the wanted harmonic
+        # cropped = self.__impulse_response[harmonic_start_sample:harmonic_stop_sample-200]
+        # harmonic = sumpf.Signal(channels=cropped.GetChannels(), samplingrate=cropped.GetSamplingRate() / self.__harmonic_order, labels=tuple(labels))
+        # if len(harmonic) % 2 != 0:
+        #     harmonic = sumpf.Signal(channels=tuple([c + (0.0,) for c in harmonic.GetChannels()]), samplingrate=harmonic.GetSamplingRate(), labels=harmonic.GetLabels())
+
+        L = self.__sweep_parameter
+        N = self.__harmonic_order
+        fs = self.__sampling_rate
+        len_Hammer = 2**12
+        h = self.__impulse_response.GetChannels()[0]
+        h = numpy.asarray(h)
+
+        # positions of higher orders up to N
+        dt = L*numpy.log(numpy.arange(1,N+1))*fs
+
+        # The time lags may be non-integer in samples, the non integer delay must be applied later
+        dt_rem = dt - numpy.around(dt)
+
+        # number of samples to make an artificail delay
+        posun = round(len_Hammer/2)
+        h_pos = numpy.hstack((h, h[0:posun + len_Hammer - 1]))
+
+        # separation of higher orders
+        hs = numpy.zeros((N,len_Hammer))
+
+        # frequency axis
+        axe_w = numpy.linspace(0, numpy.pi, num=len_Hammer/2+1);
+
+        merger = sumpf.modules.MergeSignals()
+        for k in range(N):
+            hs[k,:] = h_pos[len(h)-round(dt[k])-posun-1:len(h)-round(dt[k])-posun+len_Hammer-1]
+            H_temp = numpy.fft.rfft(hs[k,:])
+
+            # Non integer delay application
+            H_temp = H_temp * numpy.exp(-1j*dt_rem[k]*axe_w)
+            harm = numpy.fft.irfft(H_temp)
+            harm = sumpf.Signal(channels=(harm,),samplingrate=self.__sampling_rate,labels=("harmonics",))
+            merger.AddInput(harm)
+        return merger.GetOutput()

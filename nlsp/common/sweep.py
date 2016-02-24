@@ -111,15 +111,17 @@ class NovakSweepGenerator(object):
             signal = sumpf.modules.CutSignal(signal,start=0,stop=-1).GetOutput()
         return signal
 
-    def GetReversedOutput(self):
-        L = self.GetSweepParameter()
-        f_osa = numpy.linspace(0, self.__sampling_rate/2, num=self.GetLength()/2+1)
-        SI = 2*numpy.sqrt(f_osa/L)*numpy.exp(1j*(2*numpy.pi*L*f_osa*(self.__start_frequency/f_osa +
-                                                                 numpy.log(f_osa/self.__start_frequency) - 1) + numpy.pi/4))
+    def GetReversedOutput(self, length=None):
+        if length is None:
+            length = self.GetLength()
+        fft_len = int(2**numpy.ceil(numpy.log2(length)))
+        f_osa = numpy.linspace(0, self.__sampling_rate/2, num=fft_len/2+1)
+        SI = 2*numpy.sqrt(f_osa/self.GetSweepParameter())*numpy.exp(1j*(2*numpy.pi*self.GetSweepParameter()*f_osa*(self.__start_frequency/f_osa +
+                                                                     numpy.log(f_osa/self.__start_frequency) - 1) + numpy.pi/4))
         SI[0] = 0j
         si = numpy.fft.irfft(SI)
-        signal = sumpf.Signal(channels=(si,),samplingrate=self.__sampling_rate,labels=("Sweep signal",))
-        return signal
+        rev_sweep = sumpf.Signal(channels=(si,),samplingrate=self.__sampling_rate,labels=("Reversed Sweep signal",))
+        return rev_sweep
 
     def GetSweepParameter(self):
         L = 1/self.__start_frequency * round((self.__approx_length/self.__sampling_rate)*

@@ -50,7 +50,7 @@ def nonlinearconvolution_powerseries_farina(input_sweep, output_sweep, sweep_sta
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
-    ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+    ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FIsweep_parametersweep_parameter_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
     print sweep_length
     for i in range(branch-1):
@@ -60,7 +60,7 @@ def nonlinearconvolution_powerseries_farina(input_sweep, output_sweep, sweep_sta
                                                                sweep_stop_frequency=sweep_stop_freq,
                                                                sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
-                                        samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.GetLabels()))
+                                        samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.Getsweep_parameterabels()))
     tf_harmonics_all = sumpf.modules.FourierTransform(signal=ir_merger.GetOutput()).GetSpectrum()
     harmonics_tf = []
     for i in range(len(tf_harmonics_all.GetChannels())):
@@ -116,7 +116,7 @@ def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, sweep_star
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
-    ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+    ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FIsweep_parametersweep_parameter_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
 
     for i in range(branch-1):
@@ -126,7 +126,7 @@ def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, sweep_star
                                                                sweep_stop_frequency=sweep_stop_freq,
                                                                sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
-                                        samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.GetLabels()))
+                                        samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.Getsweep_parameterabels()))
     tf_harmonics_all = sumpf.modules.FourierTransform(signal=ir_merger.GetOutput()).GetSpectrum()
     harmonics_tf = []
     for i in range(len(tf_harmonics_all.GetChannels())):
@@ -182,7 +182,7 @@ def nonlinearconvolution_powerseries_farina_automatic(input_sweep, output_sweep,
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
-    ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+    ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FIsweep_parametersweep_parameter_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
 
     for i in range(branch-1):
@@ -192,7 +192,7 @@ def nonlinearconvolution_powerseries_farina_automatic(input_sweep, output_sweep,
                                                                sweep_stop_frequency=sweep_stop_freq,
                                                                sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
-                                        samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.GetLabels()))
+                                        samplingrate=ip_signal.GetSamplingRate(), labels=split_harm.Getsweep_parameterabels()))
     tf_harmonics_all = sumpf.modules.FourierTransform(signal=ir_merger.GetOutput()).GetSpectrum()
     harmonics_tf = []
     for i in range(len(tf_harmonics_all.GetChannels())):
@@ -222,27 +222,23 @@ def nonlinearconvolution_powerseries_farina_automatic(input_sweep, output_sweep,
 
 
 def nonlinearconvolution_powerseries_novak(sweep_generator, output_sweep, branches=5):
-
     sweep_length = sweep_generator.GetLength()
     sweep_start_freq = sweep_generator.GetStartFrequency()
     sweep_stop_freq = sweep_generator.GetStopFrequency()
     ip_signal = sweep_generator.GetOutput()
-    y = output_sweep.GetChannels()[0]
-    fs = output_sweep.GetSamplingRate()
-    L = sweep_generator.GetSweepParameter()
-    y = y - numpy.mean(y)
-    fft_len = int(2**numpy.ceil(numpy.log2(len(y))))
-    Y = numpy.fft.rfft(y,fft_len)/fs
-    f_osa = numpy.linspace(0, fs/2, num=fft_len/2+1)
-    SI = 2*numpy.sqrt(f_osa/L)*numpy.exp(1j*(2*numpy.pi*L*f_osa*(sweep_start_freq/f_osa +
-                                                                 numpy.log(f_osa/sweep_start_freq) - 1) + numpy.pi/4))
-    SI[0] = 0j
-    H = Y*SI
-    si = numpy.fft.irfft(SI)
-    # nlsp.common.plots.plot(sumpf.Signal(channels=(si,),samplingrate=fs,labels=("Sweep signal",)))
-    h = numpy.fft.irfft(H)
-    ir_sweep = sumpf.Signal(channels=(h,),samplingrate=fs,labels=("Sweep signal",))
-    # nlsp.common.plots.plot(ir_sweep)
+    output_sweep_channel = output_sweep.GetChannels()[0]
+    sampling_rate = output_sweep.GetSamplingRate()
+    sweep_parameter = sweep_generator.GetSweepParameter()
+    output_sweep_channel_mean_sub = output_sweep_channel - numpy.mean(output_sweep_channel)
+    fft_len = int(2**numpy.ceil(numpy.log2(len(output_sweep_channel_mean_sub))))
+    output_sweep_channel_spec = numpy.fft.rfft(output_sweep_channel_mean_sub,fft_len)/sampling_rate
+    interval = numpy.linspace(0, sampling_rate/2, num=fft_len/2+1)
+    inverse_sweep = 2*numpy.sqrt(interval/sweep_parameter)*numpy.exp(1j*(2*numpy.pi*sweep_parameter*interval*(sweep_start_freq/interval +
+                                                                 numpy.log(interval/sweep_start_freq) - 1) + numpy.pi/4))
+    inverse_sweep[0] = 0j
+    tf_sweep_channel = output_sweep_channel_spec*inverse_sweep
+    ir_sweep_channel = numpy.fft.irfft(tf_sweep_channel)
+    ir_sweep = sumpf.Signal(channels=(ir_sweep_channel,),samplingrate=sampling_rate,labels=("Sweep signal",))
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)

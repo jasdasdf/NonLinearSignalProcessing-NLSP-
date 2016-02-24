@@ -1,7 +1,7 @@
 import numpy
 import sumpf
+import nlsp
 import math
-import common.plot as plot
 
 class WindowedSweepGenerator(object):
     def __init__(self, sampling_rate=48000.0, length=2**16, start_frequency=20.0,
@@ -77,27 +77,45 @@ class WindowedSweepGenerator(object):
 
 class NovakSweepGenerator(object):
     def __init__(self, sampling_rate=48000.0, approx_length=2**16, start_frequency=20.0,
-                 stop_frequency=20000.0, silence_duration=0.03, fade_out=0.02, fade_in=0.02):
+                 stop_frequency=20000.0, silence_duration=0.00, fade_out=0.02, fade_in=0.02):
 
         self.__sampling_rate = float(sampling_rate)
         self.__approx_length = float(approx_length)
         self.__start_frequency = float(start_frequency)
         self.__stop_frequency = float(stop_frequency)
-        self.__silence_duration = float(silence_duration)
+        self.__silence_duration = float(silence_duration*self.__sampling_rate)
         self.__fade_out = float(fade_out*self.__sampling_rate)
         self.__fade_in = float(fade_in*self.__sampling_rate)
 
+    @sumpf.Input(float,["_GetSweepParameter","GetLength","GetProperties"])
     def SetLength(self,length):
         self.__approx_length = float(length)
 
     def GetOutput(self):
-        t = numpy.arange(0,round(self.__sampling_rate*self.GetLength()-1)/self.__sampling_rate,1/self.__sampling_rate)
+        t = numpy.arange(0,self.GetLength()/self.__sampling_rate,1/self.__sampling_rate)
         s = numpy.sin(2*numpy.pi*self.__start_frequency*self._GetSweepParameter()*(numpy.exp(t/self._GetSweepParameter())-1))
         if self.__fade_in > 0:
             s[0:self.__fade_in] = s[0:self.__fade_in] * ((-numpy.cos(numpy.arange(self.__fade_in)/self.__fade_in*math.pi)+1) / 2)
         if self.__fade_out > 0:
             s[-self.__fade_out:] = s[-self.__fade_out:] *  ((numpy.cos(numpy.arange(self.__fade_out)/self.__fade_out*numpy.pi)+1) / 2)
-        return sumpf.Signal(channels=(s,),samplingrate=self.__sampling_rate,labels=("Sweep signal",))
+        print len(s)
+        signal = sumpf.Signal(channels=(s,),samplingrate=self.__sampling_rate,labels=("Sweep signal",))
+        if len(signal) % 2 != 0:
+            signal = sumpf.modules.CutSignal(signal,start=0,stop=-1).GetOutput()
+        print len(signal)
+        return signal
+
+    def GetReversedOutput(self):
+        L = self._GetSweepParameter()
+        f_osa = numpy.linspace(0, self.__sampling_rate/2, num=self.GetLength()/2+1)
+        SI = 2*numpy.sqrt(f_osa/L)*numpy.exp(1j*(2*numpy.pi*L*f_osa*(self.__start_frequency/f_osa +
+                                                                 numpy.log(f_osa/self.__start_frequency) - 1) + numpy.pi/4))
+        SI[0] = 0j
+        si = numpy.fft.irfft(SI)
+        # if len(si) % 2 != 0:
+        #     si.append(0)
+        signal = sumpf.Signal(channels=(si,),samplingrate=self.__sampling_rate,labels=("Sweep signal",))
+        return signal
 
     def _GetSweepParameter(self):
         L = 1/self.__start_frequency * round((self.__approx_length/self.__sampling_rate)*
@@ -106,8 +124,8 @@ class NovakSweepGenerator(object):
 
     def GetLength(self):
         T_hat = self._GetSweepParameter()*numpy.log(self.__stop_frequency/self.__start_frequency)
-        return T_hat
+        length = round(self.__sampling_rate*T_hat-1)
+        return length
 
     def GetProperties(self):
-        sweep_duration = self.GetLength() - self.__fade_out - self.__silence_duration - self.__fade_in
-        return self.__start_frequency, self.__stop_frequency, (sweep_duration*self.__sampling_rate)
+        return self.__start_frequency, self.__stop_frequency, self.GetLength()

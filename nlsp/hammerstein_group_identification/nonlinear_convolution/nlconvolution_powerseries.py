@@ -1,9 +1,10 @@
 import sumpf
 import nlsp
 import numpy
+import math
 import common.plot as plot
 
-def nonlinearconvolution_powerseries(input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0,
+def nonlinearconvolution_powerseries_farina(input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0,
                                            sweep_length=None,branches=5):
     """
     Function to find the filter impulse response of the hammerstein group model using Nonlinear convolution method.
@@ -149,7 +150,7 @@ def nonlinearconvolution_powerseries_debug(input_sweep, output_sweep, sweep_star
     nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
     return Volterra_ir[:branches],nl_func
 
-def nonlinearconvolution_powerseries_novak(input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0,
+def nonlinearconvolution_powerseries_farina_automatic(input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0,
                                            sweep_length=None,branches=5):
     """
     Novaks iterative approach
@@ -218,3 +219,66 @@ def nonlinearconvolution_powerseries_novak(input_sweep, output_sweep, sweep_star
         B.append(sumpf.modules.InverseFourierTransform(A).GetSignal())
     nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
     return B,nl_func
+
+
+def nonlinearconvolution_powerseries_novak(input_sweep, output_sweep, sweep_start_freq=20.0, sweep_stop_freq=20000.0,
+                                           sweep_length=None,branches=5):
+    ip_signal = input_sweep.GetOutput()
+    y = output_sweep.GetChannels()[0]
+    fs = output_sweep.GetSamplingRate()
+    L = input_sweep._GetSweepParameter()
+    y = y - numpy.mean(y)
+    fft_len = int(2**numpy.ceil(numpy.log2(len(y))))
+    Y = numpy.fft.rfft(y,fft_len)/fs
+    f_osa = numpy.linspace(0, fs/2, num=fft_len/2+1)
+    SI = 2*numpy.sqrt(f_osa/L)*numpy.exp(1j*(2*numpy.pi*L*f_osa*(sweep_start_freq/f_osa +
+                                                                 numpy.log(f_osa/sweep_start_freq) - 1) + numpy.pi/4))
+    SI[0] = 0j
+    H = Y*SI
+    si = numpy.fft.irfft(SI)
+    # nlsp.common.plots.plot(sumpf.Signal(channels=(si,),samplingrate=fs,labels=("Sweep signal",)))
+    h = numpy.fft.irfft(H)
+    ir_sweep = sumpf.Signal(channels=(h,),samplingrate=fs,labels=("Sweep signal",))
+    # nlsp.common.plots.plot(ir_sweep)
+    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
+    ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
+    ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+    ir_merger.AddInput(ir_sweep_direct)
+
+    for i in range(branches-1):
+        split_harm = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=ir_sweep,
+                                                               harmonic_order=i+2,
+                                                               sweep_start_frequency=sweep_start_freq,
+                                                               sweep_stop_frequency=sweep_stop_freq,
+                                                               sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
+        ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
+                                        samplingrate=ir_sweep.GetSamplingRate(), labels=split_harm.GetLabels()))
+    tf_harmonics_all = sumpf.modules.FourierTransform(signal=ir_merger.GetOutput()).GetSpectrum()
+    harmonics_tf = []
+    for i in range(len(tf_harmonics_all.GetChannels())):
+        tf_harmonics =  sumpf.modules.SplitSpectrum(data=tf_harmonics_all, channels=[i]).GetOutput()
+        harmonics_tf.append(tf_harmonics)
+    A_matrix = numpy.zeros((branches,branches),dtype=numpy.complex128)
+    for n in range(0,branches):
+        for m in range(0,branches):
+            if ((n >=m) and ((n+m) % 2 == 0)):
+                A_matrix[m][n] = (((-1 + 0j)**(2*(n+1)-m/2))/(2**n)) * nlsp.binomial((n+1),(n-m)/2)
+            else:
+                A_matrix[m][n] = 0
+    A_inverse = numpy.linalg.inv(A_matrix)
+    for row in range(0,len(A_inverse)):
+        if row % 2 != 0.0:
+            A_inverse[row] = A_inverse[row] * (0+1j)
+    B = []
+    for row in range(0,branches):
+        A = sumpf.modules.ConstantSpectrumGenerator(value=0.0,resolution=harmonics_tf[0].GetResolution(),
+                                                    length=len(harmonics_tf[0])).GetSpectrum()
+        for column in range(0,branches):
+            temp = sumpf.modules.AmplifySpectrum(input=harmonics_tf[column],factor=A_inverse[row][column]).GetOutput()
+            A = A + temp
+        B.append(sumpf.modules.InverseFourierTransform(A).GetSignal())
+    nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
+    return B,nl_func
+
+
+

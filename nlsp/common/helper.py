@@ -109,7 +109,7 @@ def get_sweep_harmonics_ir(sweep_generator, response, max_harm=None):
     harmonics_ir = merger.GetOutput()
     return harmonics_ir
 
-def log_bpfilter(start_freq,stop_freq,branches,input,amplify=False):
+def log_bpfilter(start_freq=20.0,stop_freq=20000.0,branches=5,input=sumpf.Signal(),amplify=False):
     """
     Generates logarithmically seperated band pass filters between start and stop frequencies.
     :param start_freq: the start frequency of the bandpass filter

@@ -17,7 +17,6 @@
 import math
 import sumpf
 import numpy    # the FindHarmonicImpulseResponse class needs NumPy for the fourier transforms, so importing this file shall fail, when NumPy is not available
-import nlsp
 
 class FindHarmonicImpulseResponse(object):
     """
@@ -131,6 +130,7 @@ class FindHarmonicImpulseResponse(object):
         if sweep_duration is None:
             sweep_duration = self.__impulse_response.GetDuration()
         sweep_rate = (self.__sweep_stop_frequency / self.__sweep_start_frequency) ** (1.0 / sweep_duration)
+        # sweep_rate = self.__sweep_duration * (math.log(self.__sweep_stop_frequency/self.__sweep_start_frequency))
         harmonic_start_time = self.__impulse_response.GetDuration() - math.log(self.__harmonic_order, sweep_rate)
         harmonic_start_sample = sumpf.modules.DurationToLength(duration=harmonic_start_time, samplingrate=self.__impulse_response.GetSamplingRate(), even_length=False).GetLength()
         harmonic_stop_sample = len(self.__impulse_response)
@@ -151,3 +151,4 @@ class FindHarmonicImpulseResponse(object):
         if len(harmonic) % 2 != 0:
             harmonic = sumpf.Signal(channels=tuple([c + (0.0,) for c in harmonic.GetChannels()]), samplingrate=harmonic.GetSamplingRate(), labels=harmonic.GetLabels())
         return harmonic
+

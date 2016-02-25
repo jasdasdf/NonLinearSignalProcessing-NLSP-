@@ -156,3 +156,8 @@ def plot_array(input_array,label_array=None,save=False,name=None):
     for input,label in zip(input_array,label_array):
         relabelandplot(input,label,False,save,name)
     show()
+
+def plot_simplearray(x_array,y_array,label,show=True):
+    pyplot.plot(x_array,y_array,label=label)
+    if show is True:
+        pyplot._show()

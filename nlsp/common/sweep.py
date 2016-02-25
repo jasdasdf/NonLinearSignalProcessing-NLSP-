@@ -114,13 +114,15 @@ class NovakSweepGenerator_Sine(object):
     def GetReversedOutput(self, length=None):
         if length is None:
             length = self.GetLength()
+        sampling_rate = self.GetOutput().GetSamplingRate()
+        sweep_parameter = self.GetSweepParameter()
         fft_len = int(2**numpy.ceil(numpy.log2(length)))
-        f_osa = numpy.linspace(0, self.__sampling_rate/2, num=fft_len/2+1)
-        SI = 2*numpy.sqrt(f_osa/self.GetSweepParameter())*numpy.exp(1j*(2*numpy.pi*self.GetSweepParameter()*f_osa*(self.__start_frequency/f_osa +
-                                                                     numpy.log(f_osa/self.__start_frequency) - 1) + numpy.pi/4))
-        SI[0] = 0j
-        si = numpy.fft.irfft(SI)
-        rev_sweep = sumpf.Signal(channels=(si,),samplingrate=self.__sampling_rate,labels=("Reversed Sweep signal",))
+        interval = numpy.linspace(0, sampling_rate/2, num=fft_len/2+1)
+        inverse_sweep = 2*numpy.sqrt(interval/sweep_parameter)*numpy.exp(1j*(2*numpy.pi*sweep_parameter*interval*(self.GetStartFrequency()/interval +
+                                                                     numpy.log(interval/self.GetStartFrequency()) - 1) + numpy.pi/4))
+        inverse_sweep[0] = 0j
+        rev_sweep = numpy.fft.irfft(inverse_sweep)
+        rev_sweep = sumpf.Signal(channels=(rev_sweep,),samplingrate=sampling_rate,labels=("Reversed Sweep signal",))
         return rev_sweep
 
     def GetSweepParameter(self):
@@ -172,13 +174,15 @@ class NovakSweepGenerator_Cosine(object):
     def GetReversedOutput(self, length=None):
         if length is None:
             length = self.GetLength()
+        sampling_rate = self.GetOutput().GetSamplingRate()
+        sweep_parameter = self.GetSweepParameter()
         fft_len = int(2**numpy.ceil(numpy.log2(length)))
-        f_osa = numpy.linspace(0, self.__sampling_rate/2, num=fft_len/2+1)
-        SI = 2*numpy.sqrt(f_osa/self.GetSweepParameter())*numpy.exp(1j*(2*numpy.pi*self.GetSweepParameter()*f_osa*(self.__start_frequency/f_osa +
-                                                                     numpy.log(f_osa/self.__start_frequency) - 1) + numpy.pi/4))
-        SI[0] = 0j
-        si = numpy.fft.irfft(SI)
-        rev_sweep = sumpf.Signal(channels=(si,),samplingrate=self.__sampling_rate,labels=("Reversed Sweep signal",))
+        interval = numpy.linspace(0, sampling_rate/2, num=fft_len/2+1)
+        inverse_sweep = 2*numpy.sqrt(interval/sweep_parameter)*numpy.exp(1j*(2*numpy.pi*sweep_parameter*interval*(self.GetStartFrequency()/interval +
+                                                                     numpy.log(interval/self.GetStartFrequency()) - 1) + numpy.pi/4))
+        inverse_sweep[0] = 0j
+        rev_sweep = numpy.fft.irfft(inverse_sweep)
+        rev_sweep = sumpf.Signal(channels=(rev_sweep,),samplingrate=sampling_rate,labels=("Reversed Sweep signal",))
         return rev_sweep
 
     def GetSweepParameter(self):

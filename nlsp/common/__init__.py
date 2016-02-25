@@ -33,7 +33,7 @@ from mse import mean_squared_error_freq,mean_squared_error_freq_range,mean_squar
 
 from soft_clipping import NLClipSignal
 
-from sweep import WindowedSweepGenerator, NovakSweepGenerator, NovakSweepGenerator_cosine
+from sweep import WindowedSweepGenerator, NovakSweepGenerator_Sine, NovakSweepGenerator_Cosine
 
 from plots import *
 

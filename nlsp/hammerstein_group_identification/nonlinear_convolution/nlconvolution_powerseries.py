@@ -90,25 +90,19 @@ def nonlinearconvolution_powerseries_temporalreversal(sweep_generator, output_sw
     sweep_stop_freq = sweep_generator.GetStopFrequency()
     ip_signal = sweep_generator.GetOutput()
 
-    output_sweep_channel = output_sweep.GetChannels()[0]
-    sampling_rate = output_sweep.GetSamplingRate()
-    sweep_parameter = sweep_generator.GetSweepParameter()
-    output_sweep_channel_mean_sub = output_sweep_channel - numpy.mean(output_sweep_channel)
-    fft_len = int(2**numpy.ceil(numpy.log2(len(output_sweep_channel_mean_sub))))
-    output_sweep_channel_spec = numpy.fft.rfft(output_sweep_channel_mean_sub,fft_len)/sampling_rate
-    interval = numpy.linspace(0, sampling_rate/2, num=fft_len/2+1)
-    inverse_sweep = 2*numpy.sqrt(interval/sweep_parameter)*numpy.exp(1j*(2*numpy.pi*sweep_parameter*interval*(sweep_start_freq/interval +
-                                                                 numpy.log(interval/sweep_start_freq) - 1) + numpy.pi/4))
-    inverse_sweep[0] = 0j
-    tf_sweep_channel = output_sweep_channel_spec*inverse_sweep
-    ir_sweep_channel = numpy.fft.irfft(tf_sweep_channel)
-    ir_sweep = sumpf.Signal(channels=(ir_sweep_channel,),samplingrate=sampling_rate,labels=("Sweep signal",))
+    output_sweep = nlsp.append_zeros(output_sweep)
+    rev = sweep_generator.GetReversedOutput()
+    rev_spec = sumpf.modules.FourierTransform(rev).GetSpectrum()
+    out_spec = sumpf.modules.FourierTransform(output_sweep).GetSpectrum()
+    out_spec = out_spec / output_sweep.GetSamplingRate()
+    tf = rev_spec * out_spec
+    ir_sweep = sumpf.modules.InverseFourierTransform(tf).GetSignal()
 
-    # Novaks method
+    # Novaks method of seperating harmonic impulses
     # ir_harmonics_all = nlsp.FindHarmonicImpulseResponse_Novak(ir_sweep,harmonic_order=branches,sweep_generator=sweep_generator)
     # ir_merger = ir_harmonics_all.GetHarmonicImpulseResponse()
 
-    # Jonas method
+    # Jonas method of seperating harmonic impulses
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)

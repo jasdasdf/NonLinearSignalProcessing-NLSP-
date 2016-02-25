@@ -6,7 +6,36 @@ import sumpf
 import nlsp
 import nlsp.common.plots as plot
 
-def hgmwithfilter_evaluation(sweep_generator,branches,iden_method,Plot,Save):
+def audio_evaluation(input_generator,branches,iden_method,Plot):
+
+    input_signal = input_generator.GetOutput()
+    filter_spec_tofind = nlsp.create_bpfilter([1000,2000,4000,8000,16000],input_signal)
+    ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 filter_irs=filter_spec_tofind,
+                                                 max_harmonics=range(1,branches+1))
+
+    found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
+    iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                 nonlinear_functions=nl_functions,
+                                                 filter_irs=found_filter_spec,
+                                                 max_harmonics=range(1,branches+1))
+
+    excitation = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/recordings/inputs/Speech3",
+                                              format=sumpf.modules.SignalFile.NUMPY_NPZ).GetSignal()
+    ref_nlsystem.SetInput(excitation)
+    iden_nlsystem.SetInput(excitation)
+    ref = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/recordings/virtual_outputs/RefSpeech3",
+                                      signal=ref_nlsystem.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+    iden = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/recordings/virtual_outputs/IdenSpeech3",
+                                      signal=iden_nlsystem.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+    if Plot is True:
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+    print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
+                                                                                             iden_nlsystem.GetOutput())
+
+def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot):
     """
     Evaluation of System Identification method by hgm virtual nl system
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and bandpass filters
@@ -14,30 +43,27 @@ def hgmwithfilter_evaluation(sweep_generator,branches,iden_method,Plot,Save):
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    signal_start_freq = sweep_generator.GetStartFrequency()
-    signal_stop_freq = sweep_generator.GetStopFrequency()
-    signal_length = sweep_generator.GetLength()
-    print signal_start_freq,signal_stop_freq,signal_length
-    input_signal = sweep_generator.GetOutput()
-    print len(input_signal)
-    filter_spec_tofind = nlsp.log_bpfilter(signal_start_freq,signal_stop_freq,branches,input_signal)
+    input_signal = input_generator.GetOutput()
+
+    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
-    found_filter_spec, nl_functions = iden_method(sweep_generator,ref_nlsystem.GetOutput(),branches)
+
+    found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
+
     if Plot is True:
         plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
         plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
-    print signal_length,len(ref_nlsystem.GetOutput())
     print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
-def hgmwithoverlapfilter_evaluation(input_signal,branches,iden_method,Plot,Save):
+def hgmwithoverlapfilter_evaluation(input_generator,branches,iden_method,Plot):
     """
     Evaluation of System Identification method by hgm virtual nl system
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and overlapping
@@ -46,15 +72,14 @@ def hgmwithoverlapfilter_evaluation(input_signal,branches,iden_method,Plot,Save)
     expectation - utmost similarity between the two spectrums
     """
     frequencies = [800,5000,900,5500,1000]
-    signal_start_freq,signal_stop_freq,signal_length = input_signal.GetProperties()
-    input_signal = input_signal.GetOutput()
+    input_signal = input_generator.GetOutput()
     filter_spec_tofind = nlsp.create_bpfilter(frequencies,input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
-    found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
-                                        signal_length,branches)
+
+    found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
@@ -65,7 +90,7 @@ def hgmwithoverlapfilter_evaluation(input_signal,branches,iden_method,Plot,Save)
     print "SNR between Reference and Identified output with overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
-def linearmodel_evaluation(input_signal,branches,iden_method,Plot,Save):
+def linearmodel_evaluation(input_generator,branches,iden_method,Plot):
     """
     Evaluation of System Identification method by linear amplification
     nonlinear system - no nonlinearity, linear amplifier as linear system
@@ -73,24 +98,23 @@ def linearmodel_evaluation(input_signal,branches,iden_method,Plot,Save):
     plot - the virtual linear system output and the identified linear system output
     expectation - utmost similarity between the two outputs
     """
-    signal_start_freq,signal_stop_freq,signal_length = input_signal.GetProperties()
-    input_signal = input_signal.GetOutput()
+    input_signal = input_generator.GetOutput()
     amplification = 1.0
     ref_nlsystem = sumpf.modules.AmplifySignal(factor=amplification)
     ref_nlsystem.SetInput(input_signal)
-    found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
-                                        signal_length,branches)
+
+    found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                  nonlinear_functions=nl_functions,
-                                                  filter_irs=found_filter_spec,
-                                                  max_harmonics=range(1,branches+1))
+                                                 nonlinear_functions=nl_functions,
+                                                 filter_irs=found_filter_spec,
+                                                 max_harmonics=range(1,branches+1))
     if Plot is True:
         plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
         plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
     print "SNR between Reference and Identified output for linear systems: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
-def hgmwithreversedfilter_evaluation(input_signal,branches,iden_method,Plot,Save):
+def hgmwithreversedfilter_evaluation(input_generator,branches,iden_method,Plot):
     """
     Evaluation of System Identification method by hgm virtual nl system
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and bandpass filters
@@ -98,17 +122,15 @@ def hgmwithreversedfilter_evaluation(input_signal,branches,iden_method,Plot,Save
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    signal_start_freq,signal_stop_freq,signal_length = input_signal.GetProperties()
-    print signal_start_freq,signal_stop_freq,signal_length
-    input_signal = input_signal.GetOutput()
-    filter_spec_tofind = nlsp.log_bpfilter(signal_start_freq,signal_stop_freq,branches,input_signal)
+    input_signal = input_generator.GetOutput()
+    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
     filter_spec_tofind = [i for i in reversed(filter_spec_tofind)]
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
-    found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
-                                        signal_length,branches)
+
+    found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
@@ -116,11 +138,10 @@ def hgmwithreversedfilter_evaluation(input_signal,branches,iden_method,Plot,Save
     if Plot is True:
         plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
         plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
-    print signal_length,len(ref_nlsystem.GetOutput())
     print "SNR between Reference and Identified output with reversed filter orders: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
-def hgmwithamplifiedfilter_evaluation(input_signal,branches,iden_method,Plot,Save):
+def hgmwithamplifiedfilter_evaluation(input_generator,branches,iden_method,Plot):
     """
     Evaluation of System Identification method by hgm virtual nl system
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and bandpass filters
@@ -128,16 +149,14 @@ def hgmwithamplifiedfilter_evaluation(input_signal,branches,iden_method,Plot,Sav
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    signal_start_freq,signal_stop_freq,signal_length = input_signal.GetProperties()
-    print signal_start_freq,signal_stop_freq,signal_length
-    input_signal = input_signal.GetOutput()
-    filter_spec_tofind = nlsp.log_bpfilter(signal_start_freq,signal_stop_freq,branches,input_signal,amplify=True)
+    input_signal = input_generator.GetOutput()
+    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal,amplify=True)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
-    found_filter_spec, nl_functions = iden_method(input_signal,ref_nlsystem.GetOutput(),signal_start_freq,signal_stop_freq,
-                                        signal_length,branches)
+
+    found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
@@ -145,6 +164,6 @@ def hgmwithamplifiedfilter_evaluation(input_signal,branches,iden_method,Plot,Sav
     if Plot is True:
         plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
         plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
-    print signal_length,len(ref_nlsystem.GetOutput())
     print "SNR between Reference and Identified output with differently amplified filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
+

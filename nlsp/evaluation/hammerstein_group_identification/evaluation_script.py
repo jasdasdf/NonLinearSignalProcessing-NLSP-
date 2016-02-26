@@ -4,21 +4,24 @@ import nlsp
 sampling_rate = 48000.0
 sweep_start_freq = 20.0
 sweep_stop_freq = 20000.0
-sweep_length = 2**14
-silence_duration = 0.00
-fade_out = 0.00
-fade_in = 0.00
+sweep_length = 2**18
+fade_out = 0.05
+fade_in = 0.50
 branches = 5
-iden_method = [nlsp.nonlinearconvolution_powerseries_spectralinversion]
+iden_method = [nlsp.nonlinearconvolution_powerseries_temporalreversal,nlsp.nonlinearconvolution_powerseries_spectralinversion,
+               nlsp.nonlinearconvolution_chebyshev_temporalreversal,nlsp.nonlinearconvolution_chebyshev_spectralinversion]
 
 Plot = False
 Save = False
 
-input_generator = nlsp.NovakSweepGenerator(sampling_rate=sampling_rate, length=sweep_length, start_frequency=sweep_start_freq,
+sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=sweep_length, start_frequency=sweep_start_freq,
                                    stop_frequency=sweep_stop_freq, fade_out= fade_out,fade_in=fade_in)
+cos = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=sweep_length, start_frequency=sweep_start_freq,
+                                   stop_frequency=sweep_stop_freq, fade_out= fade_out,fade_in=fade_in)
+excitation = [sine,sine,cos,cos]
 
-for method in iden_method:
-    print method
+for method,input_generator in zip(iden_method,excitation):
+    print method,input_generator
     # nlsp.audio_evaluation(input_generator,branches,method,Plot)
     nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
     nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,method,Plot)

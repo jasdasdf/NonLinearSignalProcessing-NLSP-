@@ -161,3 +161,30 @@ def plot_simplearray(x_array,y_array,label,show=True):
     pyplot.plot(x_array,y_array,label=label)
     if show is True:
         pyplot._show()
+
+def plot_histogram(data, legend=True, show=True, save=False, name=None):
+    if not isinstance(data, collections.Iterable):
+        data = [data]
+    for d in data:
+        # create x_data
+        x_data = []
+        for i in range(len(d)):
+            x_data.append(float(i) / d.GetSamplingRate())
+        # plot
+        for i in range(len(d.GetChannels())):
+            pyplot.hist(x_data, bins=100)
+    axis.set_xlabel("Value", fontsize="x-large")
+    if legend:
+        pyplot.legend(loc="best", fontsize="x-large")
+    pyplot.xticks(fontsize="large")
+    pyplot.yticks(fontsize="large")
+    if save is True:
+        location = "C:/Users/diplomand.8/OneDrive/Pictures/"
+        fig = os.path.join(location,name)
+        pyplot.savefig(fig, dpi=None, facecolor='w', edgecolor='w',
+        orientation='portrait', papertype=None, format=None,
+        transparent=False, bbox_inches=None, pad_inches=0.1,
+        frameon=None)
+    else:
+        if show:
+            _show()

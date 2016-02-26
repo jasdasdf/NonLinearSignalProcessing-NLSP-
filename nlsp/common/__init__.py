@@ -41,3 +41,5 @@ from calculate_energy import exponential_energy
 
 from find_harmonics import FindHarmonicImpulseResponse_Novak
 
+from gaussian import WhiteGaussianGenerator
+

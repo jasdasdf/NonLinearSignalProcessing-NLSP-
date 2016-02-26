@@ -32,7 +32,8 @@ def wgn_hgm_decorrelate(input,branches,total_branches):
 
 
 
-def wgn_hgm_identification(input_wgn,output_wgn,branches):
+def wgn_hgm_identification(input_generator,output_wgn,branches):
+    input_wgn = input_generator.GetOutput()
     l = []
     C = []
     for branch in range(1,branches+1):
@@ -54,5 +55,5 @@ def wgn_hgm_identification(input_wgn,output_wgn,branches):
             temp = sumpf.modules.AmplifySpectrum(input=l[column],factor=k_matrix[row][column]).GetOutput()
             A = A + temp
         B.append(sumpf.modules.InverseFourierTransform(A + mu_matrix[row]).GetSignal())
-
-    return C
+    nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
+    return B,nl_func

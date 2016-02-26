@@ -129,9 +129,23 @@ class FindHarmonicImpulseResponse(object):
         sweep_duration = self.__sweep_duration
         if sweep_duration is None:
             sweep_duration = self.__impulse_response.GetDuration()
+
+        # # logesh
+        # sweep_rate = (132628.0/48000.0) * math.log((self.__sweep_stop_frequency / self.__sweep_start_frequency), math.e)
+        # harmonic_start_time =  self.__impulse_response.GetDuration() - ((math.log((self.__harmonic_order+1), math.e) * sweep_rate)/self.__sweep_start_frequency)
+        # print harmonic_start_time,sweep_rate
+        #
+        # # jonas
+        # sweep_rate = (self.__sweep_stop_frequency / self.__sweep_start_frequency) ** (1.0 / sweep_duration)
+        # m = (2 * math.pi * self.__sweep_start_frequency)/math.log(sweep_rate,math.e)
+        # harmonic_start_time = self.__impulse_response.GetDuration() - math.log((self.__harmonic_order/m)+1, sweep_rate)
+        # print harmonic_start_time,sweep_rate
+
+        # stable
         sweep_rate = (self.__sweep_stop_frequency / self.__sweep_start_frequency) ** (1.0 / sweep_duration)
-        # sweep_rate = self.__sweep_duration * (math.log(self.__sweep_stop_frequency/self.__sweep_start_frequency))
         harmonic_start_time = self.__impulse_response.GetDuration() - math.log(self.__harmonic_order, sweep_rate)
+        print harmonic_start_time,sweep_rate,self.__harmonic_order
+
         harmonic_start_sample = sumpf.modules.DurationToLength(duration=harmonic_start_time, samplingrate=self.__impulse_response.GetSamplingRate(), even_length=False).GetLength()
         harmonic_stop_sample = len(self.__impulse_response)
         if self.__harmonic_order > 2:

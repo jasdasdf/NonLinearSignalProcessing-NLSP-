@@ -116,7 +116,8 @@ class NovakSweepGenerator_Sine(object):
             length = self.GetLength()
         sampling_rate = self.GetOutput().GetSamplingRate()
         sweep_parameter = self.GetSweepParameter()
-        fft_len = int(2**numpy.ceil(numpy.log2(length)))
+        # fft_len = int(2**numpy.ceil(numpy.log2(length)))
+        fft_len = int(length)
         interval = numpy.linspace(0, sampling_rate/2, num=fft_len/2+1)
         inverse_sweep = 2*numpy.sqrt(interval/sweep_parameter)*numpy.exp(1j*(2*numpy.pi*sweep_parameter*interval*(self.GetStartFrequency()/interval +
                                                                      numpy.log(interval/self.GetStartFrequency()) - 1) + numpy.pi/4))
@@ -176,7 +177,8 @@ class NovakSweepGenerator_Cosine(object):
             length = self.GetLength()
         sampling_rate = self.GetOutput().GetSamplingRate()
         sweep_parameter = self.GetSweepParameter()
-        fft_len = int(2**numpy.ceil(numpy.log2(length)))
+        # fft_len = int(2**numpy.ceil(numpy.log2(length)))
+        fft_len = int(length)
         interval = numpy.linspace(0, sampling_rate/2, num=fft_len/2+1)
         inverse_sweep = 2*numpy.sqrt(interval/sweep_parameter)*numpy.exp(1j*(2*numpy.pi*sweep_parameter*interval*(self.GetStartFrequency()/interval +
                                                                      numpy.log(interval/self.GetStartFrequency()) - 1) + numpy.pi/4))

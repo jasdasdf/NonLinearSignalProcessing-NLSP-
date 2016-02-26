@@ -166,13 +166,8 @@ def plot_histogram(data, legend=True, show=True, save=False, name=None):
     if not isinstance(data, collections.Iterable):
         data = [data]
     for d in data:
-        # create x_data
-        x_data = []
-        for i in range(len(d)):
-            x_data.append(float(i) / d.GetSamplingRate())
-        # plot
         for i in range(len(d.GetChannels())):
-            pyplot.hist(x_data, bins=100)
+            pyplot.hist(d.GetChannels()[i], bins=500)
     axis.set_xlabel("Value", fontsize="x-large")
     if legend:
         pyplot.legend(loc="best", fontsize="x-large")

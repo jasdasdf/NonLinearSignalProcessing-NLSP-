@@ -1,4 +1,5 @@
 import sumpf
+import numpy
 
 class WhiteGaussianGenerator(object):
     def __init__(self, sampling_rate=48000.0, length=2**16, start_frequency=20.0,
@@ -24,6 +25,8 @@ class WhiteGaussianGenerator(object):
         print len(bandpass), len(sumpf.modules.FourierTransform(noise).GetSpectrum())
         wgn = bandpass * sumpf.modules.FourierTransform(noise).GetSpectrum()
         return sumpf.modules.InverseFourierTransform(wgn).GetSignal()
+        # wgn = numpy.random.normal(0.0,1.0,self.__length)
+        # return sumpf.Signal(channels=(wgn,),samplingrate=self.__sampling_rate,labels=("wgn",))
 
     @sumpf.Output(float)
     def GetLength(self):

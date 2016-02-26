@@ -41,11 +41,9 @@ def nonlinearconvolution_chebyshev_spectralinversion(sweep_generator, output_swe
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
     for i in range(branches-1):
-        split_harm = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=ir_sweep,
-                                                               harmonic_order=i+2,
-                                                               sweep_start_frequency=sweep_start_freq,
-                                                               sweep_stop_frequency=sweep_stop_freq,
-                                                               sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
+        split_harm = nlsp.FindHarmonicImpulseResponse_Novak(impulse_response=ir_sweep,
+                                                            harmonic_order=i+2,
+                                                            sweep_generator=sweep_generator).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ir_sweep.GetSamplingRate(), labels=split_harm.GetLabels()))
     ir_merger = ir_merger.GetOutput()
@@ -70,7 +68,7 @@ def nonlinearconvolution_chebyshev_temporalreversal(sweep_generator, output_swee
     sweep_stop_freq = sweep_generator.GetStopFrequency()
     ip_signal = sweep_generator.GetOutput()
 
-    output_sweep = nlsp.append_zeros(output_sweep)
+    # output_sweep = nlsp.append_zeros(output_sweep)
     rev = sweep_generator.GetReversedOutput()
     rev_spec = sumpf.modules.FourierTransform(rev).GetSpectrum()
     out_spec = sumpf.modules.FourierTransform(output_sweep).GetSpectrum()
@@ -88,11 +86,9 @@ def nonlinearconvolution_chebyshev_temporalreversal(sweep_generator, output_swee
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
     for i in range(branches-1):
-        split_harm = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=ir_sweep,
-                                                               harmonic_order=i+2,
-                                                               sweep_start_frequency=sweep_start_freq,
-                                                               sweep_stop_frequency=sweep_stop_freq,
-                                                               sweep_duration=(sweep_length/ip_signal.GetSamplingRate())).GetHarmonicImpulseResponse()
+        split_harm = nlsp.FindHarmonicImpulseResponse_Novak(impulse_response=ir_sweep,
+                                                            harmonic_order=i+2,
+                                                            sweep_generator=sweep_generator).GetHarmonicImpulseResponse()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ir_sweep.GetSamplingRate(), labels=split_harm.GetLabels()))
     ir_merger = ir_merger.GetOutput()

@@ -189,7 +189,7 @@ def get_mean(ip):
             # energy_singlechannel.append((abs(s)**2)*(1*(dummy**i)))
             energy_singlechannel.append(s)
         #energy_allchannels.append(numpy.average(energy_singlechannel,weights=range(1,len(energy_singlechannel)+1).reverse()))
-        energy_allchannels.append(numpy.sum(energy_singlechannel))
+        energy_allchannels.append(numpy.divide(numpy.sum(energy_singlechannel),len(c)))
     return energy_allchannels
 
 def cut_spectrum(inputspectrum,freq_range):
@@ -308,19 +308,15 @@ def add_noise(signal,distribution):
     signal_and_noise = sumpf.modules.AddSignals(signal1=signal, signal2=noise).GetOutput()
     return signal_and_noise
 
-def plot_array(input_array,label_array=None):
+def plot_array(input_array):
     """
     Helper function to plot array
     :param input_array: the input array of signal or spectrum
     :param label_array: the array of labels
     :return: the plot of the input array with labels
     """
-    if label_array is None:
-        label_array = []
-        for input in input_array:
-            label_array.append(str(input.GetLabels()))
-    for input,label in zip(input_array,label_array):
-        nlsp.relabelandplot(input,label,False)
+    for input in input_array:
+        nlsp.common.plots.plot(input,show=False)
     plot.show()
 
 def binomial(x, y):

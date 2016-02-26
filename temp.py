@@ -65,4 +65,4 @@ def generateandevaluate():
     nlsp.plot(sumpf.modules.FourierTransform(excitation).GetSpectrum())
     nlsp.plot(sumpf.modules.FourierTransform(response).GetSpectrum())
 
-generateandevaluate()
+# generateandevaluate()

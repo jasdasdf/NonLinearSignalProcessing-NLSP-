@@ -13,30 +13,40 @@ def differentlength_evaluation(input_generator,branches,iden_method,Plot):
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    length = [2**17,2**18,2**19]
-    for signal_length in length:
-        input_generator.SetLength(signal_length)
-        print input_generator.GetLength()
-        input_signal = input_generator.GetOutput()
-        filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
-        ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+    length_ref = [2**16,2**17]
+    length_iden = [2**15,2**16,2**17]
+    input_generator_ref = input_generator
+    input_generator_iden = input_generator
+    for signal_length, ref_length in itertools.product(length_iden,length_ref):
+        input_generator_ref.SetLength(ref_length)
+        input_ref = input_generator_ref.GetOutput()
+        filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_ref)
+        ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_ref,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
-
         found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
-        iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+        print signal_length,ref_length
+        print len(input_generator_iden.GetOutput()),len(input_generator_ref.GetOutput())
+
+        input_generator_iden.SetLength(signal_length)
+        input_iden = input_generator_iden.GetOutput()
+        iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_iden,
                                                      nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
 
+        print signal_length,ref_length
+        print len(input_generator_iden.GetOutput()),len(input_generator_ref.GetOutput())
+
         if Plot is True:
             plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
             plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
-        print "SNR between Reference and Identified output : %r, input length: %r" %(nlsp.snr(ref_nlsystem.GetOutput(),
-                                                                                     iden_nlsystem.GetOutput()),len(input_signal))
+        print "SNR between Reference(length:%r) and Identified output(length:%r) : %r" %(len(input_ref),len(input_iden),nlsp.snr(ref_nlsystem.GetOutput(),
+                                                                                     iden_nlsystem.GetOutput()))
 
 def differentbranches_evaluation(input_generator,branches,iden_method,Plot):
+    ref_branches = 5
     for branches in range(3,branches+2):
         input_signal = input_generator.GetOutput()
 
@@ -44,7 +54,7 @@ def differentbranches_evaluation(input_generator,branches,iden_method,Plot):
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
-                                                     max_harmonics=range(1,branches+1))
+                                                     max_harmonics=range(1,ref_branches+1))
 
         found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
@@ -55,8 +65,8 @@ def differentbranches_evaluation(input_generator,branches,iden_method,Plot):
         if Plot is True:
             plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
             plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
-        print "SNR between Reference and Identified output : %r, with number of branches: %r" %(nlsp.snr(ref_nlsystem.GetOutput(),
-                                                                                     iden_nlsystem.GetOutput()),branches)
+        print "SNR between Reference and Identified output : %r, with number of ref_branches: %r and iden_branches: %r" %(nlsp.snr(ref_nlsystem.GetOutput(),
+                                                                                     iden_nlsystem.GetOutput()),branches,ref_branches)
 
 def computationtime_evaluation(input_generator,branches,iden_method,Plot):
 

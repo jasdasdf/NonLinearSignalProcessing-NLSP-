@@ -22,7 +22,7 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot):
                                                      max_harmonics=range(1,branches+1))
         ref_nlsystem_noise = nlsp.add_noise(ref_nlsystem.GetOutput(),sumpf.modules.NoiseGenerator.GaussianDistribution(mean,sd))
         found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
-        noise_filter_spec, nl_functions = iden_method(ref_nlsystem_noise,ref_nlsystem.GetOutput(),branches)
+        noise_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem_noise.GetOutput(),branches)
 
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nl_functions,

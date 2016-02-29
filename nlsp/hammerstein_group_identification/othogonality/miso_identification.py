@@ -50,7 +50,10 @@ def wgn_hgm_decorrelate(input,total_branches):
     return signal_matrix,k_matrix,mu_matrix
 
 def wgn_hgm_identification(input_generator,output_wgn,branches):
-    input_wgn = input_generator.GetOutput()
+    if hasattr(input_generator,"GetOutput"):
+        input_wgn = input_generator.GetOutput()
+    else:
+        input_wgn = input_generator
     l = []
     L = []
     signal_matrix, k_matrix, mu_matrix = wgn_hgm_decorrelate(input_wgn,branches)

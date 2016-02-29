@@ -2,25 +2,25 @@ import sumpf
 import nlsp
 
 sampling_rate = 48000.0
-sweep_start_freq = 20.0
-sweep_stop_freq = 20000.0
-sweep_length = 2**15
-fade_out = 0.00
-fade_in = 0.00
+start_freq = 20.0
+stop_freq = 20000.0
+length = 2**16
+fade_out = 0.05
+fade_in = 0.05
 branches = 5
 distribution = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
-iden_method = [nlsp.nonlinearconvolution_powerseries_temporalreversal,nlsp.nonlinearconvolution_powerseries_spectralinversion,
+iden_method = [nlsp.nonlinearconvolution_powerseries_spectralinversion,nlsp.nonlinearconvolution_powerseries_temporalreversal,
                nlsp.nonlinearconvolution_chebyshev_temporalreversal,nlsp.nonlinearconvolution_chebyshev_spectralinversion]
 
 Plot = False
 Save = False
 
-sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=sweep_length, start_frequency=sweep_start_freq,
-                                   stop_frequency=sweep_stop_freq, fade_out= fade_out,fade_in=fade_in)
-cos = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=sweep_length, start_frequency=sweep_start_freq,
-                                   stop_frequency=sweep_stop_freq, fade_out= fade_out,fade_in=fade_in)
-wgn = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=sweep_length, start_frequency=sweep_start_freq,
-                                   stop_frequency=sweep_stop_freq, distribution=distribution)
+sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
+cos = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
+wgn = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, distribution=distribution)
 excitation = [sine,sine,cos,cos]
 
 print sine.GetSweepParameter(),sine.GetLength(),len(sine.GetOutput())

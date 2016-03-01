@@ -17,64 +17,63 @@ def split_signals():
                                       signal=excitation,format=sumpf.modules.SignalFile.NUMPY_NPZ)
 
 
-def loudspeakermodel_evaluation(input_sweep,input_sample,branches,iden_method,Plot,Save):
+def loudspeakermodel_evaluation(input_signal,input_sample,branches,iden_method,Plot,Save):
     loudspeaker = "Visaton BF45"
-    sweep = input_sweep
+    signal = input_signal
     sample = input_sample
     # load loudspeaker measurings
-    load_sweep = sumpf.modules.SignalFile(filename=common.get_filename(loudspeaker,sweep, 1),
+    load_sweep = sumpf.modules.SignalFile(filename=common.get_filename(loudspeaker,signal, 1),
                                     format=sumpf.modules.SignalFile.WAV_FLOAT)
     excitation = sumpf.modules.SplitSignal(data=load_sweep.GetSignal(), channels=[0]).GetOutput()
     response = sumpf.modules.SplitSignal(data=load_sweep.GetSignal(), channels=[1]).GetOutput()
 
-    # identify kernel using nonlinear convolution method
-    sweep_start_freq, sweep_stop_freq, sweep_duration = head_specific.get_sweep_properties(excitation)
-    found_filter_spec, nl_functions = iden_method(excitation,response,sweep_start_freq,sweep_stop_freq,
-                                        sweep_duration,branches)
-
-    # use identified kernel in nl convolution hammerstein model
-    ls_model = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl_functions,
-                                       filter_irs=found_filter_spec,max_harmonics=range(1,branches+1))
+    # identify kernel using identification methods
+    found_filter_spec, nl_functions = iden_method(excitation,response,branches)
+    ls_model = nlsp.HammersteinGroupModel_up(input_signal=excitation,
+                                                 nonlinear_functions=nl_functions,
+                                                 filter_irs=found_filter_spec,
+                                                 max_harmonics=range(1,branches+1))
+    nlsp.relabelandplot(ls_model.GetOutput(),"ls")
+    nlsp.relabelandplot(response,"ref")
 
     # load sample to evaluate the loudspeaker model
-    load_sample = sumpf.modules.SignalFile(filename=common.get_filename(loudspeaker, sample, 1),
-                                          format=sumpf.modules.SignalFile.WAV_FLOAT)
-    sample_excitation = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[0]).GetOutput()
-    sample_response = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[1]).GetOutput()
-    if len(sample_excitation) > len(excitation):
-        sample_excitation = sumpf.modules.CutSignal(signal=sample_excitation,start=0,stop=len(excitation)).GetOutput()
-        sample_response = sumpf.modules.CutSignal(signal=sample_response,start=0,stop=len(excitation)).GetOutput()
-    else:
-        sample_excitation = nlsp.append_zeros(sample_excitation,length=len(excitation))
-        sample_response = nlsp.append_zeros(sample_response,length=len(response))
-    ls_model.SetInput(sample_excitation)
+    # load_sample = sumpf.modules.SignalFile(filename=common.get_filename(loudspeaker, sample, 1),
+    #                                       format=sumpf.modules.SignalFile.WAV_FLOAT)
+    # sample_excitation = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[0]).GetOutput()
+    # sample_response = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[1]).GetOutput()
+    # if len(sample_excitation) > len(excitation):
+    #     sample_excitation = sumpf.modules.CutSignal(signal=sample_excitation,start=0,stop=len(excitation)).GetOutput()
+    #     sample_response = sumpf.modules.CutSignal(signal=sample_response,start=0,stop=len(excitation)).GetOutput()
+    # else:
+    #     sample_excitation = nlsp.append_zeros(sample_excitation,length=len(excitation))
+    #     sample_response = nlsp.append_zeros(sample_response,length=len(response))
+    # ls_model.SetInput(sample_excitation)
 
     # highpass filter the output of the model to prevent amplification of low freq signals
-    prp = sumpf.modules.ChannelDataProperties()
-    prp.SetSignal(ls_model.GetOutput())
-    highpass = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),
-                                                      frequency=100.0,transform=True,resolution=prp.GetResolution(),
-                                                      length=prp.GetSpectrumLength()).GetSpectrum()
-    model_up_highpass = sumpf.modules.MultiplySpectrums(spectrum1=sumpf.modules.FourierTransform(ls_model.GetOutput()).GetSpectrum(),
-                                                        spectrum2=highpass).GetOutput()
-    model_up_highpass_signal = sumpf.modules.InverseFourierTransform(model_up_highpass).GetSignal()
+    # prp = sumpf.modules.ChannelDataProperties()
+    # prp.SetSignal(ls_model.GetOutput())
+    # highpass = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=2),
+    #                                                   frequency=100.0,transform=True,resolution=prp.GetResolution(),
+    #                                                   length=prp.GetSpectrumLength()).GetSpectrum()
+    # model_up_highpass = sumpf.modules.MultiplySpectrums(spectrum1=sumpf.modules.FourierTransform(ls_model.GetOutput()).GetSpectrum(),
+    #                                                     spectrum2=highpass).GetOutput()
+    # model_up_highpass_signal = sumpf.modules.InverseFourierTransform(model_up_highpass).GetSignal()
 
     # save the output to the directory
-    iden = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/recordings/NLconvolution/loudspeaker/identified",
-                                      signal=model_up_highpass_signal,format=sumpf.modules.SignalFile.WAV_FLOAT)
-    ref = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/recordings/NLconvolution/loudspeaker/reference",
-                                      signal=sample_response,format=sumpf.modules.SignalFile.WAV_FLOAT)
-    inp = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/recordings/NLconvolution/loudspeaker/input",
-                                      signal=sample_excitation,format=sumpf.modules.SignalFile.WAV_FLOAT)
-    print "Loudspeaker, SNR between Reference and Identified output Sample: %r" %nlsp.snr(sample_response,
-                                                                                             model_up_highpass_signal)
+    # iden = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/recordings/miso/loudspeaker/identified",
+    #                                   signal=ls_model.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+    # ref = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/recordings/miso/loudspeaker/reference",
+    #                                   signal=sample_response,format=sumpf.modules.SignalFile.WAV_FLOAT)
+    # inp = sumpf.modules.SignalFile(filename="O:/Diplomanden/Logeshwaran.Thamilselvan/Loudspeaker nonlinearity/recordings/miso/loudspeaker/input",
+    #                                   signal=sample_excitation,format=sumpf.modules.SignalFile.WAV_FLOAT)
+    # print "Loudspeaker, SNR between Reference and Identified output Sample: %r" %nlsp.snr(sample_response,
+    #                                                                                          ls_model.GetOutput())
     if Plot is True:
         # plot the loudspeaker op against identified op
-        nlsp.relabelandplot(sumpf.modules.FourierTransform(ls_model.GetOutput()).GetSpectrum(),"identified_sample_spectrum",False)
-        nlsp.relabelandplot(sumpf.modules.FourierTransform(sample_response).GetSpectrum(),"reference_sample_spectrum",True)
+        # nlsp.relabelandplot(sumpf.modules.FourierTransform(ls_model.GetOutput()).GetSpectrum(),"identified_sample_spectrum",False)
+        # nlsp.relabelandplot(sumpf.modules.FourierTransform(sample_response).GetSpectrum(),"reference_sample_spectrum",True)
 
         # plot the sweep prediction outputs
-        ls_model.SetInput(excitation)
         nlsp.relabelandplot(sumpf.modules.FourierTransform(ls_model.GetOutput()).GetSpectrum(),"identified_sweep_spectrum",False)
         nlsp.relabelandplot(sumpf.modules.FourierTransform(response).GetSpectrum(),"reference_sweep_spectrum",True)
 

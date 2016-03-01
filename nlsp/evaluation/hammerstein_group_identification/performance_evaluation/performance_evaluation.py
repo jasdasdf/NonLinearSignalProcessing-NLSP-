@@ -13,11 +13,11 @@ def differentlength_evaluation(input_generator,branches,iden_method,Plot):
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    length_ref = [2**16,2**17]
+    length_ref = [2**15,2**16,2**17]
     length_iden = [2**15,2**16,2**17]
     input_generator_ref = input_generator
     input_generator_iden = input_generator
-    for signal_length, ref_length in itertools.product(length_iden,length_ref):
+    for signal_length, ref_length in zip(length_iden,length_ref):
         input_generator_ref.SetLength(ref_length)
         input_ref = input_generator_ref.GetOutput()
         filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_ref)

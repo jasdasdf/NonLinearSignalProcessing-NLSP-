@@ -180,7 +180,7 @@ def snr(input_signalorspectrum,output_signalorspectrum):
             observed = nlsp.cut_spectrum(observed,[100,19000])
             identified = nlsp.cut_spectrum(identified,[100,19000])
             noise =  observed - identified
-            noise2 = (identified - observed)/identified
+            # noise2 = (identified - observed)/identified
 
             # nlsp.common.plots.relabelandplotphase(noise,"noise1",show=False)
             # nlsp.common.plots.relabelandplotphase(noise2,"noise2",show=False)

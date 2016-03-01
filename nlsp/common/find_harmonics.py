@@ -214,7 +214,6 @@ class FindHarmonicImpulseResponse_Novak(object):
         # stable
         sweep_rate = self.__sweep_generator.GetSweepParameter()
         harmonic_start_time = self.__sweep_duration - (math.log(self.__harmonic_order)*sweep_rate)
-        print harmonic_start_time,sweep_rate,self.__harmonic_order
 
         harmonic_start_sample = sumpf.modules.DurationToLength(duration=harmonic_start_time, samplingrate=self.__impulse_response.GetSamplingRate(), even_length=False).GetLength()
         harmonic_stop_sample = len(self.__impulse_response)

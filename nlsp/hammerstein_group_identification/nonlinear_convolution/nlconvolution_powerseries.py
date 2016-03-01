@@ -71,7 +71,8 @@ def nonlinearconvolution_powerseries_spectralinversion(sweep_generator, output_s
         for column in range(0,branches):
             temp = sumpf.modules.AmplifySpectrum(input=harmonics_tf[column],factor=A_inverse[row][column]).GetOutput()
             A = A + temp
-        B.append(sumpf.modules.InverseFourierTransform(A).GetSignal())
+        B_temp = nlsp.relabel(sumpf.modules.InverseFourierTransform(A).GetSignal(),"%r harmonic identified psi" %str(row+1))
+        B.append(B_temp)
     nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
     return B,nl_func
 
@@ -95,6 +96,7 @@ def nonlinearconvolution_powerseries_temporalreversal(sweep_generator, output_sw
     out_spec = out_spec / output_sweep.GetSamplingRate()
     tf = rev_spec * out_spec
     ir_sweep = sumpf.modules.InverseFourierTransform(tf).GetSignal()
+    # ir_sweep = sumpf.modules.ShiftSignal(signal=ir_sweep,shift=250,circular=True).GetOutput()
 
     # Novaks method of seperating harmonic impulses
     # ir_harmonics_all = nlsp.FindHarmonicImpulseResponse_Novak(ir_sweep,harmonic_order=branches,sweep_generator=sweep_generator)
@@ -114,6 +116,7 @@ def nonlinearconvolution_powerseries_temporalreversal(sweep_generator, output_sw
                                         samplingrate=ir_sweep.GetSamplingRate(), labels=split_harm.GetLabels()))
     ir_merger = ir_merger.GetOutput()
 
+    # nlsp.common.plots.plot(ir_merger)
     tf_harmonics_all = sumpf.modules.FourierTransform(ir_merger).GetSpectrum()
     harmonics_tf = []
     for i in range(len(tf_harmonics_all.GetChannels())):
@@ -137,7 +140,8 @@ def nonlinearconvolution_powerseries_temporalreversal(sweep_generator, output_sw
         for column in range(0,branches):
             temp = sumpf.modules.AmplifySpectrum(input=harmonics_tf[column],factor=A_inverse[row][column]).GetOutput()
             A = A + temp
-        B.append(sumpf.modules.InverseFourierTransform(A).GetSignal())
+        B_temp = nlsp.relabel(sumpf.modules.InverseFourierTransform(A).GetSignal(),"%r harmonic identified ptr" %str(row+1))
+        B.append(B_temp)
     nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
     return B,nl_func
 

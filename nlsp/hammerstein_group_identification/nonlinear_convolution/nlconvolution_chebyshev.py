@@ -51,7 +51,7 @@ def nonlinearconvolution_chebyshev_spectralinversion(sweep_generator, output_swe
     Volterra_ir = []
     for i in range(len(ir_merger.GetChannels())):
         ir_harmonics =  sumpf.modules.SplitSignal(data=ir_merger, channels=[i]).GetOutput()
-        Volterra_ir.append(ir_harmonics)
+        Volterra_ir.append(nlsp.relabel(ir_harmonics,"%r harmonic identified csi" %str(i+1)))
     nl_func = nlsp.nl_branches(nlsp.function_factory.chebyshev1_polynomial,branches)
     return Volterra_ir, nl_func
 
@@ -92,10 +92,10 @@ def nonlinearconvolution_chebyshev_temporalreversal(sweep_generator, output_swee
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ir_sweep.GetSamplingRate(), labels=split_harm.GetLabels()))
     ir_merger = ir_merger.GetOutput()
-
+    # nlsp.common.plots.plot(ir_merger)
     Volterra_ir = []
     for i in range(len(ir_merger.GetChannels())):
         ir_harmonics =  sumpf.modules.SplitSignal(data=ir_merger, channels=[i]).GetOutput()
-        Volterra_ir.append(ir_harmonics)
+        Volterra_ir.append(nlsp.relabel(ir_harmonics,"%r harmonic identified ctr" %str(i+1)))
     nl_func = nlsp.nl_branches(nlsp.function_factory.chebyshev1_polynomial,branches)
     return Volterra_ir, nl_func

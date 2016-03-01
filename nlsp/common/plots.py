@@ -117,6 +117,40 @@ def plot_groupdelayandmagnitude(data, legend=True, show=True, save=False, name=N
         if show:
             _show()
 
+def plot_timeandfreq(data_time, data_freq, legend=True, show=True):
+    if not isinstance(data_time, collections.Iterable):
+        data_time = [data_time]
+    if not isinstance(data_freq, collections.Iterable):
+        data_freq = [data_freq]
+    for d in data_freq:
+        # create x_data
+        x_data = []
+        for i in range(len(d)):
+            x_data.append(i * d.GetResolution())
+        # plot
+        for i in range(len(d.GetMagnitude())):
+            pyplot.subplot(2,1,1)
+            pyplot.title("Frequency")
+            pyplot.loglog(x_data, d.GetMagnitude()[i], label=d.GetLabels()[i])
+    axis.set_xlabel("Frequeny [Hz]", fontsize="x-large")
+    for d in data_time:
+        # create x_data
+        x_data = []
+        for i in range(len(d)):
+            x_data.append(float(i) / d.GetSamplingRate())
+        # plot
+        for i in range(len(d.GetChannels())):
+            pyplot.subplot(2,1,2)
+            pyplot.title("Amplitude")
+            pyplot.plot(x_data, d.GetChannels()[i], label=d.GetLabels()[i])
+    axis.set_xlabel("Time [s]", fontsize="x-large")
+    if legend:
+        pyplot.legend(loc="best", fontsize="x-large")
+    pyplot.xticks(fontsize="large")
+    pyplot.yticks(fontsize="large")
+    if show:
+        _show()
+
 def relabelandplot(input,label=None,show=True,save=False,name=None):
     """
     Relabel the input signal or spectrum and plot
@@ -183,3 +217,20 @@ def plot_histogram(data, legend=True, show=True, save=False, name=None):
     else:
         if show:
             _show()
+
+def plot_timeandfreq_array(input_array,show=True):
+    if isinstance(input_array, list) != True:
+        array1 = []
+        array1.append(input_array)
+    else:
+        array1 = input_array
+    for one in array1:
+        if isinstance(one,sumpf.Signal):
+            one_signal = one
+            one_spectrum = sumpf.modules.FourierTransform(one).GetSpectrum()
+        else:
+            one_signal = sumpf.modules.InverseFourierTransform(one).GetSignal()
+            one_spectrum = one
+        plot_timeandfreq(one_signal,one_spectrum,show=False)
+    if show is True:
+        _show()

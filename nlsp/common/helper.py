@@ -326,46 +326,40 @@ def binomial(x, y):
         binom = 0
     return binom
 
-def get_nl_impulse_response(sweepgenerator,response):
-
-    sweep_start_freq = sweepgenerator.GetStartFrequency()
-    y = response.GetChannels()[0]
-    fs = response.GetSamplingRate()
-    try:
-        L = sweepgenerator.GetSweepParameter()
-    except:
-        L = len(sweepgenerator.GetOutput())/(math.log(sweepgenerator.GetStopFrequency()/sweepgenerator.GetStartFrequency()))
-    y = y - numpy.mean(y)
-    fft_len = int(2**numpy.ceil(numpy.log2(len(y))))
-    Y = numpy.fft.rfft(y,fft_len)/fs
-    f_osa = numpy.linspace(0, fs/2, num=fft_len/2+1)
-    SI = 2*numpy.sqrt(f_osa/L)*numpy.exp(1j*(2*numpy.pi*L*f_osa*(sweep_start_freq/f_osa +
-                                                                 numpy.log(f_osa/sweep_start_freq) - 1) + numpy.pi/4))
-    SI[0] = 0j
-    H = Y*SI
-    h = numpy.fft.irfft(H)
-    ir_sweep = sumpf.Signal(channels=(h,),samplingrate=fs,labels=("Sweep signal",))
+def get_nl_impulse_response(sweep_generator,response):
+    rev = sweep_generator.GetReversedOutput()
+    rev_spec = sumpf.modules.FourierTransform(rev).GetSpectrum()
+    out_spec = sumpf.modules.FourierTransform(response).GetSpectrum()
+    out_spec = out_spec / response.GetSamplingRate()
+    tf = rev_spec * out_spec
+    ir_sweep = sumpf.modules.InverseFourierTransform(tf).GetSignal()
     return ir_sweep
 
+def get_nl_harmonics(sweep_generator,response,harmonics):
+    sweep_length = sweep_generator.GetLength()
+    ir_sweep = get_nl_impulse_response(sweep_generator,response)
+    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
+    ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
+    ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+    ir_merger.AddInput(ir_sweep_direct)
+    for i in range(harmonics-1):
+        split_harm = nlsp.FindHarmonicImpulseResponse_Novak(impulse_response=ir_sweep,
+                                                            harmonic_order=i+2,
+                                                            sweep_generator=sweep_generator).GetHarmonicImpulseResponse()
+        ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
+                                        samplingrate=ir_sweep.GetSamplingRate(), labels=split_harm.GetLabels()))
+    ir_merger = ir_merger.GetOutput()
+    return ir_merger
 
-def get_sweep_harmonics_ir_novak(sweepgenerator, response, max_harm):
+def harmonicsvsall_energyratio_nl(sweep_generator,response,degree):
 
-    excitation = sweepgenerator.GetOutput()
-    sweep_start_freq = sweepgenerator.GetStartFrequency()
-    sweep_stop_freq = sweepgenerator.GetStopFrequency()
-    sweep_length = len(excitation)
-    impulse_response = get_nl_impulse_response(sweepgenerator,response)
-    linear = sumpf.modules.CutSignal(signal=impulse_response,start=0,stop=len(impulse_response)/4).GetOutput()
-    linear = nlsp.relabel(nlsp.append_zeros(linear),"1 hamonic")
-    merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
-    merger.AddInput(linear)
-    for i in range(2,max_harm+1):
-        harmonics = sumpf.modules.FindHarmonicImpulseResponse(impulse_response=impulse_response, harmonic_order=i,
-                                                              sweep_start_frequency=sweep_start_freq,
-                                                              sweep_stop_frequency=sweep_stop_freq,
-                                                              sweep_duration=(sweep_length/excitation.GetSamplingRate())).GetHarmonicImpulseResponse()
-        harmonics = nlsp.relabel(harmonics,"%d harmonic"%i)
-        merger.AddInput(sumpf.Signal(channels=harmonics.GetChannels(),
-                                        samplingrate=excitation.GetSamplingRate(), labels=harmonics.GetLabels()))
-    harmonics_ir = merger.GetOutput()
-    return harmonics_ir
+    harmonics = nlsp.get_nl_harmonics(sweep_generator,response,degree)
+    all_energy = nlsp.calculateenergy_freq(harmonics)
+    harm_energy = []
+    for i in range(0,degree):
+        harm_energy.append(all_energy[i])
+    if degree % 2 == 0: # even
+        harm_energy = harm_energy[1::2]
+    else: # odd
+        harm_energy = harm_energy[0::2]
+    return numpy.divide(numpy.sum(harm_energy),numpy.sum(all_energy))

@@ -52,7 +52,7 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot):
         sample_signal = sumpf.modules.AmplifySignal(input=input,factor=sample_amp).GetOutput()
         filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,5),
+                                                     nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
         ref_nlsystem_scaled = sumpf.modules.AmplifySignal(input=ref_nlsystem.GetOutput(),factor=sample_amp)

@@ -1,3 +1,4 @@
+import numpy
 import collections
 import math
 import sumpf
@@ -218,7 +219,7 @@ def plot_histogram(data, legend=True, show=True, save=False, name=None):
         if show:
             _show()
 
-def plot_timeandfreq_array(input_array,show=True):
+def plot_timeandfreq_array(input_array,show=True,legend=True):
     if isinstance(input_array, list) != True:
         array1 = []
         array1.append(input_array)
@@ -231,6 +232,28 @@ def plot_timeandfreq_array(input_array,show=True):
         else:
             one_signal = sumpf.modules.InverseFourierTransform(one).GetSignal()
             one_spectrum = one
-        plot_timeandfreq(one_signal,one_spectrum,show=False)
+        plot_timeandfreq(one_signal,one_spectrum,show=False,legend=legend)
     if show is True:
         _show()
+
+def plot_spectrogram(data):
+    print
+    x_data = []
+    for i in range(len(data)):
+        x_data.append(float(i) / data.GetSamplingRate())
+    y_data = []
+    for i in range(len(data.GetSpectrums()[0])):
+        y_data.append(i * data.GetSpectrums()[0].GetResolution())
+    color_data = []
+    for s in data.GetSpectrums():
+        color_data.append(s.GetMagnitude()[0])
+    color_data = numpy.transpose(color_data)
+    axis.set_yscale('symlog')
+    axis.set_ylim(y_data[1], y_data[-1])
+    axis.set_xlim(x_data[0], x_data[-1])
+    x_axis = numpy.array(x_data)
+    y_axis = numpy.array(y_data)
+    color_grid = numpy.multiply(numpy.log10(color_data), 10.0)
+    plot = axis.pcolormesh(x_axis, y_axis, color_grid)
+    pyplot.colorbar(plot)
+    show()

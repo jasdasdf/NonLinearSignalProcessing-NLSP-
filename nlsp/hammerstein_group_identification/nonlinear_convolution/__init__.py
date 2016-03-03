@@ -2,6 +2,3 @@ from .nlconvolution_powerseries import nonlinearconvolution_powerseries_spectral
 
 from .nlconvolution_chebyshev import nonlinearconvolution_chebyshev_spectralinversion,nonlinearconvolution_chebyshev_temporalreversal
 
-from .nlconvolution_cosine import nonlinearconvolution_chebyshev_cosine
-
-from .nl_convolution import NLConvolution

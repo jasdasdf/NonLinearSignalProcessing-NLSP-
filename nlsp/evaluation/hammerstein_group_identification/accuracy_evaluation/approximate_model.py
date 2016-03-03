@@ -67,7 +67,7 @@ def doublehgm_same_evaluation(input_generator,branches,iden_method,Plot):
     input_signal = input_generator.GetOutput()
     filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroup_Series(input_signal=input_signal,
-                                                nonlinear_functions=(nlsp.nl_branches(nlsp.function_factory.power_series,5),nlsp.nl_branches(nlsp.function_factory.power_series,5)),
+                                                nonlinear_functions=(nlsp.nl_branches(nlsp.function_factory.power_series,branches),nlsp.nl_branches(nlsp.function_factory.power_series,branches)),
                                                 filter_irs=(filter_spec_tofind,filter_spec_tofind),
                                                 max_harmonics=(range(1,branches+1),range(1,branches+1)),
                                                 hgm_type=(nlsp.HammersteinGroupModel_up,nlsp.HammersteinGroupModel_up))

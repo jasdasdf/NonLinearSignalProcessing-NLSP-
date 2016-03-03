@@ -2,6 +2,7 @@ import sumpf
 import nlsp
 import common
 import head_specific
+import nlsp.common.plots as plot
 
 def split_signals():
 
@@ -144,3 +145,75 @@ def distortionbox_evaluation(input_sweep,input_sample,branches,iden_method,Plot,
         nlsp.relabelandplot(sumpf.modules.FourierTransform(response).GetSpectrum(),"reference_sweep_spectrum",True)
 
     print "Distortion box, SNR between Reference and Identified output Sweep: %r" %nlsp.snr(response,ls_model.GetOutput())
+
+def distortionbox_save():
+    sampling_rate = 48000.0
+    start_freq = 100.0
+    stop_freq = 20000.0
+    length = 2**18
+    fade_out = 0.05
+    fade_in = 0.10
+
+    sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
+    cos = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
+    save_sine = sumpf.modules.SignalFile(filename="F:/nl_recordings/sine_f",
+                                      signal=sine.GetOutput(),format=sumpf.modules.SignalFile.NUMPY_NPZ)
+    save_cos = sumpf.modules.SignalFile(filename="F:/nl_recordings/cos_f",
+                                      signal=cos.GetOutput(),format=sumpf.modules.SignalFile.NUMPY_NPZ)
+
+    fade_out = 0.0
+    fade_in = 0.0
+    sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
+    cos = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
+    save_sine = sumpf.modules.SignalFile(filename="F:/nl_recordings/sine",
+                                      signal=sine.GetOutput(),format=sumpf.modules.SignalFile.NUMPY_NPZ)
+    save_cos = sumpf.modules.SignalFile(filename="F:/nl_recordings/cos",
+                                      signal=cos.GetOutput(),format=sumpf.modules.SignalFile.NUMPY_NPZ)
+
+def distortionbox_model(Plot=True):
+    sampling_rate = 48000.0
+    start_freq = 100.0
+    stop_freq = 20000.0
+    length = 2**18
+    fade_out = 0.00
+    fade_in = 0.00
+    branches = 5
+
+    sine = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
+
+    op_sine = sumpf.modules.SignalFile(filename="F:/nl_recordings/rec/cos", format=sumpf.modules.SignalFile.WAV_FLOAT)
+
+    found_filter_spec, nl_functions = nlsp.nonlinearconvolution_chebyshev_temporalreversal(sine,op_sine.GetSignal(),branches)
+    iden_nlsystem_sine = nlsp.HammersteinGroupModel_up(input_signal=sine.GetOutput(),
+                                                 nonlinear_functions=nl_functions,
+                                                 filter_irs=found_filter_spec,
+                                                 max_harmonics=range(1,branches+1))
+    if Plot is True:
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(op_sine.GetSignal()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem_sine.GetOutput()).GetSpectrum(),"Identified System",show=True)
+    print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(op_sine.GetSignal(),
+                                                                                             iden_nlsystem_sine.GetOutput())
+    save_sine_op = sumpf.modules.SignalFile(filename="F:/nl_recordings/sim/sine",
+                                      signal=iden_nlsystem_sine.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+
+    load_sample = sumpf.modules.SignalFile(filename="F:/nl_recordings/outputs/speech3.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+
+    ref_sample = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[1]).GetOutput()
+    ip_sample = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[0]).GetOutput()
+
+    iden_nlsystem_sine.SetInput(ip_sample)
+
+    # save the output to the directory
+    iden = sumpf.modules.SignalFile(filename="F:/nl_recordings/sim/identified",
+                                      signal=iden_nlsystem_sine.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+    ref = sumpf.modules.SignalFile(filename="F:/nl_recordings/sim/reference",
+                                      signal=ref_sample,format=sumpf.modules.SignalFile.WAV_FLOAT)
+    inp = sumpf.modules.SignalFile(filename="F:/nl_recordings/sim/input",
+                                      signal=ip_sample,format=sumpf.modules.SignalFile.WAV_FLOAT)
+    print "Distortion box, SNR between Reference and Identified output Sample: %r" %nlsp.snr(ref_sample,
+                                                                                             iden_nlsystem_sine.GetOutput())

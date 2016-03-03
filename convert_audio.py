@@ -4,7 +4,7 @@ import os
 
 from_format = sumpf.modules.SignalFile.NUMPY_NPZ
 to_format = sumpf.modules.SignalFile.WAV_FLOAT
-directory = "F:/nl_recordings/outputs/"
+directory = "F:/nl_recordings/rec_3/"
 
 def get_filepaths(directory):
     """

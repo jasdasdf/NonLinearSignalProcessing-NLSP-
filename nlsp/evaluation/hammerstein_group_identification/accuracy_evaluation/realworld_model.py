@@ -179,41 +179,47 @@ def distortionbox_model(Plot=True):
     start_freq = 100.0
     stop_freq = 20000.0
     length = 2**18
-    fade_out = 0.00
-    fade_in = 0.00
+    fade_out = 0.05
+    fade_in = 0.10
     branches = 5
 
-    sine = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+    sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
 
-    op_sine = sumpf.modules.SignalFile(filename="F:/nl_recordings/rec/cos", format=sumpf.modules.SignalFile.WAV_FLOAT)
+    op_sine = sumpf.modules.SignalFile(filename="F:/nl_recordings/rec_2/sine_f.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+    op_sine = sumpf.modules.SplitSignal(data=op_sine.GetSignal(),channels=[1]).GetOutput()
 
-    found_filter_spec, nl_functions = nlsp.nonlinearconvolution_chebyshev_temporalreversal(sine,op_sine.GetSignal(),branches)
+    found_filter_spec, nl_functions = nlsp.nonlinearconvolution_powerseries_temporalreversal(sine,op_sine,branches)
     iden_nlsystem_sine = nlsp.HammersteinGroupModel_up(input_signal=sine.GetOutput(),
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
+    linear_op = nlsp.linear_identification_temporalreversal(sine,op_sine,sine.GetOutput())
     if Plot is True:
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(op_sine.GetSignal()).GetSpectrum(),"Reference System",show=False)
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem_sine.GetOutput()).GetSpectrum(),"Identified System",show=True)
-    print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(op_sine.GetSignal(),
-                                                                                             iden_nlsystem_sine.GetOutput())
-    save_sine_op = sumpf.modules.SignalFile(filename="F:/nl_recordings/sim/sine",
-                                      signal=iden_nlsystem_sine.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(op_sine).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem_sine.GetOutput()).GetSpectrum(),"NL Identified System",show=False)
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(linear_op).GetSpectrum(),"Linear Identified System",show=True)
+    print "SNR between Reference and Identified output, nonlinear: %r" %nlsp.snr(op_sine, iden_nlsystem_sine.GetOutput())
+    print "SNR between Reference and Identified output, linear: %r" %nlsp.snr(op_sine, linear_op)
 
-    load_sample = sumpf.modules.SignalFile(filename="F:/nl_recordings/outputs/speech3.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+    load_sample = sumpf.modules.SignalFile(filename="F:/nl_recordings/rec_2/speech2.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
 
     ref_sample = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[1]).GetOutput()
     ip_sample = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[0]).GetOutput()
 
     iden_nlsystem_sine.SetInput(ip_sample)
+    linear_op = nlsp.linear_identification_temporalreversal(sine, op_sine, ip_sample)
 
     # save the output to the directory
-    iden = sumpf.modules.SignalFile(filename="F:/nl_recordings/sim/identified",
+    iden = sumpf.modules.SignalFile(filename="F:/nl_recordings/rec_2/sim/identified",
                                       signal=iden_nlsystem_sine.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
-    ref = sumpf.modules.SignalFile(filename="F:/nl_recordings/sim/reference",
+    ref = sumpf.modules.SignalFile(filename="F:/nl_recordings/rec_2/sim/reference",
                                       signal=ref_sample,format=sumpf.modules.SignalFile.WAV_FLOAT)
-    inp = sumpf.modules.SignalFile(filename="F:/nl_recordings/sim/input",
+    inp = sumpf.modules.SignalFile(filename="F:/nl_recordings/rec_2/sim/input",
                                       signal=ip_sample,format=sumpf.modules.SignalFile.WAV_FLOAT)
-    print "Distortion box, SNR between Reference and Identified output Sample: %r" %nlsp.snr(ref_sample,
+    linear = sumpf.modules.SignalFile(filename="F:/nl_recordings/rec_2/sim/linear",
+                                      signal=linear_op,format=sumpf.modules.SignalFile.WAV_FLOAT)
+    print "Distortion box, SNR between Reference and Identified output Sample,nl: %r" %nlsp.snr(ref_sample,
                                                                                              iden_nlsystem_sine.GetOutput())
+    print "Distortion box, SNR between Reference and Identified output Sample,l: %r" %nlsp.snr(ref_sample,
+                                                                                             linear_op)

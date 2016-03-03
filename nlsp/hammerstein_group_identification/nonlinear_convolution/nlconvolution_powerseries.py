@@ -30,6 +30,7 @@ def nonlinearconvolution_powerseries_spectralinversion(sweep_generator, output_s
                                                              stop_frequency=sweep_stop_freq).GetOutput()
     tf_sweep = sumpf.modules.MultiplySpectrums(spectrum1=inversed_ip, spectrum2=op_spectrum).GetOutput()
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
+    # nlsp.common.plots.plot(ir_sweep)
 
     # Novaks method
     # ir_harmonics_all = nlsp.FindHarmonicImpulseResponse_Novak(ir_sweep,harmonic_order=branches,sweep_generator=sweep_generator)
@@ -96,6 +97,7 @@ def nonlinearconvolution_powerseries_temporalreversal(sweep_generator, output_sw
     out_spec = out_spec / output_sweep.GetSamplingRate()
     tf = rev_spec * out_spec
     ir_sweep = sumpf.modules.InverseFourierTransform(tf).GetSignal()
+    # nlsp.common.plots.plot(ir_sweep)
     # ir_sweep = sumpf.modules.ShiftSignal(signal=ir_sweep,shift=250,circular=True).GetOutput()
 
     # Novaks method of seperating harmonic impulses

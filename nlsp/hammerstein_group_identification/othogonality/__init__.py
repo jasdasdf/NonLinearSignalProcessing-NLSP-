@@ -1,1 +1,3 @@
-from miso_identification import wgn_hgm_decorrelate,wgn_hgm_identification
+from miso_identification import wgn_hgm_decorrelate,miso_identification
+
+from wiener_g_identification import wiener_g_identification

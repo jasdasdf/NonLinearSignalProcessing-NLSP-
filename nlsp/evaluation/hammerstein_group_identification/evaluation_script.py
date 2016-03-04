@@ -49,6 +49,6 @@ for method,input_generator in zip(iden_method,excitation):
     # nlsp.loudspeakermodel_evaluation("Sweep18","Speech2",branches,method,Plot,Save)
     # nlsp.distortionbox_evaluation("Sweep18","Speech1",branches,method,Plot,Save)
     # nlsp.distortionbox_save()
-    nlsp.distortionbox_model(True)
+    nlsp.distortionbox_model(False)
 
 

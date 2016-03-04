@@ -7,12 +7,12 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 sweep_start_freq = 20.0
 sweep_stop_freq = 20000.0
-sweep_length = 2**10
+sweep_length = 2**13
 branches = 5
-distribution = sumpf.modules.NoiseGenerator.WhiteNoise()
-iden_method = [nlsp.wgn_hgm_identification]
+distribution = sumpf.modules.NoiseGenerator.GaussianDistribution()
+iden_method = [nlsp.wiener_g_identification]
 
-Plot = True
+Plot = False
 Save = False
 
 wgn = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=sweep_length, start_frequency=sweep_start_freq,

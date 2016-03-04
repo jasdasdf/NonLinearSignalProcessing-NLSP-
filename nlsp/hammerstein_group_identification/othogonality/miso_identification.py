@@ -49,7 +49,7 @@ def wgn_hgm_decorrelate(input,total_branches):
         signal_matrix.append(core)
     return signal_matrix,k_matrix,mu_matrix
 
-def wgn_hgm_identification(input_generator,output_wgn,branches):
+def miso_identification(input_generator,output_wgn,branches):
     if hasattr(input_generator,"GetOutput"):
         input_wgn = input_generator.GetOutput()
     else:

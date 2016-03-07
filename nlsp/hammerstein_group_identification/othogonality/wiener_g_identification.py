@@ -13,7 +13,7 @@ def wiener_g_identification(input_gen, output, branches):
         k = []
         for i in range(0, kernel_length):
             shifted = sumpf.modules.ShiftSignal(signal=excitation,shift=-i,circular=False).GetOutput()
-            power = nlsp.NonlinearFunction(signal=shifted,nonlin_func=nlsp.function_factory.power_series(branch))
+            power = nlsp.NonlinearFunction(signal=shifted,nonlin_func=nlsp.function_factory.hermite_polynomial(branch))
             product = response * power.GetOutput()
             mean = sumpf.modules.SignalMean(signal=product).GetMean()[0]
             factor = 1.0 / (math.factorial(branch) * (variance ** branch))
@@ -23,6 +23,24 @@ def wiener_g_identification(input_gen, output, branches):
     nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
     return kernels, nl_func
 
+def wiener_g_identification_corr(input_gen, output, branches):
+    excitation = input_gen.GetOutput()
+    response = output
+    variance = sumpf.modules.SignalMean(input_gen.GetOutput() * input_gen.GetOutput()).GetMean()[0] - \
+               (sumpf.modules.SignalMean(input_gen.GetOutput()).GetMean()[0]**2)
+    kernels = []
+    for branch in range(1, branches + 1):
+        input = nlsp.NonlinearFunction.hermite_polynomial(branch,excitation)
+        cross_corr = sumpf.modules.CorrelateSignals(signal1=input.GetOutput(),signal2=response,
+                                                    mode=sumpf.modules.CorrelateSignals.SPECTRUM).GetOutput()
+        factor = (math.factorial(branch) * (variance ** branch))
+        factor = sumpf.modules.ConstantSignalGenerator(value=factor,samplingrate=cross_corr.GetSamplingRate(),length=len(cross_corr)).GetSignal()
+        k = cross_corr * factor
+        kernels.append(k)
+    kernels[1] = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=excitation.GetSamplingRate(),length=len(cross_corr)).GetSignal()
+    kernels[2] = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=excitation.GetSamplingRate(),length=len(cross_corr)).GetSignal()
+    nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
+    return kernels, nl_func
 
 # sampling_rate = 48000.0
 # sweep_start_freq = 20.0

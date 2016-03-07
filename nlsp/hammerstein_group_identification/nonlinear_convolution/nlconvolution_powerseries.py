@@ -26,8 +26,8 @@ def nonlinearconvolution_powerseries_spectralinversion(sweep_generator, output_s
         op_spectrum = sumpf.modules.FourierTransform(signal=output_sweep).GetSpectrum()
     else:
         op_spectrum = output_sweep
-    inversed_ip = sumpf.modules.RegularizedSpectrumInversion(spectrum=ip_spectrum,start_frequency=sweep_start_freq,
-                                                             stop_frequency=sweep_stop_freq).GetOutput()
+    inversed_ip = sumpf.modules.RegularizedSpectrumInversion(spectrum=ip_spectrum,start_frequency=sweep_start_freq+50,
+                                                             stop_frequency=sweep_stop_freq-100).GetOutput()
     tf_sweep = sumpf.modules.MultiplySpectrums(spectrum1=inversed_ip, spectrum2=op_spectrum).GetOutput()
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
     # nlsp.common.plots.plot(ir_sweep)

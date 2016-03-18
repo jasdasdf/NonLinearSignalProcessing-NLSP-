@@ -13,7 +13,7 @@ def hardclipping_evaluation(input_generator,branches,iden_method,Plot):
     plot - the virtual nl system output and the identified nl system output
     expectation - utmost similarity between the two outputs
     """
-    for t in range(5,12):
+    for t in range(9,10):
         t = t / 10.0
         thresholds = [-t,t]
         input_signal = input_generator.GetOutput()
@@ -25,10 +25,12 @@ def hardclipping_evaluation(input_generator,branches,iden_method,Plot):
                                                      nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
-
+        sine = sumpf.modules.SineWaveGenerator(frequency=1000.0,phase=0.0,samplingrate=input_signal.GetSamplingRate(),length=len(input_signal)).GetSignal()
+        ref_nlsystem.SetInput(sine)
+        iden_nlsystem.SetInput(sine)
         if Plot is True:
-            plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
-            plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+            plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
         print "SNR between Reference and Identified output for hardclipping(thresholds:%r): %r" %(thresholds,nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput()))
 

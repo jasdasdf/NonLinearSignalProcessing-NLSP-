@@ -26,11 +26,10 @@ def wiener_g_identification(input_gen, output, branches):
 def wiener_g_identification_corr(input_gen, output, branches):
     excitation = input_gen.GetOutput()
     response = output
-    variance = sumpf.modules.SignalMean(input_gen.GetOutput() * input_gen.GetOutput()).GetMean()[0] - \
-               (sumpf.modules.SignalMean(input_gen.GetOutput()).GetMean()[0]**2)
+    variance = sumpf.modules.SignalMean(input_gen.GetOutput() * input_gen.GetOutput()).GetMean()[0]
     kernels = []
     for branch in range(1, branches + 1):
-        input = nlsp.NonlinearFunction.hermite_polynomial(branch,excitation)
+        input = nlsp.NonlinearFunction.power_series(branch,excitation)
         cross_corr = sumpf.modules.CorrelateSignals(signal1=input.GetOutput(),signal2=response,
                                                     mode=sumpf.modules.CorrelateSignals.SPECTRUM).GetOutput()
         factor = (math.factorial(branch) * (variance ** branch))
@@ -39,7 +38,7 @@ def wiener_g_identification_corr(input_gen, output, branches):
         kernels.append(k)
     kernels[1] = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=excitation.GetSamplingRate(),length=len(cross_corr)).GetSignal()
     kernels[2] = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=excitation.GetSamplingRate(),length=len(cross_corr)).GetSignal()
-    nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
+    nl_func = nlsp.nl_branches(nlsp.function_factory.legrendre_polynomial,branches)
     return kernels, nl_func
 
 # sampling_rate = 48000.0

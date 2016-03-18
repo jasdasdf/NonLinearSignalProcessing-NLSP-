@@ -45,6 +45,6 @@ def laguerre_polynomial(degree):
     def func(channel):
         channell = []
         for i in range(0,len(channel)):
-            channell.append(mpmath.laguerre(degree,channel[i]))
+            channell.append(mpmath.laguerre(degree,0,channel[i]))
         return channell
     return func

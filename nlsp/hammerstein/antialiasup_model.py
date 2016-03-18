@@ -32,6 +32,7 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
         self._downoutput = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
         self._attenuator = sumpf.modules.AmplifySignal()
         self._downsampling_position = downsampling_position
+        self._downnloutput = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
 
         self.SetNLFunction = self._nonlin_function.SetNonlinearFunction
 
@@ -43,7 +44,6 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
             self.GetOutput = self._downoutput.GetOutput
         else:
             self.GetOutput = self._itransform.GetSignal
-        self.GetNLOutput = self._nonlin_function.GetOutput
         self.GetMaximumHarmonic = self._GetMaximumHarmonic
 
     def _Connect(self):
@@ -84,3 +84,9 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
     @sumpf.Output(float)
     def _Getattenuation(self):
         return (1/float(self._GetMaximumHarmonic()))
+
+    @sumpf.Output(sumpf.Signal)
+    def GetNLOutput(self):
+        sumpf.connect(self._nonlin_function.GetOutput,self._downnloutput.SetInput)
+        sumpf.connect(self._prp.GetSamplingRate, self._downnloutput.SetSamplingRate)
+        return self._downnloutput.GetOutput()

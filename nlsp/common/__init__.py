@@ -10,11 +10,11 @@ from generate import generate_puretones
 
 from helper import get_impulse_response, get_sweep_harmonics_ir, get_sweep_harmonics_spectrum, get_transfer_function, log_bpfilter, append_zeros
 
-from helper import cut_spectrum, relabel, nl_branches, add_noise, plot_array
+from helper import cut_spectrum, relabel, nl_branches, add_noise
 
-from helper import get_nl_impulse_response, get_nl_harmonics, harmonicsvsall_energyratio_nl
+from helper import get_nl_impulse_response, get_nl_harmonics, harmonicsvsall_energyratio_nl, get_nl_harmonics_iden
 
-from helper import harmonicsvsall_energyratio,relabelandplot,create_bpfilter,binomial,get_mean
+from helper import harmonicsvsall_energyratio,create_bpfilter,binomial,get_mean
 
 from calculate_aliasing import calculate_aliasing_percentage
 

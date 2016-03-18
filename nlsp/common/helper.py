@@ -143,7 +143,7 @@ def log_bpfilter(start_freq=20.0,stop_freq=20000.0,branches=5,input=sumpf.Signal
         if amplify is True:
             spec = sumpf.modules.AmplifySpectrum(input=spec,factor=random.randint(10,100)).GetOutput()
         filter_spec.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
-    filter_spec = [i for i in reversed(filter_spec)]
+    # filter_spec = [i for i in reversed(filter_spec)]
     return filter_spec
 
 def create_bpfilter(frequencies,input):
@@ -247,19 +247,6 @@ def relabel(input,labels=None):
         outputs = outputs
     return outputs
 
-def relabelandplot(input,label,show=True):
-    """
-    Relabel the input signal or spectrum and plot
-    :param input: the input signal or spectrum
-    :param label: the label text
-    :param show: True or False
-    :return: plots the given input with label
-    """
-    relabelled = nlsp.relabel(input,label)
-    if isinstance(relabelled, sumpf.Spectrum):
-        plot.log()
-    plot.plot(relabelled,show=show)
-
 def harmonicsvsall_energyratio(output_nlsystem,input,nl_order,sweep_start_freq,sweep_stop_freq,sweep_duration,max_harm):
     """
     Calculates the energy ratio between the desired and undesired harmonics in power series expansion
@@ -309,17 +296,6 @@ def add_noise(signal,distribution):
     signal_and_noise = sumpf.modules.AddSignals(signal1=signal, signal2=noise).GetOutput()
     return signal_and_noise
 
-def plot_array(input_array):
-    """
-    Helper function to plot array
-    :param input_array: the input array of signal or spectrum
-    :param label_array: the array of labels
-    :return: the plot of the input array with labels
-    """
-    for input in input_array:
-        nlsp.common.plots.plot(input,show=False)
-    plot.show()
-
 def binomial(x, y):
     try:
         binom = math.factorial(x) // math.factorial(y) // math.factorial(x - y)
@@ -338,19 +314,49 @@ def get_nl_impulse_response(sweep_generator,response):
 
 def get_nl_harmonics(sweep_generator,response,harmonics):
     sweep_length = sweep_generator.GetLength()
-    ir_sweep = get_nl_impulse_response(sweep_generator,response)
+    rev = sweep_generator.GetReversedOutput()
+    rev_spec = sumpf.modules.FourierTransform(rev).GetSpectrum()
+    out_spec = sumpf.modules.FourierTransform(response).GetSpectrum()
+    out_spec = out_spec / response.GetSamplingRate()
+    tf = rev_spec * out_spec
+    ir_sweep = sumpf.modules.InverseFourierTransform(tf).GetSignal()
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
+    ir_sweep_direct = nlsp.relabel(ir_sweep_direct,"Reference Harmonics 1")
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
     for i in range(harmonics-1):
         split_harm = nlsp.FindHarmonicImpulseResponse_Novak(impulse_response=ir_sweep,
                                                             harmonic_order=i+2,
                                                             sweep_generator=sweep_generator).GetHarmonicImpulseResponse()
+        split_harm = sumpf.modules.CutSignal(signal=split_harm,stop=len(sweep_generator.GetOutput())).GetOutput()
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
-                                        samplingrate=ir_sweep.GetSamplingRate(), labels=split_harm.GetLabels()))
-    ir_merger = ir_merger.GetOutput()
-    return ir_merger
+                                        samplingrate=ir_sweep.GetSamplingRate(), labels=("Reference Harmonics %r"%(i+2),)))
+    tf = sumpf.modules.FourierTransform(ir_merger.GetOutput()).GetSpectrum()
+    return tf
+
+def get_nl_harmonics_iden(sweep_generator,response,harmonics):
+    sweep_length = sweep_generator.GetLength()
+    rev = sweep_generator.GetReversedOutput()
+    rev_spec = sumpf.modules.FourierTransform(rev).GetSpectrum()
+    out_spec = sumpf.modules.FourierTransform(response).GetSpectrum()
+    out_spec = out_spec / response.GetSamplingRate()
+    tf = rev_spec * out_spec
+    ir_sweep = sumpf.modules.InverseFourierTransform(tf).GetSignal()
+    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
+    ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
+    ir_sweep_direct = nlsp.relabel(ir_sweep_direct,"Identified Harmonics 1")
+    ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
+    ir_merger.AddInput(ir_sweep_direct)
+    for i in range(harmonics-1):
+        split_harm = nlsp.FindHarmonicImpulseResponse_Novak(impulse_response=ir_sweep,
+                                                            harmonic_order=i+2,
+                                                            sweep_generator=sweep_generator).GetHarmonicImpulseResponse()
+        split_harm = sumpf.modules.CutSignal(signal=split_harm,stop=len(sweep_generator.GetOutput())).GetOutput()
+        ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
+                                        samplingrate=ir_sweep.GetSamplingRate(), labels=("Identified Harmonics %r"%(i+2),)))
+    tf = sumpf.modules.FourierTransform(ir_merger.GetOutput()).GetSpectrum()
+    return tf
 
 def harmonicsvsall_energyratio_nl(sweep_generator,response,degree):
 

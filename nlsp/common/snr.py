@@ -182,10 +182,10 @@ def snr(input_signalorspectrum,output_signalorspectrum):
             noise =  observed - identified
             # noise2 = (identified - observed)/identified
 
-            # nlsp.common.plots.relabelandplotphase(noise,"noise1",show=False)
+            # nlsp.common.plots.relabelandplot(noise,"noise1",show=False)
             # nlsp.common.plots.relabelandplotphase(noise2,"noise2",show=False)
-            # nlsp.common.plots.relabelandplotphase(identified,"identified",show=False)
-            # nlsp.common.plots.relabelandplotphase(observed,"observed",show=True)
+            # nlsp.common.plots.relabelandplot(identified,"identified",show=False)
+            # nlsp.common.plots.relabelandplot(observed,"observed",show=True)
             #
             noise_energy = nlsp.calculateenergy_betweenfreq_freq(noise,[100,19000])
             input_energy = nlsp.calculateenergy_betweenfreq_freq(identified,[100,19000])

@@ -43,7 +43,7 @@ def _show():
     show()
 
 
-def plot(data, legend=True, show=True, save=False, name=None):
+def plot(data, legend=True, show=True, save=False, name=None, line='-'):
     if not isinstance(data, collections.Iterable):
         data = [data]
     if isinstance(data[0], sumpf.Spectrum):
@@ -55,7 +55,7 @@ def plot(data, legend=True, show=True, save=False, name=None):
                 x_data.append(i * d.GetResolution())
             # plot
             for i in range(len(d.GetMagnitude())):
-                pyplot.plot(x_data, d.GetMagnitude()[i], label=d.GetLabels()[i])
+                pyplot.plot(x_data, d.GetMagnitude()[i],line, label=d.GetLabels()[i])
             #				pyplot.plot(x_data[0:len(x_data) // 2], d.GetPhase()[i][0:len(x_data) // 2], label=d.GetLabels()[i])
             #				pyplot.plot(x_data, d.GetGroupDelay()[i], label=d.GetLabels()[i])
         pyplot.xlim((0.0, max_freq))
@@ -152,7 +152,7 @@ def plot_timeandfreq(data_time, data_freq, legend=True, show=True):
     if show:
         _show()
 
-def relabelandplot(input,label=None,show=True,save=False,name=None):
+def relabelandplot(input,label=None,show=True,save=False,name=None,line="-"):
     """
     Relabel the input signal or spectrum and plot
     :param input: the input signal or spectrum
@@ -163,7 +163,7 @@ def relabelandplot(input,label=None,show=True,save=False,name=None):
     relabelled = nlsp.relabel(input,label)
     if isinstance(relabelled, sumpf.Spectrum):
         log()
-    plot(relabelled,show=show,save=save,name=name)
+    plot(relabelled,show=show,save=save,name=name,line=line)
 
 def relabelandplotphase(input,label,show=True,save=False,name=None):
     """

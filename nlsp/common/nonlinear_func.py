@@ -37,7 +37,8 @@ class NonlinearFunction(object):
 
     @staticmethod
     def laguerre_polynomial(degree, signal=None):
-        return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.laguerre_polynomial(degree), max_harm=degree)
+        return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.laguerre_polynomial(degree),
+                                 max_harm=degree)
 
 
     def __init__(self, signal=None, nonlin_func=lambda x: x, max_harm=1):

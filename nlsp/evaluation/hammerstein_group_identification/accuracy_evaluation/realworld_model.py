@@ -179,26 +179,29 @@ def distortionbox_model(Plot=True):
     start_freq = 100.0
     stop_freq = 20000.0
     length = 2**18
-    fade_out = 0.05
-    fade_in = 0.10
+    fade_out = 0.00
+    fade_in = 0.00
     branches = 5
 
-    sine = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+    sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
 
-    op_sine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/sine_f.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+    op_sine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/cos.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
     op_sine = sumpf.modules.SplitSignal(data=op_sine.GetSignal(),channels=[1]).GetOutput()
 
-    found_filter_spec, nl_functions = nlsp.nonlinearconvolution_chebyshev_temporalreversal(sine,op_sine,branches)
+    found_filter_spec, nl_functions = nlsp.nonlinearconvolution_powerseries_temporalreversal(sine,op_sine,branches)
     iden_nlsystem_sine = nlsp.HammersteinGroupModel_up(input_signal=sine.GetOutput(),
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
-    linear_op = nlsp.linear_identification_spectralinversion(sine,op_sine,sine.GetOutput())
+    linear_op = nlsp.linear_identification_temporalreversal(sine,op_sine,sine.GetOutput())
     if Plot is True:
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(op_sine).GetSpectrum(),"Reference System",show=False)
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem_sine.GetOutput()).GetSpectrum(),"NL Identified System",show=False)
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(linear_op).GetSpectrum(),"Linear Identified System",show=True)
+        # plot.relabelandplot(sumpf.modules.FourierTransform(op_sine).GetSpectrum(),"Reference System",show=False,line='b-')
+        # plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem_sine.GetOutput()).GetSpectrum(),"NL Identified System",show=False,line='r-')
+        # plot.relabelandplot(sumpf.modules.FourierTransform(linear_op).GetSpectrum(),"Linear Identified System",show=True,line='g-')
+        plot.relabelandplot(sumpf.modules.CutSignal(op_sine,stop=48000).GetOutput(),"Reference output",show=False)
+        plot.relabelandplot(sumpf.modules.CutSignal(iden_nlsystem_sine.GetOutput(),stop=48000).GetOutput(),"Identified output",show=False)
+        plot.relabelandplot(sumpf.modules.CutSignal(linear_op,stop=48000).GetOutput(),"linear output",show=True)
     print "SNR between Reference and Identified output, nonlinear: %r" %nlsp.snr(op_sine, iden_nlsystem_sine.GetOutput())
     print "SNR between Reference and Identified output, linear: %r" %nlsp.snr(op_sine, linear_op)
 

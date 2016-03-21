@@ -6,7 +6,10 @@ def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001
     M = filter_taps
     channels = len(input_signal)
     W = []
-    init = initCoeffs
+    if initCoeffs is None:
+        init = np.zeros((channels,M))
+    else:
+        init = initCoeffs
     leakstep = (1 - step*leak)
 
     for channel in range(channels):

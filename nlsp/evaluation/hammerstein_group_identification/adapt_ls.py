@@ -11,10 +11,10 @@ impulse = sumpf.modules.ImpulseGenerator(samplingrate=48000.0,length=len(input.G
 prop = sumpf.modules.ChannelDataProperties()
 prop.SetSignal(impulse)
 fil = nlsp.create_bpfilter([9000],input.GetOutput())
-ref_nlsystem = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input.GetOutput(),nonlin_func=nlsp.function_factory.power_series(2),max_harm=2,
+ref_nlsystem = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input.GetOutput(),nonlin_func=nlsp.function_factory.power_series(1),max_harm=1,
                                                 filter_impulseresponse=fil[0],downsampling_position=1)
 
-iden_nlsystem = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input.GetOutput(),nonlin_func=nlsp.function_factory.power_series(2),max_harm=2,
+iden_nlsystem = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input.GetOutput(),nonlin_func=nlsp.function_factory.power_series(1),max_harm=1,
                                                 filter_impulseresponse=impulse,downsampling_position=1)
 
 input_signal = ref_nlsystem.GetNLOutput().GetChannels()[0]
@@ -26,6 +26,7 @@ iterations = 5
 w = np.zeros(filtertaps)
 error = []
 for i in range(iterations):
+    print w[:10]
     y,e,w = adf.nlms(input_signal, desired_signal, filtertaps, step, initCoeffs=w)
     iden_filter = sumpf.Signal(channels=(w,), samplingrate=48000.0, labels=("filter",))
     iden_nlsystem.SetFilterIR(iden_filter)

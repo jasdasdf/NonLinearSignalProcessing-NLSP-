@@ -58,7 +58,8 @@ class HammersteinGroupModel_up(object):
                 # print "connecting adder %i to adder %i" % (i+1, i)
                 sumpf.connect(self.__sums[i+1].GetOutput, self.__a.SetInput2)
             self.__sums[i] = self.__a
-
+        if len(self.hmodels) == 1:
+            self.__sums[0] = self.hmodels[0]
         self.GetOutput = self.__sums[0].GetOutput
 
     @sumpf.Input(sumpf.Signal)
@@ -89,9 +90,16 @@ class HammersteinGroupModel_up(object):
             harmonics.append((self.hmodels[i].SetMaximumHarmonic, maxharmonics[i]))
         sumpf.set_multiple_values(harmonics)
 
-    @sumpf.Output(sumpf.Signal)
-    def GetHammersteinBranchOutput(self, branchnumber):
+    @sumpf.Input(int)
+    def GetHammersteinBranchOutput(self, branch):
+        if branch > self.__branches:
+            print "The branch doesnot exists"
+        else:
+            return self.hmodels[branch-1].GetOutput()
+
+    @sumpf.Input(int)
+    def GetHammersteinBranchNLOutput(self, branchnumber):
         if branchnumber > self.__branches:
             print "The branch doesnot exists"
         else:
-            return self.hmodels[branchnumber-1].GetOutput()
+            return self.hmodels[branchnumber-1].GetNLOutput()

@@ -5,29 +5,40 @@ import sumpf
 import nlsp
 import nlsp.common.plots as plot
 
-sampling_rate = 48000.0
-start_freq = 100.0
-stop_freq = 20000.0
-length = 2**18
-fade_out = 0.00
-fade_in = 0.00
-branches = 5
-sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
-                               stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
-op_sine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/sine.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
-op_sine = sumpf.modules.SplitSignal(data=op_sine.GetSignal(),channels=[1]).GetOutput()
+branches = 1
+input = nlsp.NovakSweepGenerator_Sine(sampling_rate=48000.0,length=2**15,start_frequency=20.0,stop_frequency=20000.0)
+# input = nlsp.WhiteGaussianGenerator()
+impulse = sumpf.modules.ImpulseGenerator(samplingrate=48000.0,length=len(input.GetOutput())).GetSignal()
+prop = sumpf.modules.ChannelDataProperties()
+prop.SetSignal(impulse)
+fil = nlsp.create_bpfilter([9000],input.GetOutput())
+ref_nlsystem = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input.GetOutput(),nonlin_func=nlsp.function_factory.power_series(2),max_harm=2,
+                                                filter_impulseresponse=fil[0],downsampling_position=1)
 
-kernel = nlsp.linear_identification_kernel(sine,op_sine)
-init_coeff = kernel.GetChannels()[0]
-M = len(kernel)  # Number of filter taps in adaptive filter
-step = 0.9999  # Step size
-u = sine.GetOutput().GetChannels()[0]
-d = op_sine.GetChannels()[0]
-y1, e1, w1 = adf.nlms(u, d, M, step, returnCoeffs=True, initCoeffs=np.array(init_coeff))
-filter_iden_hgm = sumpf.Signal(channels=(w1[-1],), samplingrate=48000.0, labels=("filter_hm",))
+iden_nlsystem = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input.GetOutput(),nonlin_func=nlsp.function_factory.power_series(2),max_harm=2,
+                                                filter_impulseresponse=impulse,downsampling_position=1)
 
-iden_hgm = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=sine.GetOutput(),nonlin_func=nlsp.function_factory.power_series(1),
-                                                           max_harm=1,filter_impulseresponse=filter_iden_hgm)
+input_signal = []
+input_signal.append(ref_nlsystem.GetNLOutput().GetChannels()[0])
 
-plot.plot(sumpf.modules.FourierTransform(iden_hgm.GetOutput()).GetSpectrum(),show=False)
-plot.plot(sumpf.modules.FourierTransform(op_sine).GetSpectrum(),show=True)
+desired_signal = ref_nlsystem.GetOutput().GetChannels()[0]
+filtertaps = 1024
+step = 0.1
+iterations = 5
+w = np.zeros((len(input_signal),filtertaps))
+error = []
+for i in range(iterations):
+    w = nlsp.multichannel_nlms(input_signal, desired_signal, filtertaps, step, initCoeffs=w)
+    kernel = []
+    for k in w:
+        iden_filter = sumpf.Signal(channels=(k,), samplingrate=48000.0, labels=("filter",))
+        kernel.append(iden_filter)
+    iden_nlsystem.SetFilterIR(kernel[0])
+    print "SNR %r" %nlsp.snr(ref_nlsystem.GetOutput(),iden_nlsystem.GetOutput())
+
+plot.relabelandplot(iden_nlsystem.GetOutput(),"identified",show=False)
+plot.relabelandplot(ref_nlsystem.GetOutput(),"reference",show=True)
+for i in range(len(fil)):
+    plot.relabelandplot(sumpf.modules.FourierTransform(fil[i]).GetSpectrum(),"Ref filter",show=False)
+    plot.relabelandplot(sumpf.modules.FourierTransform(kernel[i]).GetSpectrum(),"Iden filter",show=True)
+

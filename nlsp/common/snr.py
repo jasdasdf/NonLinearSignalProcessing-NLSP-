@@ -189,8 +189,6 @@ def snr(input_signalorspectrum,output_signalorspectrum):
             #
             noise_energy = nlsp.calculateenergy_betweenfreq_freq(noise,[100,19000])
             input_energy = nlsp.calculateenergy_betweenfreq_freq(identified,[100,19000])
-            print input_energy,noise_energy
-
             snr.append(10*math.log10(input_energy[0]/noise_energy[0]))
         else:
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"

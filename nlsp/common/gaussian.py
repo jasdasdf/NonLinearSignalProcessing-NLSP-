@@ -22,7 +22,6 @@ class WhiteGaussianGenerator(object):
                                                                  stop_frequency=self.__stop_frequency,
                                                                  resolution=prop.GetResolution(),
                                                                  length=prop.GetSpectrumLength()).GetSpectrum()
-        print len(bandpass), len(sumpf.modules.FourierTransform(noise).GetSpectrum())
         wgn = bandpass * sumpf.modules.FourierTransform(noise).GetSpectrum()
         return sumpf.modules.InverseFourierTransform(wgn).GetSignal()
         # wgn = numpy.random.normal(0.0,1.0,self.__length)

@@ -56,20 +56,10 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot):
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
-
-    plot.relabelandplot(sumpf.modules.FourierTransform(filter_spec_tofind[2]).GetSpectrum(),"Reference kernel",show=False)
-    plot.relabelandplot(sumpf.modules.FourierTransform(found_filter_spec[2]).GetSpectrum(),"Identified kernel",show=True)
-    # sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=input_signal.GetSamplingRate(), length=len(input_signal), start_frequency=20.0,
-    #                                stop_frequency=20000.0, fade_out= 0.00,fade_in=0.00)
-    # ref_nlsystem.SetInput(sine.GetOutput())
-    # iden_nlsystem.SetInput(sine.GetOutput())
-    # ref_harm = nlsp.get_nl_harmonics(sine,ref_nlsystem.GetOutput(),branches)
-    # iden_harm = nlsp.get_nl_harmonics_iden(sine,iden_nlsystem.GetOutput(),branches)
-    # ref_harm = sumpf.modules.SplitSpectrum(ref_harm,channels=[2]).GetOutput()
-    # iden_harm = sumpf.modules.SplitSpectrum(iden_harm,channels=[2]).GetOutput()
+    for i in range(len(found_filter_spec)):
+        plot.plot(sumpf.modules.FourierTransform(found_filter_spec[i]).GetSpectrum(),show=False)
+        plot.plot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),show=True)
     if Plot is True:
-        # plot.plot(ref_harm,show=False)
-        # plot.plot(iden_harm,show=True)
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
     print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),

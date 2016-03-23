@@ -10,7 +10,7 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
     nonlinear block and then downsampling at the end of the branch.
     It uses sumpf modules to do the signal processing stuff.
     """
-    def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1), max_harm=1,
+    def __init__(self, input_signal=None, nonlin_func=nlsp.function_factory.power_series(1), max_harm=1,
                  filter_impulseresponse=None,
                  resampling_algorithm=sumpf.modules.ResampleSignal.SPECTRUM,
                  downsampling_position=1):

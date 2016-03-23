@@ -23,14 +23,14 @@ wgn_normal = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=len
                                    stop_frequency=stop_freq, distribution=normal)
 wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, distribution=uniform)
-excitation = [wgn_normal,wgn_uniform]
+excitation = [sine,wgn_uniform]
 
 
 for method,input_generator in zip(iden_method,excitation):
     print method,input_generator
     # nlsp.audio_evaluation(input_generator,branches,method,Plot)
     # nlsp.puretone_evaluation(input_generator,branches,method,Plot)
-    # nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
+    nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
     # nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,method,Plot)
     # nlsp.linearmodel_evaluation(input_generator,branches,method,Plot)
     # nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot)
@@ -53,6 +53,6 @@ for method,input_generator in zip(iden_method,excitation):
     # nlsp.distortionbox_evaluation("Sweep18","Speech1",branches,method,Plot,Save)
     # nlsp.distortionbox_save()
     # nlsp.distortionbox_model(True)
-    nlsp.adaptive_distortionbox_model(True)
+    # nlsp.adaptive_distortionbox_model(True)
 
 

@@ -56,9 +56,9 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot):
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
-    for i in range(len(found_filter_spec)):
-        plot.plot(sumpf.modules.FourierTransform(found_filter_spec[i]).GetSpectrum(),show=False)
-        plot.plot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),show=True)
+    # for i in range(len(found_filter_spec)):
+    #     plot.plot(sumpf.modules.FourierTransform(found_filter_spec[i]).GetSpectrum(),show=False)
+    #     plot.plot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),show=True)
     if Plot is True:
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)

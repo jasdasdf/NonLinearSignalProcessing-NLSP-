@@ -1,7 +1,7 @@
 import numpy as np
 import adaptfilt
 
-def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001, leak=0, initCoeffs=None, N=None):
+def multichannel_lms(input_signal, desired_output, filter_taps, step, leak=0, initCoeffs=None, N=None):
 
     d = desired_output
     M = filter_taps
@@ -23,10 +23,37 @@ def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001
             x = np.flipud(u[n:n+M])  # Slice to get view of M latest datapoints
             y[n] = np.dot(x, w)
             e[n] = d[n+M-1] - y[n]
+            w = leakstep * w + step * x * e[n]
+        W.append(w)
+    return W
+
+
+
+def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001, leak=0, initCoeffs=None, N=None):
+
+    d = desired_output
+    M = filter_taps
+    channels = len(input_signal)
+    W = []
+    if initCoeffs is None:
+        init = np.zeros((channels,M))
+    else:
+        init = initCoeffs
+    leakstep = (1 - step*leak)
+
+    for channel in range(channels):
+        u = input_signal[channel]
+        N = len(u)-M+1
+        w = init[channel]
+        y = np.zeros(N)  # Filter output
+        e = np.zeros(N)  # Error signal
+        for n in xrange(N):
+            x = np.flipud(u[n:n+M])  # Slice to get view of M latest datapoints
+            y = np.dot(x, w)
+            e = d[n+M-1] - y
 
             normFactor = 1./(np.dot(x, x) + eps)
-            w = leakstep * w + step * normFactor * x * e[n]
-            y[n] = np.dot(x, w)
+            w = leakstep * w + step * normFactor * x * e
         W.append(w)
     return W
 
@@ -71,3 +98,4 @@ def multichannel_ap(input_signal, desired_output, filter_taps, step, proj_order=
         W.append(w)
 
     return W
+

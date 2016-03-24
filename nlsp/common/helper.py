@@ -370,3 +370,17 @@ def harmonicsvsall_energyratio_nl(sweep_generator,response,degree):
     else: # odd
         harm_energy = harm_energy[0::2]
     return numpy.divide(numpy.sum(harm_energy),numpy.sum(all_energy))
+
+def dot_product(signal1=None,signal2=None):
+    if signal1 is None:
+        signal1 = sumpf.Signal()
+    if signal2 is None:
+        signal2 = sumpf.Signal()
+    product = sumpf.modules.MultiplySignals(signal1=signal1,signal2=signal2).GetOutput()
+    energy_allchannels = []
+    for c in product.GetChannels():
+        energy_singlechannel = []
+        for s in c:
+            energy_singlechannel.append(abs(s)**2)
+        energy_allchannels.append(numpy.sum(energy_singlechannel))
+    return energy_allchannels

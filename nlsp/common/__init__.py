@@ -12,7 +12,7 @@ from helper import get_impulse_response, get_sweep_harmonics_ir, get_sweep_harmo
 
 from helper import cut_spectrum, relabel, nl_branches, add_noise
 
-from helper import get_nl_impulse_response, get_nl_harmonics, harmonicsvsall_energyratio_nl, get_nl_harmonics_iden
+from helper import get_nl_impulse_response, get_nl_harmonics, harmonicsvsall_energyratio_nl, get_nl_harmonics_iden, dot_product
 
 from helper import harmonicsvsall_energyratio,create_bpfilter,binomial,get_mean
 
@@ -33,7 +33,7 @@ from mse import mean_squared_error_freq,mean_squared_error_freq_range,mean_squar
 
 from soft_clipping import NLClipSignal
 
-from sweep import WindowedSweepGenerator, NovakSweepGenerator_Sine, NovakSweepGenerator_Cosine
+from sweep import WindowedSweepGenerator, NovakSweepGenerator_Sine, NovakSweepGenerator_Cosine, SquareSweepGenerator
 
 from plots import *
 

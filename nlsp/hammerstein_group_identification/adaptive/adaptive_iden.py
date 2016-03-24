@@ -2,8 +2,8 @@ import nlsp
 import sumpf
 import numpy
 
-def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.power_series, iterations=100, step_size=0.1, filtertaps=1024,
-                            algorithm=nlsp.multichannel_lms):
+def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.legrendre_polynomial, iterations=50, step_size=0.1, filtertaps=1024,
+                            algorithm=nlsp.multichannel_ap, init_coeffs=None):
 
     if hasattr(input_generator,"GetOutput"):
         input = input_generator.GetOutput()
@@ -20,7 +20,12 @@ def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func
         nl.SetNLFunction(nonlinear_func(i))
         input_signal.append(nl.GetOutput().GetChannels()[0])
     desired_signal = outputs.GetChannels()[0]
-    w = numpy.zeros((len(input_signal),filtertaps))
+    if init_coeffs is None:
+        w = numpy.zeros((len(input_signal),filtertaps))
+    else:
+        w = []
+        for k in init_coeffs:
+            w.append(numpy.asarray(k.GetChannels()[0]))
     for i in range(iterations):
         w = algorithm(input_signal, desired_signal, filtertaps, step_size, initCoeffs=w)
         kernel = []

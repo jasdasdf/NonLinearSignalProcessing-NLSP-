@@ -47,7 +47,7 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot):
 
     filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.chebyshev1_polynomial,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
 
@@ -56,9 +56,13 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot):
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
+    # sine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/test_signals/Speech.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+    # ref_nlsystem.SetInput(sine.GetSignal())
+    # iden_nlsystem.SetInput(sine.GetSignal())
     # for i in range(len(found_filter_spec)):
     #     plot.plot(sumpf.modules.FourierTransform(found_filter_spec[i]).GetSpectrum(),show=False)
-    #     plot.plot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),show=True)
+    #     plot.plot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),show=False)
+    # plot.show()
     if Plot is True:
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)

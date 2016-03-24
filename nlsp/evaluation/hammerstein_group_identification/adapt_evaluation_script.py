@@ -30,7 +30,7 @@ square_sweep_asymmetric = nlsp.SquareSweepGenerator(sampling_rate=sampling_rate,
                                    stop_frequency=stop_freq,max_value=0.8,min_value=-0.7)
 soft_clip_sweep = nlsp.NLClipSignal(signal=sine.GetOutput())
 
-excitation = [square_sweep_asymmetric]
+excitation = [wgn_normal]
 
 for method,input_generator in zip(iden_method,excitation):
     print method,input_generator

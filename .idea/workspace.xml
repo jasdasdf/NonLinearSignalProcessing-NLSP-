@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py" line="167" />
+    <bookmark url="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py" line="171" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="39d02c43-234b-4a09-97b1-e6ee0ba2638c" name="Default" comment="">
-      <change type="DELETED" beforePath="O:\Diplomanden\Logeshwaran.Thamilselvan\Loudspeaker nonlinearity\Source Code\Loudspeakermodel\nlsp\common\multichannel_nlms.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/common/__init__.py" afterPath="$PROJECT_DIR$/nlsp/common/__init__.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_evaluation_script.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_evaluation_script.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py" afterPath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_metadata/channeldataproperties.py" afterPath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_metadata/channeldataproperties.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/filtergenerator.py" afterPath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/filtergenerator.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/findharmonicimpulseresponse.py" afterPath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/findharmonicimpulseresponse.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/sa-nl-aec.py" afterPath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/sa-nl-aec.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/sweepgenerator.py" afterPath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/sweepgenerator.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="Loudspeakermodel.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -34,11 +34,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="adapt_evaluation_script.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_evaluation_script.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="32" column="25" selection-start-line="32" selection-start-column="25" selection-end-line="32" selection-end-column="25" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="adaptive_iden.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="5" column="59" selection-start-line="5" selection-start-column="59" selection-end-line="5" selection-end-column="59" />
+              <caret line="27" column="53" selection-start-line="27" selection-start-column="53" selection-end-line="27" selection-end-column="53" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -46,41 +58,43 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="multichannel_adaptive_filter.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="multichannel_adaptive_filter.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/nlsp/common/multichannel_adaptive_filter.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.75100404">
-              <caret line="23" column="13" selection-start-line="23" selection-start-column="12" selection-end-line="23" selection-end-column="13" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="96" column="0" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="lms.py" pinned="false" current-in-tab="false">
-        <entry file="file://D:/WinPython-64bit-2.7.10.2/python-2.7.10.amd64/Lib/site-packages/adaptfilt/lms.py">
+      <file leaf-file-name="sa-nl-aec.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/sa-nl-aec.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.48795182">
+              <caret line="90" column="42" selection-start-line="90" selection-start-column="42" selection-end-line="90" selection-end-column="42" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="hammerstein_group_model_up.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group/hammerstein_group_model_up.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="127" column="0" selection-start-line="127" selection-start-column="0" selection-end-line="131" selection-end-column="42" />
+              <caret line="36" column="58" selection-start-line="36" selection-start-column="48" selection-end-line="36" selection-end-column="58" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="adapt_evaluation_script.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_evaluation_script.py">
+      <file leaf-file-name="helper.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/nlsp/common/helper.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="6" column="14" selection-start-line="6" selection-start-column="14" selection-end-line="6" selection-end-column="14" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="exact_model.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="53" column="0" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
+              <caret line="385" column="29" selection-start-line="385" selection-start-column="29" selection-end-line="385" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -102,7 +116,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/__init__.py" />
         <option value="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/signal.py" />
         <option value="$PROJECT_DIR$/nlsp/common/calculate_energy.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein/aliasing_evaluation.py" />
@@ -114,7 +127,6 @@
         <option value="$PROJECT_DIR$/temp.py" />
         <option value="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/findharmonicimpulseresponse.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/performance_evaluation/performance_evaluation.py" />
-        <option value="$PROJECT_DIR$/nlsp/common/sweep.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein/sweep_aliasing_evaluation.py" />
         <option value="$PROJECT_DIR$/nlsp/common/find_harmonics.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/robustness_evaluation/robustness_evaluation.py" />
@@ -137,22 +149,24 @@
         <option value="$PROJECT_DIR$/nlsp/tests/identification_test/decorrelation_test.py" />
         <option value="$PROJECT_DIR$/nlsp/common/snr.py" />
         <option value="$PROJECT_DIR$/nlsp/common/gaussian.py" />
-        <option value="$PROJECT_DIR$/nlsp/hammerstein_group/hammerstein_group_model_up.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_ls.py" />
         <option value="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/__init__.py" />
         <option value="$PROJECT_DIR$/nlsp/hammerstein_group_identification/__init__.py" />
         <option value="$PROJECT_DIR$/nlsp/common/function_factory.py" />
         <option value="$PROJECT_DIR$/nlsp/hammerstein/antialiasup_model.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_filt.py" />
-        <option value="$PROJECT_DIR$/nlsp/common/helper.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/__init__.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/realworld_model.py" />
         <option value="$PROJECT_DIR$/nlsp/common/multichannel_nlms.py" />
-        <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py" />
-        <option value="$PROJECT_DIR$/nlsp/common/__init__.py" />
-        <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_evaluation_script.py" />
-        <option value="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py" />
         <option value="$PROJECT_DIR$/nlsp/common/multichannel_adaptive_filter.py" />
+        <option value="$PROJECT_DIR$/nlsp/common/sweep.py" />
+        <option value="$PROJECT_DIR$/nlsp/common/helper.py" />
+        <option value="$PROJECT_DIR$/nlsp/common/__init__.py" />
+        <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py" />
+        <option value="$PROJECT_DIR$/nlsp/hammerstein_group/hammerstein_group_model_up.py" />
+        <option value="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py" />
+        <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_evaluation_script.py" />
+        <option value="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/sa-nl-aec.py" />
       </list>
     </option>
   </component>
@@ -191,8 +205,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -225,84 +237,10 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Loudspeakermodel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Loudspeakermodel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nlsp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hammerstein_group_identification" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Loudspeakermodel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Loudspeakermodel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nlsp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="hammerstein_group_identification" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="othogonality" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Loudspeakermodel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Loudspeakermodel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nlsp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="evaluation" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Loudspeakermodel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Loudspeakermodel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nlsp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="common" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
+      <pane id="Scratches" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -344,24 +282,7 @@
       <recent name="O:\Diplomanden\Logeshwaran.Thamilselvan\Loudspeaker nonlinearity\Source Code\Loudspeakermodel\nlsp" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.adapt_evaluation_script">
-    <configuration default="false" name="evaluation_script" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="Loudspeakermodel" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/evaluation_script.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Python.sa-nl-aec">
     <configuration default="false" name="adapt_filt" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -426,6 +347,23 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Loudspeakermodel" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_evaluation_script.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="sa-nl-aec" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="Loudspeakermodel" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/sa-nl-aec.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -704,19 +642,19 @@
       <item index="5" class="java.lang.String" itemvalue="Python.hgm" />
       <item index="6" class="java.lang.String" itemvalue="Python.temp" />
       <item index="7" class="java.lang.String" itemvalue="Python tests.Testing_Models" />
-      <item index="8" class="java.lang.String" itemvalue="Python.evaluation_script" />
-      <item index="9" class="java.lang.String" itemvalue="Python.adapt_filt" />
-      <item index="10" class="java.lang.String" itemvalue="Python.decorrelation_test" />
-      <item index="11" class="java.lang.String" itemvalue="Python.adapt_ls" />
-      <item index="12" class="java.lang.String" itemvalue="Python.adapt_evaluation_script" />
+      <item index="8" class="java.lang.String" itemvalue="Python.adapt_filt" />
+      <item index="9" class="java.lang.String" itemvalue="Python.decorrelation_test" />
+      <item index="10" class="java.lang.String" itemvalue="Python.adapt_ls" />
+      <item index="11" class="java.lang.String" itemvalue="Python.adapt_evaluation_script" />
+      <item index="12" class="java.lang.String" itemvalue="Python.sa-nl-aec" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.adapt_evaluation_script" />
-        <item index="1" class="java.lang.String" itemvalue="Python.adapt_filt" />
-        <item index="2" class="java.lang.String" itemvalue="Python.adapt_ls" />
-        <item index="3" class="java.lang.String" itemvalue="Python.decorrelation_test" />
-        <item index="4" class="java.lang.String" itemvalue="Python.evaluation_script" />
+        <item index="0" class="java.lang.String" itemvalue="Python.sa-nl-aec" />
+        <item index="1" class="java.lang.String" itemvalue="Python.adapt_evaluation_script" />
+        <item index="2" class="java.lang.String" itemvalue="Python.adapt_filt" />
+        <item index="3" class="java.lang.String" itemvalue="Python.adapt_ls" />
+        <item index="4" class="java.lang.String" itemvalue="Python.decorrelation_test" />
       </list>
     </recent_temporary>
   </component>
@@ -749,15 +687,15 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21917808" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3274648" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.679868" sideWeight="0.39726028" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42134213" sideWeight="0.4520548" order="12" side_tool="true" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42134213" sideWeight="0.45416227" order="12" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.41254124" sideWeight="0.4915701" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42134213" sideWeight="0.5479452" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.42134213" sideWeight="0.5458377" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24960254" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3286385" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -816,39 +754,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="29" />
+      <option name="time" value="31" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/nlsp/common/find_harmonics.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5141777">
-          <caret line="184" column="8" selection-start-line="184" selection-start-column="8" selection-end-line="184" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/performance_evaluation/performance_evaluation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.47577092">
-          <caret line="94" column="33" selection-start-line="94" selection-start-column="33" selection-end-line="94" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/robustness_evaluation/robustness_evaluation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.06439394">
-          <caret line="5" column="4" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group_identification/nonlinear_convolution/nlconvolution_powerseries.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.5473485">
@@ -909,14 +819,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="995" column="0" selection-start-line="995" selection-start-column="0" selection-end-line="995" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/common/sweep.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33211008">
-          <caret line="105" column="0" selection-start-line="105" selection-start-column="0" selection-end-line="105" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1032,13 +934,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group/hammerstein_group_model_up.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.57651246">
-          <caret line="96" column="13" selection-start-line="96" selection-start-column="13" selection-end-line="96" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group_identification/nonlinear_convolution/nlconvolution_chebyshev.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.7269076">
@@ -1106,7 +1001,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.06827309">
           <caret line="5" column="148" selection-start-line="5" selection-start-column="148" selection-end-line="5" selection-end-column="148" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1114,7 +1008,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.4437751">
           <caret line="52" column="0" selection-start-line="52" selection-start-column="0" selection-end-line="55" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1122,48 +1015,76 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.40963855">
           <caret line="136" column="0" selection-start-line="136" selection-start-column="0" selection-end-line="140" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/WinPython-64bit-2.7.10.2/python-2.7.10.amd64/Lib/site-packages/adaptfilt/lms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.38554215">
+          <caret line="127" column="0" selection-start-line="127" selection-start-column="0" selection-end-line="131" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Common/common/clip_signal.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.18072289">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="25" selection-end-column="87" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/common/sweep.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.79518074">
+          <caret line="227" column="21" selection-start-line="227" selection-start-column="21" selection-end-line="227" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/common/soft_clipping.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.06827309">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/realworld_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.24899599">
-          <caret line="237" column="16" selection-start-line="237" selection-start-column="16" selection-end-line="237" selection-end-column="16" />
+        <state vertical-scroll-proportion="7.4076304">
+          <caret line="239" column="4" selection-start-line="239" selection-start-column="4" selection-end-line="239" selection-end-column="154" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/common/helper.py">
+    <entry file="file://$PROJECT_DIR$/nlsp/common/calculate_energy.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.034136545">
-          <caret line="111" column="4" selection-start-line="111" selection-start-column="4" selection-end-line="111" selection-end-column="4" />
+        <state vertical-scroll-proportion="0.65245205">
+          <caret line="37" column="0" selection-start-line="37" selection-start-column="0" selection-end-line="42" selection-end-column="29" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nlsp/common/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7610442">
-          <caret line="45" column="91" selection-start-line="45" selection-start-column="91" selection-end-line="45" selection-end-column="91" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.21485944">
+          <caret line="14" column="116" selection-start-line="14" selection-start-column="116" selection-end-line="14" selection-end-column="116" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/common/helper.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="385" column="29" selection-start-line="385" selection-start-column="29" selection-end-line="385" selection-end-column="29" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="53" column="0" selection-start-line="53" selection-start-column="0" selection-end-line="53" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_evaluation_script.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="6" column="14" selection-start-line="6" selection-start-column="14" selection-end-line="6" selection-end-column="14" />
+        <state vertical-scroll-proportion="0.19678715">
+          <caret line="45" column="0" selection-start-line="45" selection-start-column="0" selection-end-line="53" selection-end-column="100" />
           <folding />
         </state>
       </provider>
@@ -1171,26 +1092,46 @@
     <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="5" column="59" selection-start-line="5" selection-start-column="59" selection-end-line="5" selection-end-column="59" />
+          <caret line="27" column="53" selection-start-line="27" selection-start-column="53" selection-end-line="27" selection-end-column="53" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/WinPython-64bit-2.7.10.2/python-2.7.10.amd64/Lib/site-packages/adaptfilt/lms.py">
+    <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/adapt_evaluation_script.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="127" column="0" selection-start-line="127" selection-start-column="0" selection-end-line="131" selection-end-column="42" />
-          <folding />
+          <caret line="32" column="25" selection-start-line="32" selection-start-column="25" selection-end-line="32" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/nlsp/common/multichannel_adaptive_filter.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.75100404">
-          <caret line="23" column="13" selection-start-line="23" selection-start-column="12" selection-end-line="23" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="96" column="0" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group/hammerstein_group_model_up.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="36" column="58" selection-start-line="36" selection-start-column="48" selection-end-line="36" selection-end-column="58" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/sa-nl-aec.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.48795182">
+          <caret line="90" column="42" selection-start-line="90" selection-start-column="42" selection-end-line="90" selection-end-column="42" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

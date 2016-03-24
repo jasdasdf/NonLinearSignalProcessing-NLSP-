@@ -1,5 +1,6 @@
 import sumpf
 import nlsp
+import nlsp.common.plots as plot
 
 sampling_rate = 48000.0
 start_freq = 20.0
@@ -10,7 +11,7 @@ fade_in = 0.00
 branches = 5
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
-iden_method = [nlsp.adaptive_identification,nlsp.adaptive_identification,nlsp.adaptive_identification,nlsp.adaptive_identification]
+iden_method = [nlsp.adaptive_identification]
 
 Plot = True
 Save = False
@@ -23,8 +24,13 @@ wgn_normal = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=len
                                    stop_frequency=stop_freq, distribution=normal)
 wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, distribution=uniform)
-excitation = [sine,wgn_uniform]
+square_sweep_symmetric = nlsp.SquareSweepGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq)
+square_sweep_asymmetric = nlsp.SquareSweepGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq,max_value=0.8,min_value=-0.7)
+soft_clip_sweep = nlsp.NLClipSignal(signal=sine.GetOutput())
 
+excitation = [square_sweep_asymmetric]
 
 for method,input_generator in zip(iden_method,excitation):
     print method,input_generator

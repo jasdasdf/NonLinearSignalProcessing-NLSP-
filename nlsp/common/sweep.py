@@ -181,7 +181,7 @@ class NovakSweepGenerator_Cosine(object):
         fft_len = int(length)
         interval = numpy.linspace(0, sampling_rate/2, num=fft_len/2+1)
         inverse_sweep = 2*numpy.sqrt(interval/sweep_parameter)*numpy.exp(1j*(2*numpy.pi*sweep_parameter*interval*(self.GetStartFrequency()/interval +
-                                                                     numpy.log(interval/self.GetStartFrequency()) - 1) - numpy.pi/4))
+                                                                                                                  numpy.log(interval/self.GetStartFrequency()) - 1) - numpy.pi/4))
         inverse_sweep[0] = 0j
         rev_sweep = numpy.fft.irfft(inverse_sweep)
         rev_sweep = sumpf.Signal(channels=(rev_sweep,),samplingrate=sampling_rate,labels=("Reversed Sweep signal",))
@@ -205,3 +205,27 @@ class NovakSweepGenerator_Cosine(object):
     @sumpf.Output(float)
     def GetStopFrequency(self):
         return self.__stop_frequency
+
+class SquareSweepGenerator(object):
+    def __init__(self, sampling_rate=48000.0, length=2**16, start_frequency=20.0,
+                 stop_frequency=20000.0, max_value=1.0, min_value=-1.0):
+        self.__max_value = max_value
+        self.__min_value = min_value
+        self.__sweep = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_frequency,
+                                                     stop_frequency=stop_frequency, fade_out=0.0, fade_in=0.0)
+        self.__signal = self.__sweep.GetOutput()
+
+    @sumpf.Output(sumpf.Signal)
+    def GetOutput(self):
+        channels = []
+        for c in self.__signal.GetChannels():
+            channel = []
+            for s in c:
+                if s < 0.0:
+                    channel.append(self.__min_value)
+                elif s > 0.0:
+                    channel.append(self.__max_value)
+                else:
+                    channel.append(s)
+            channels.append(tuple(channel))
+        return sumpf.Signal(channels=tuple(channels), labels=self.__signal.GetLabels())

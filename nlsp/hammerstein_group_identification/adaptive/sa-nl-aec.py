@@ -94,7 +94,7 @@ ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                              nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                              filter_irs=filter_spec_tofind,
                                              max_harmonics=range(1,branches+1))
-ec = SA_HammersteinGroupModel(input_signal=input_generator.GetOutput(),output_signal=ref_nlsystem.GetOutput())
+ec = SA_HammersteinGroupModel(input_signal=input_generator.GetOutput(),output_signal=ref_nlsystem.GetOutput(),nonlinear_function=nlsp.function_factory.laguerre_polynomial)
 for i in range(iteration):
     ec.SetInputOutput(input_generator.GetOutput(),ref_nlsystem.GetOutput())
 plot.relabelandplot(ref_nlsystem.GetOutput(),"ref",show=False)

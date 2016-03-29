@@ -6,9 +6,9 @@ sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
 length = 2**14
-fade_out = 0.00
-fade_in = 0.00
-branches = 5
+fade_out = 0.01
+fade_in = 0.01
+branches = 1
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
 iden_method = [nlsp.adaptive_identification]
@@ -30,7 +30,7 @@ square_sweep_asymmetric = nlsp.SquareSweepGenerator(sampling_rate=sampling_rate,
                                    stop_frequency=stop_freq,max_value=0.8,min_value=-0.7)
 soft_clip_sweep = nlsp.NLClipSignal(signal=sine.GetOutput())
 
-excitation = [wgn_normal]
+excitation = [sine]
 
 for method,input_generator in zip(iden_method,excitation):
     print method,input_generator

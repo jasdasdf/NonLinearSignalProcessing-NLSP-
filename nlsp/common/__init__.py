@@ -43,4 +43,4 @@ from find_harmonics import FindHarmonicImpulseResponse_Novak
 
 from gaussian import WhiteGaussianGenerator
 
-from multichannel_adaptive_filter import multichannel_nlms,multichannel_ap,multichannel_lms
+from multichannel_adaptive_filter import multichannel_nlms,multichannel_ap,multichannel_lms,multichannel_ap_ideal,multichannel_nlms_ideal

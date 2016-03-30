@@ -45,7 +45,8 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot):
     """
     input_signal = input_generator.GetOutput()
 
-    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+    # filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+    filter_spec_tofind = nlsp.create_bpfilter([5000,10000,20000],input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.chebyshev1_polynomial,branches),
                                                  filter_irs=filter_spec_tofind,

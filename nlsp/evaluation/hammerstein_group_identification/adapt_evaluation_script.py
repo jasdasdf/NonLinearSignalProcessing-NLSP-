@@ -8,7 +8,7 @@ stop_freq = 20000.0
 length = 2**14
 fade_out = 0.01
 fade_in = 0.01
-branches = 1
+branches = 3
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
 iden_method = [nlsp.adaptive_identification]
@@ -30,7 +30,7 @@ square_sweep_asymmetric = nlsp.SquareSweepGenerator(sampling_rate=sampling_rate,
                                    stop_frequency=stop_freq,max_value=0.8,min_value=-0.7)
 soft_clip_sweep = nlsp.NLClipSignal(signal=sine.GetOutput())
 
-excitation = [sine]
+excitation = [wgn_normal]
 
 for method,input_generator in zip(iden_method,excitation):
     print method,input_generator
@@ -59,6 +59,6 @@ for method,input_generator in zip(iden_method,excitation):
     # nlsp.distortionbox_evaluation("Sweep18","Speech1",branches,method,Plot,Save)
     # nlsp.distortionbox_save()
     # nlsp.distortionbox_model(True)
-    # nlsp.adaptive_distortionbox_model(True)
+    nlsp.adaptive_distortionbox_model(True)
 
 

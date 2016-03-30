@@ -237,7 +237,7 @@ def adaptive_distortionbox_model(Plot=True):
     fade_in = 0.00
     branches = 5
 
-    sine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/Noise18.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+    sine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/Speech1.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
     op_sine = sumpf.modules.SplitSignal(data=sine.GetSignal(),channels=[1]).GetOutput()
     ip_sine = sumpf.modules.SplitSignal(data=sine.GetSignal(),channels=[0]).GetOutput()
 

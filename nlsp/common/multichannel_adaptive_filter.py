@@ -212,8 +212,6 @@ def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001
         w1 = leakstep * w1 + step * normFactor1 * x1 * e[0][n]
         w2 = (leakstep/5) * w2 + step * normFactor2 * x2 * e[0][n]
         w3 = (leakstep/5) * w3 + step * normFactor3 * x3 * e[0][n]
-    # nlsp.common.plots.plot_simplearray(range(len(e[channel])),e[channel],"x","y","e")
-    # d = d - np.dot(x, w)
     W.append(w1)
     W.append(w2)
     W.append(w3)

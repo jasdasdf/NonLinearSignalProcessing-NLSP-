@@ -4,13 +4,12 @@ import nlsp
 sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
-length = 2**16
+length = 2**14
 fade_out = 0.00
 fade_in = 0.00
-branches = 5
+branches = 3
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
-iden_method = [nlsp.nonlinearconvolution_chebyshev_temporalreversal_adaptivefilter]
 
 Plot = True
 Save = False
@@ -23,15 +22,15 @@ wgn_normal = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=len
                                    stop_frequency=stop_freq, distribution=normal)
 wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, distribution=uniform)
-excitation = [cos]
+excitation = [wgn_normal]
+iden_method = [nlsp.adaptive_identification]
 
 
 for method,input_generator in zip(iden_method,excitation):
-    print method,input_generator
-    nlsp.hgmwithfilter_evaluation_adaptive_chebyshev(input_generator,branches,method,Plot)
+    # print method,input_generator
     # nlsp.audio_evaluation(input_generator,branches,method,Plot)
     # nlsp.puretone_evaluation(input_generator,branches,method,Plot)
-    # nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
+    nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
     # nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,method,Plot)
     # nlsp.linearmodel_evaluation(input_generator,branches,method,Plot)
     # nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot)
@@ -55,4 +54,4 @@ for method,input_generator in zip(iden_method,excitation):
     # nlsp.distortionbox_save()
     # nlsp.distortionbox_model(True)
 
-
+nlsp.common.plots.show()

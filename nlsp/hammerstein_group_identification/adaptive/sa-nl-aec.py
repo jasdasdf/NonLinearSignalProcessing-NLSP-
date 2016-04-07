@@ -85,8 +85,8 @@ class SA_HammersteinGroupModel(object):
 
 
 branches = 5
-iteration = 10
-input_generator = nlsp.NovakSweepGenerator_Sine(sampling_rate=48000.0, length=2**15, start_frequency=20.0,
+iteration = 2
+input_generator = nlsp.NovakSweepGenerator_Sine(sampling_rate=48000.0, length=2**18, start_frequency=20.0,
                                    stop_frequency=20000.0, fade_out= 0.0,fade_in=0.0)
 input_signal = input_generator.GetOutput()
 filter_spec_tofind = nlsp.log_bpfilter(branches=5,input=input_signal)

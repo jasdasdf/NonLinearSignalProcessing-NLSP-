@@ -192,8 +192,25 @@ def plot_array(input_array,label_array=None,save=False,name=None):
         relabelandplot(input,label,False,save,name)
     show()
 
-def plot_simplearray(x_array,y_array,label,show=True):
-    pyplot.plot(x_array,y_array,label=label)
+def plot_simplearray(x_array,y_array,x_label,y_label,label,show=True):
+    # print label
+    # fig, ax = pyplot.subplots()
+    pyplot.plot(x_array, y_array, label=label)
+    pyplot.ylabel(y_label)
+    pyplot.xlabel(x_label)
+    # Now add the legend with some customizations.
+    pyplot.legend(loc='upper center', shadow=True)
+    #
+    # # The frame is matplotlib.patches.Rectangle instance surrounding the legend.
+    # frame = legend.get_frame()
+    # frame.set_facecolor('0.90')
+    #
+    # # Set the fontsize
+    # for label in legend.get_texts():
+    #     label.set_fontsize('large')
+    #
+    # for label in legend.get_lines():
+    #     label.set_linewidth(1.5)  # the legend line width
     if show is True:
         pyplot._show()
 

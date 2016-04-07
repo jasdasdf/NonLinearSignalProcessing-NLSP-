@@ -45,10 +45,10 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot):
     """
     input_signal = input_generator.GetOutput()
 
-    # filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
-    filter_spec_tofind = nlsp.create_bpfilter([5000,10000,20000],input_signal)
+    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+    filter_spec_tofind = nlsp.create_bpfilter([2000,8000,20000],input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.chebyshev1_polynomial,branches),
+                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
 
@@ -78,7 +78,7 @@ def hgmwithoverlapfilter_evaluation(input_generator,branches,iden_method,Plot):
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    frequencies = [800,5000,900]
+    frequencies = [800,900,5000,7000,20000]
     input_signal = input_generator.GetOutput()
     filter_spec_tofind = nlsp.create_bpfilter(frequencies,input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
@@ -92,8 +92,8 @@ def hgmwithoverlapfilter_evaluation(input_generator,branches,iden_method,Plot):
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
     print "SNR between Reference and Identified output with overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
@@ -116,8 +116,8 @@ def linearmodel_evaluation(input_generator,branches,iden_method,Plot):
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
     print "SNR between Reference and Identified output for linear systems: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
@@ -257,37 +257,4 @@ def puretone_evaluation(input_generator,branches,iden_method,Plot):
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
     print "SNR between Reference and Identified output puretone: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
-                                                                                             iden_nlsystem.GetOutput())
-
-def hgmwithfilter_evaluation_adaptive_chebyshev(input_generator,branches,iden_method,Plot):
-    """
-    Evaluation of System Identification method by hgm virtual nl system
-    nonlinear system - virtual hammerstein group model with power series polynomials as nl function and bandpass filters
-                        as linear functions
-    plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
-    expectation - utmost similarity between the two spectrums
-    """
-    input_signal = input_generator.GetOutput()
-
-    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
-    ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
-                                                 filter_irs=filter_spec_tofind,
-                                                 max_harmonics=range(1,branches+1))
-    outputs = []
-    outputs.append(ref_nlsystem.GetOutput())
-    for i in range(branches):
-        input = nlsp.NonlinearFunction.chebyshev1_polynomial(i+1,signal=input_generator.GetOutput())
-        ref_nlsystem.SetInput(input.GetOutput())
-        outputs.append(ref_nlsystem.GetOutput())
-
-    found_filter_spec, nl_functions = iden_method(input_generator,outputs,branches)
-    iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nl_functions,
-                                                 filter_irs=found_filter_spec,
-                                                 max_harmonics=range(1,branches+1))
-    if Plot is True:
-        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
-        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
-    print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())

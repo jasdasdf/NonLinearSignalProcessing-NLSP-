@@ -124,12 +124,9 @@ def harmonics_evaluation():
         branch_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=input_sweep_signal,
                                                                   nonlin_func=nlsp.function_factory.power_series(i),
                                                                   max_harm=i)
-        harm_simple = nlsp.get_sweep_harmonics_ir(input_sweep_signal,branch_simple.GetOutput(),sweep_start_freq,
-                                                        sweep_stop_freq,length,degree)
-        harm_lp = nlsp.get_sweep_harmonics_ir(input_sweep_signal,branch_lp.GetOutput(),sweep_start_freq,
-                                                        sweep_stop_freq,length,degree)
-        harm_up = nlsp.get_sweep_harmonics_ir(input_sweep_signal,branch_up.GetOutput(),sweep_start_freq,
-                                                        sweep_stop_freq,length,degree)
+        harm_simple = nlsp.get_nl_impulse_response(input_signal,branch_simple.GetOutput())
+        harm_lp = nlsp.get_nl_impulse_response(input_signal,branch_lp.GetOutput())
+        harm_up = nlsp.get_nl_impulse_response(input_signal,branch_up.GetOutput())
         print "degree %r" %i
         print nlsp.calculateenergy_freq(harm_simple)
         print nlsp.calculateenergy_freq(harm_lp)
@@ -251,10 +248,8 @@ silence_duration = 0.02
 fade_out = 0.02
 fade_in = 0.02
 
-input_signal = nlsp.WindowedSweepGenerator(sampling_rate=sampling_rate, length=length, start_frequency=sweep_start_freq,
-                                   stop_frequency=sweep_stop_freq, silence_duration= silence_duration,fade_out= fade_out,
-                                           fade_in=fade_in)
-sweep_start_freq,sweep_stop_freq,length = input_signal.GetProperties()
+input_signal = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=sweep_start_freq,
+                                   stop_frequency=sweep_stop_freq, fade_in=fade_in,fade_out= fade_out)
 input_sweep_signal = input_signal.GetOutput()
 
 # lowpass_evaluation()

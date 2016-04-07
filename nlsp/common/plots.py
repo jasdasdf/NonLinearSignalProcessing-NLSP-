@@ -192,6 +192,13 @@ def plot_array(input_array,label_array=None,save=False,name=None):
         relabelandplot(input,label,False,save,name)
     show()
 
+def plot_filterspec(input_array,show=True):
+    for input in input_array:
+        input = sumpf.modules.FourierTransform(input).GetSpectrum()
+        plot(input,show=False)
+    if show is True:
+        _show()
+
 def plot_simplearray(x_array,y_array,x_label,y_label,label,show=True):
     # print label
     # fig, ax = pyplot.subplots()

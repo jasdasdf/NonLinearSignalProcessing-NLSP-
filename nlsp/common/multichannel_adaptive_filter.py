@@ -172,47 +172,82 @@ def multichannel_nlms_ideal(input_signal, desired_output, filter_taps, step, eps
     return W
 
 
+# def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001, leak=0, initCoeffs=None, N=None):
+#
+#     d = desired_output
+#     M = filter_taps
+#     channels = len(input_signal)
+#     W = []
+#     if initCoeffs is None:
+#         init = np.zeros((channels,M))
+#     else:
+#         init = initCoeffs
+#     leakstep = (1 - step*leak)
+#
+#     u1 = input_signal[0]
+#     u2 = input_signal[1]
+#     u3 = input_signal[2]
+#     if N is None:
+#         N = len(u1)-M+1
+#     w1 = init[0]           # Initial coefficients
+#     w2 = init[1]           # Initial coefficients
+#     w3 = init[2]           # Initial coefficients
+#     y1 = np.zeros(N)  # Filter output
+#     y2 = np.zeros(N)  # Filter output
+#     y3 = np.zeros(N)  # Filter output
+#     e = np.zeros((channels,N))  # Error signal
+#     for n in xrange(N):
+#         x1 = np.flipud(u1[n:n+M])  # Slice to get view of M latest datapoints
+#         x2 = np.flipud(u2[n:n+M])  # Slice to get view of M latest datapoints
+#         x3 = np.flipud(u3[n:n+M])  # Slice to get view of M latest datapoints
+#         y1[n] = np.dot(x1, w1)
+#         y2[n] = np.dot(x2, w2)
+#         y3[n] = np.dot(x3, w3)
+#         y = np.sum([y1[n],y2[n],y3[n]],axis=0)
+#         e[0][n] = d[n+M-1] - y
+#
+#         normFactor1 = 1./(np.dot(x1, x1) + eps)
+#         normFactor2 = 1./(np.dot(x2, x2) + eps)
+#         normFactor3 = 1./(np.dot(x3, x3) + eps)
+#         w1 = leakstep * w1 + step * normFactor1 * x1 * e[0][n]
+#         w2 = leakstep * w2 + step * normFactor2 * x2 * e[0][n]
+#         w3 = leakstep * w3 + step * normFactor3 * x3 * e[0][n]
+#     W.append(w1)
+#     W.append(w2)
+#     W.append(w3)
+#     return W
+
 def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001, leak=0, initCoeffs=None, N=None):
 
     d = desired_output
     M = filter_taps
     channels = len(input_signal)
     W = []
+    if N is None:
+        N = len(input_signal[0])-M+1
     if initCoeffs is None:
         init = np.zeros((channels,M))
     else:
         init = initCoeffs
     leakstep = (1 - step*leak)
-
-    u1 = input_signal[0]
-    u2 = input_signal[1]
-    u3 = input_signal[2]
-    if N is None:
-        N = len(u1)-M+1
-    w1 = init[0]           # Initial coefficients
-    w2 = init[1]           # Initial coefficients
-    w3 = init[2]           # Initial coefficients
-    y1 = np.zeros(N)  # Filter output
-    y2 = np.zeros(N)  # Filter output
-    y3 = np.zeros(N)  # Filter output
-    e = np.zeros((channels,N))  # Error signal
+    u = []                      # input signal array
+    w = []                      # filter coefficients array
+    for channel in range(channels):
+        u.append(input_signal[channel])
+        w.append(init[channel])
     for n in xrange(N):
-        x1 = np.flipud(u1[n:n+M])  # Slice to get view of M latest datapoints
-        x2 = np.flipud(u2[n:n+M])  # Slice to get view of M latest datapoints
-        x3 = np.flipud(u3[n:n+M])  # Slice to get view of M latest datapoints
-        y1[n] = np.dot(x1, w1)
-        y2[n] = np.dot(x2, w2)
-        y3[n] = np.dot(x3, w3)
-        y = np.sum([y1[n],y2[n],y3[n]],axis=0)
-        e[0][n] = d[n+M-1] - y
+        normfac = [0,]*channels
+        x = np.zeros((channels,M))
+        y = np.zeros((channels,M))
+        for channel in range(channels):
+            x[channel] = np.flipud(u[channel][n:n+M])
+            normfac[channel] = 1./(np.dot(x[channel], x[channel]) + eps)
+            y[channel] = np.dot(x[channel], w[channel])
 
-        normFactor1 = 1./(np.dot(x1, x1) + eps)
-        normFactor2 = 1./(np.dot(x2, x2) + eps)
-        normFactor3 = 1./(np.dot(x3, x3) + eps)
-        w1 = leakstep * w1 + step * normFactor1 * x1 * e[0][n]
-        w2 = (leakstep/5) * w2 + step * normFactor2 * x2 * e[0][n]
-        w3 = (leakstep/5) * w3 + step * normFactor3 * x3 * e[0][n]
-    W.append(w1)
-    W.append(w2)
-    W.append(w3)
+        Y = np.sum(y,axis=0)
+        e = d[n+M-1] - Y
+        for channel in range(channels):
+            w[channel] = leakstep * w[channel] + step * normfac[channel] * x[channel] * e
+    for channel in range(channels):
+        W.append(w[channel])
     return W

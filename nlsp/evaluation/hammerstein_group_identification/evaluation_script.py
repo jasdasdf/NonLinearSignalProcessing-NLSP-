@@ -30,7 +30,7 @@ for method,input_generator in zip(iden_method,excitation):
     # print method,input_generator
     # nlsp.audio_evaluation(input_generator,branches,method,Plot)
     # nlsp.puretone_evaluation(input_generator,branches,method,Plot)
-    nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
+    # nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
     # nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,method,Plot)
     # nlsp.linearmodel_evaluation(input_generator,branches,method,Plot)
     # nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot)
@@ -52,6 +52,5 @@ for method,input_generator in zip(iden_method,excitation):
     # nlsp.loudspeakermodel_evaluation("Sweep18","Speech2",branches,method,Plot,Save)
     # nlsp.distortionbox_evaluation("Sweep18","Speech1",branches,method,Plot,Save)
     # nlsp.distortionbox_save()
-    # nlsp.distortionbox_model(True)
+    nlsp.distortionbox_model(True)
 
-nlsp.common.plots.show()

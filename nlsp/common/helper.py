@@ -143,7 +143,7 @@ def log_bpfilter(start_freq=20.0,stop_freq=20000.0,branches=5,input=sumpf.Signal
         if amplify is True:
             spec = sumpf.modules.AmplifySpectrum(input=spec,factor=random.randint(10,100)).GetOutput()
         filter_spec.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
-    filter_spec = [i for i in reversed(filter_spec)]
+    # filter_spec = [i for i in reversed(filter_spec)]
     return filter_spec
 
 def create_bpfilter(frequencies,input):

@@ -4,7 +4,7 @@ import numpy
 import nlsp.common.plots as plot
 import adaptfilt as adf
 
-def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.legrendre_polynomial, iterations=20, step_size=0.1, filtertaps=1024,
+def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.power_series, iterations=20, step_size=0.1, filtertaps=1024,
                             algorithm=nlsp.multichannel_nlms, init_coeffs=None, Plot=False, label=None):
 
     if hasattr(input_generator,"GetOutput"):

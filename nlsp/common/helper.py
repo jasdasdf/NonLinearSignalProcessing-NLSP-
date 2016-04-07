@@ -384,3 +384,12 @@ def dot_product(signal1=None,signal2=None):
             energy_singlechannel.append(abs(s)**2)
         energy_allchannels.append(numpy.sum(energy_singlechannel))
     return energy_allchannels
+
+
+def change_length_filterkernels(filter_kernels,length=2**10):
+    filter_kernels_modified = []
+    for filter in filter_kernels:
+        if len(filter) > length:
+            filter_kernels_modified.append(sumpf.modules.CutSignal(signal=filter,start=0,stop=length).GetOutput())
+        elif len(filter) < length:
+            nlsp.append_zeros(filter,length)

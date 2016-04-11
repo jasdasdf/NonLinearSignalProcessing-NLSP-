@@ -394,3 +394,41 @@ def change_length_filterkernels(filter_kernels,length=2**10):
         elif len(filter) < length:
             filter_kernels_modified.append(nlsp.append_zeros(filter,length))
     return filter_kernels_modified
+
+def calculate_sdr(reference_kernel_array, identified_kernel_array, plot=False):
+    dist = []
+    sdr = []
+    reference_kernel_array = nlsp.change_length_filterkernels(reference_kernel_array,length=len(identified_kernel_array[0]))
+    for number,(ref,iden) in enumerate(zip(reference_kernel_array,identified_kernel_array)):
+        distoriton = ref - iden
+        if plot is True:
+            nlsp.common.plots.plot_sdrvsfreq(ref,iden,label=str(number)+" kernel",show=False)
+        dist.append(distoriton)
+        distortion_energy = nlsp.calculateenergy_betweenfreq_freq(distoriton,[100,19000])
+        # input_energy = nlsp.calculateenergy_betweenfreq_freq(iden,[100,19000])
+        # sdr.append(10*math.log10(input_energy[0]/distortion_energy[0]))
+        sdr.append(distortion_energy[0])
+    if plot is True:
+        nlsp.common.plots.show()
+    sdr = numpy.sum(sdr)
+    print "distortion energy: %r" %sdr
+    return sdr
+
+def calculate_sdr_add(reference_kernel_array, identified_kernel_array, plot=False):
+    dist = []
+    sdr = []
+    reference_kernel_array = nlsp.change_length_filterkernels(reference_kernel_array,length=len(identified_kernel_array[0]))
+    dummy_ref = sumpf.modules.ConstantSignalGenerator(value=0.0,
+                                                      samplingrate=reference_kernel_array[0].GetSamplingRate(),
+                                                      length=len(reference_kernel_array[0])).GetSignal()
+    dummy_iden = sumpf.modules.ConstantSignalGenerator(value=0.0,
+                                                       samplingrate=identified_kernel_array[0].GetSamplingRate(),
+                                                       length=len(identified_kernel_array[0])).GetSignal()
+    for number,(ref,iden) in enumerate(zip(reference_kernel_array,identified_kernel_array)):
+        dummy_iden = dummy_iden + iden
+        dummy_ref = dummy_ref + ref
+    distortion = dummy_ref - dummy_iden
+    if plot is True:
+        nlsp.common.plots.plot_sdrvsfreq(dummy_ref,dummy_iden,label="kernel difference",show=True)
+    print "distortion energy: %r" %nlsp.calculateenergy_betweenfreq_freq(distortion,[100,19000])
+    return nlsp.calculateenergy_betweenfreq_freq(distortion,[100,19000])

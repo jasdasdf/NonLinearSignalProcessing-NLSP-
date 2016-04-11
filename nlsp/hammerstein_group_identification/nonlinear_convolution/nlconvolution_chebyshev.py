@@ -101,7 +101,7 @@ def nonlinearconvolution_chebyshev_temporalreversal(sweep_generator, output_swee
     nl_func = nlsp.nl_branches(nlsp.function_factory.chebyshev1_polynomial,branches)
     return Volterra_ir, nl_func
 
-def nonlinearconvolution_chebyshev_temporalreversal_adaptivefilter(sweep_generator, outputs, branches=5, iterations=20):
+def nonlinearconvolution_chebyshev_adaptive(sweep_generator, output_sweep, branches=5, filter_taps=2**10):
     """
     System Identification using Nonlinear Convolution (Temporal Reversal method)
     :param sweep_generator: the object of sweep generator class
@@ -112,10 +112,8 @@ def nonlinearconvolution_chebyshev_temporalreversal_adaptivefilter(sweep_generat
     sweep_start_freq = sweep_generator.GetStartFrequency()
     sweep_stop_freq = sweep_generator.GetStopFrequency()
     ip_signal = sweep_generator.GetOutput()
-    filter_taps = 2**10
 
     # output_sweep = nlsp.append_zeros(output_sweep)
-    output_sweep = outputs
     rev = sweep_generator.GetReversedOutput()
     rev_spec = sumpf.modules.FourierTransform(rev).GetSpectrum()
     out_spec = sumpf.modules.FourierTransform(output_sweep).GetSpectrum()
@@ -128,7 +126,7 @@ def nonlinearconvolution_chebyshev_temporalreversal_adaptivefilter(sweep_generat
     # ir_merger = ir_harmonics_all.GetHarmonicImpulseResponse()
 
     # Jonas method
-    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(filter_taps)).GetOutput()
+    ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
     ir_merger.AddInput(ir_sweep_direct)
@@ -144,9 +142,14 @@ def nonlinearconvolution_chebyshev_temporalreversal_adaptivefilter(sweep_generat
     for i in range(len(ir_merger.GetChannels())):
         ir_harmonics =  sumpf.modules.SplitSignal(data=ir_merger, channels=[i]).GetOutput()
         Volterra_ir.append(nlsp.relabel(ir_harmonics,"%r harmonic identified ctr" %str(i+1)))
-
-    found_filter_spec, nl_functions = nlsp.adaptive_identification(sweep_generator.GetOutput(),outputs,branches,nlsp.function_factory.chebyshev1_polynomial,iterations=iterations,
-                                                                   step_size=0.002,filtertaps=len(Volterra_ir[0]),algorithm=nlsp.multichannel_nlms_ideal,
-                                                                   init_coeffs=Volterra_ir)
-    return found_filter_spec, nl_functions
-
+    nl_func = nlsp.nl_branches(nlsp.function_factory.chebyshev1_polynomial,branches)
+    Volterra_ir = nlsp.change_length_filterkernels(Volterra_ir,length=filter_taps)
+    Volterra_ir, nl_function_adaptive = nlsp.adaptive_identification(input_generator=sweep_generator.GetOutput(),
+                                                                     outputs=output_sweep,iterations=1,
+                                                                     branches=branches,
+                                                                     step_size=0.1,
+                                                                     filtertaps=filter_taps,
+                                                                     algorithm=nlsp.multichannel_nlms,Plot=False,
+                                                                     init_coeffs=Volterra_ir,
+                                                                     nonlinear_func=nlsp.function_factory.chebyshev1_polynomial)
+    return Volterra_ir, nl_func

@@ -67,5 +67,33 @@ def noisetest():
     print "SNR between Reference and Identified output: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
+def audio_evaluation(input_generator,branches,iden_method,Plot):
+
+    input_signal = input_generator.GetOutput()
+    filter_spec_tofind = nlsp.create_bpfilter([1000,2000,4000,8000,16000],input_signal)
+    ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 filter_irs=filter_spec_tofind,
+                                                 max_harmonics=range(1,branches+1))
+
+    found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
+    iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                 nonlinear_functions=nl_functions,
+                                                 filter_irs=found_filter_spec,
+                                                 max_harmonics=range(1,branches+1))
+
+    excitation = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/virtual/Speech3.npz",
+                                              format=sumpf.modules.SignalFile.NUMPY_NPZ).GetSignal()
+    ref_nlsystem.SetInput(excitation)
+    iden_nlsystem.SetInput(excitation)
+    ref = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/virtual/Ref",
+                                      signal=ref_nlsystem.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+    iden = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/virtual/Iden",
+                                      signal=iden_nlsystem.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+    if Plot is True:
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+    print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
+                                                                                             iden_nlsystem.GetOutput())
 sweeptest()
 noisetest()

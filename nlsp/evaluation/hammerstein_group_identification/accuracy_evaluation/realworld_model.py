@@ -183,13 +183,13 @@ def distortionbox_model(Plot=True):
     fade_in = 0.00
     branches = 3
 
-    sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+    sine = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
 
     op_sine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/sine.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
     op_sine = sumpf.modules.SplitSignal(data=op_sine.GetSignal(),channels=[1]).GetOutput()
 
-    found_filter_spec, nl_functions = nlsp.nonlinearconvolution_powerseries_temporalreversal(sine,op_sine,branches)
+    found_filter_spec, nl_functions = nlsp.nonlinearconvolution_chebyshev_adaptive(sine,op_sine,branches)
     # found_filter_spec, nl_functions = nlsp.adaptive_identification(sine.GetOutput(),op_sine,branches,nlsp.function_factory.power_series,iterations=5,
     #                                                                step_size=0.002,filtertaps=len(found_filter_spec[0]),algorithm=nlsp.multichannel_nlms_ideal,
     #                                                                init_coeffs=found_filter_spec)

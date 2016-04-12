@@ -194,7 +194,7 @@ def plot_array(input_array,label_array=None,save=False,name=None):
 
 def plot_filterspec(input_array,show=True):
     for input in input_array:
-        input = sumpf.modules.FourierTransform(input).GetSpectrum()
+        # input = sumpf.modules.FourierTransform(input).GetSpectrum()
         plot(input,show=False)
     if show is True:
         _show()
@@ -281,3 +281,38 @@ def plot_spectrogram(data):
     plot = axis.pcolormesh(x_axis, y_axis, color_grid)
     pyplot.colorbar(plot)
     show()
+
+def plot_sdrvsfreq(input_signalorspectrum,output_signalorspectrum,label=None,show=True):
+    if isinstance(input_signalorspectrum, list) != True:
+        observed_l = []
+        observed_l.append(input_signalorspectrum)
+    else:
+        observed_l = input_signalorspectrum
+    if isinstance(output_signalorspectrum, list) != True:
+        identified_l = []
+        identified_l.append(output_signalorspectrum)
+    else:
+        identified_l = output_signalorspectrum
+    for observed,identified in zip(observed_l,identified_l):
+        if isinstance(observed,(sumpf.Signal,sumpf.Spectrum)) and isinstance(observed,(sumpf.Signal,sumpf.Spectrum)):
+            if isinstance(observed,sumpf.Signal):
+                observed = sumpf.modules.FourierTransform(observed).GetSpectrum()
+            if isinstance(identified,sumpf.Signal):
+                identified = sumpf.modules.FourierTransform(identified).GetSpectrum()
+            if len(observed) != len(identified):
+                merged_spectrum = sumpf.modules.MergeSpectrums(spectrums=[observed,identified],
+                                                   on_length_conflict=sumpf.modules.MergeSpectrums.FILL_WITH_ZEROS).GetOutput()
+                observed = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[0]).GetOutput()
+                identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
+
+            observed = nlsp.cut_spectrum(observed,[100,19000])
+            identified = nlsp.cut_spectrum(identified,[100,19000])
+            noise =  observed - identified
+            noise = noise/observed
+            if label is None:
+                pass
+            else:
+                noise = nlsp.relabel(noise,labels=label)
+            nlsp.common.plots.plot(noise,show=show)
+        else:
+            print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"

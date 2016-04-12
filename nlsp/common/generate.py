@@ -1,4 +1,5 @@
 import sumpf
+import nlsp
 
 def generate_puretones(frequencies,sampling_rate,length):
     """

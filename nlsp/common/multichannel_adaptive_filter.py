@@ -217,7 +217,7 @@ def multichannel_nlms_ideal(input_signal, desired_output, filter_taps, step, eps
 #     W.append(w3)
 #     return W
 
-def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001, leak=0, initCoeffs=None, N=None):
+def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001, leak=0, initCoeffs=None, N=None, plot = False):
 
     d = desired_output
     M = filter_taps
@@ -235,6 +235,7 @@ def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001
     for channel in range(channels):
         u.append(input_signal[channel])
         w.append(init[channel])
+    E = np.zeros(N)
     for n in xrange(N):
         normfac = [0,]*channels
         x = np.zeros((channels,M))
@@ -246,8 +247,11 @@ def multichannel_nlms(input_signal, desired_output, filter_taps, step, eps=0.001
 
         Y = np.sum(y,axis=0)
         e = d[n+M-1] - Y
+        E[n] = np.sum(e)
         for channel in range(channels):
             w[channel] = leakstep * w[channel] + step * normfac[channel] * x[channel] * e
+    if plot is True:
+        nlsp.common.plots.plot_simplearray(range(len(E)),E,"x","y","e")
     for channel in range(channels):
         W.append(w[channel])
     return W

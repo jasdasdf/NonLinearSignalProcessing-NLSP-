@@ -4,7 +4,7 @@ import numpy
 import nlsp.common.plots as plot
 import adaptfilt as adf
 
-def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.power_series, iterations=20, step_size=0.1, filtertaps=1024,
+def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.legrendre_polynomial, iterations=1, step_size=0.1, filtertaps=1024,
                             algorithm=nlsp.multichannel_nlms, init_coeffs=None, Plot=False, label=None):
 
     if hasattr(input_generator,"GetOutput"):
@@ -30,7 +30,7 @@ def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func
     SNR = numpy.zeros(iterations)
     iteration = numpy.zeros(iterations)
     for i in range(iterations):
-        w = algorithm(input_signal, desired_signal, filtertaps, step_size, initCoeffs=w)
+        w = algorithm(input_signal, desired_signal, filtertaps, step_size, initCoeffs=w, plot=Plot)
         kernel = []
         for k in w:
             iden_filter = sumpf.Signal(channels=(k,), samplingrate=outputs.GetSamplingRate(), labels=("filter",))
@@ -44,8 +44,8 @@ def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func
         print "Error energy %r, iteration %r" %(error_energy[i],iteration[i])
         print
 
-    if Plot is True:
-        # plot.plot_simplearray(iteration,SNR,"Iterations","SNR between ref and iden",show=False)
-        plot.plot_simplearray(iteration,error_energy,x_label="Iterations",y_label="Error(energy)",label=label,show=False)
+    # if Plot is True:
+    #     # plot.plot_simplearray(iteration,SNR,"Iterations","SNR between ref and iden",show=False)
+    #     plot.plot_simplearray(iteration,error_energy,x_label="Iterations",y_label="Error(energy)",label=label,show=False)
     nl_func = nlsp.nl_branches(nonlinear_func,branches)
     return kernel,nl_func

@@ -9,11 +9,9 @@ class WhiteGaussianGenerator(object):
         self.__start_frequency = float(start_frequency)
         self.__stop_frequency = float(stop_frequency)
         self.__distribution = distribution
+        self._generate()
 
-    def SetLength(self,length):
-        self.__length = float(length)
-
-    def GetOutput(self):
+    def _generate(self):
         noise = sumpf.modules.NoiseGenerator(distribution=self.__distribution, samplingrate=self.__sampling_rate,
                                              length=self.__length).GetSignal()
         prop = sumpf.modules.ChannelDataProperties()
@@ -23,9 +21,18 @@ class WhiteGaussianGenerator(object):
                                                                  resolution=prop.GetResolution(),
                                                                  length=prop.GetSpectrumLength()).GetSpectrum()
         wgn = bandpass * sumpf.modules.FourierTransform(noise).GetSpectrum()
-        return sumpf.modules.InverseFourierTransform(wgn).GetSignal()
+        self.__output = sumpf.modules.InverseFourierTransform(wgn).GetSignal()
         # wgn = numpy.random.normal(0.0,1.0,self.__length)
         # return sumpf.Signal(channels=(wgn,),samplingrate=self.__sampling_rate,labels=("wgn",))
+
+    @sumpf.Input(int,"GetOutput")
+    def SetLength(self,length):
+        self.__length = float(length)
+        self._generate()
+
+    @sumpf.Output(sumpf.Signal)
+    def GetOutput(self):
+        return self.__output
 
     @sumpf.Output(float)
     def GetLength(self):

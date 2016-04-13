@@ -150,7 +150,7 @@ def signal_to_noise_ratio_freq_range(input_signalorspectrum, output_signalorspec
     snr = nlsp.signal_to_noise_ratio_freq(input_spec_m,output_spec_m)
     return snr
 
-def snr(input_signalorspectrum,output_signalorspectrum,type=3,freqrange=[20,20000],plot=True,show=True,label=None):
+def snr(input_signalorspectrum,output_signalorspectrum,type=3,freqrange=[20,20000],plot=False,show=False,label=None):
     if isinstance(input_signalorspectrum, list) != True:
         observed_l = []
         observed_l.append(input_signalorspectrum)

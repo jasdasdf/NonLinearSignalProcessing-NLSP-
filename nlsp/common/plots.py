@@ -305,10 +305,12 @@ def plot_sdrvsfreq(input_signalorspectrum,output_signalorspectrum,label=None,sho
                 observed = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[0]).GetOutput()
                 identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
 
-            observed = nlsp.cut_spectrum(observed,[100,19000])
-            identified = nlsp.cut_spectrum(identified,[100,19000])
-            noise =  observed - identified
-            noise = noise/observed
+            # observed = nlsp.cut_spectrum(observed,[100,19000])
+            # identified = nlsp.cut_spectrum(identified,[100,19000])
+            identified = sumpf.modules.InverseFourierTransform(identified).GetSignal()
+            observed = sumpf.modules.InverseFourierTransform(observed).GetSignal()
+            noise =  identified - observed
+            print nlsp.calculateenergy_time(noise)
             if label is None:
                 pass
             else:

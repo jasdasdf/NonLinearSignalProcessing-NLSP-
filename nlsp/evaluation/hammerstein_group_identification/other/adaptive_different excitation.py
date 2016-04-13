@@ -95,5 +95,5 @@ def audio_evaluation(input_generator,branches,iden_method,Plot):
         plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
     print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
-sweeptest()
+
 noisetest()

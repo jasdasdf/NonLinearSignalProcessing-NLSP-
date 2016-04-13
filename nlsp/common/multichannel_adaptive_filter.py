@@ -140,7 +140,7 @@ def multichannel_ap_ideal(input_signal, desired_output, filter_taps, step, proj_
 
     return W
 
-def multichannel_nlms_ideal(input_signal, desired_output, filter_taps, step, eps=0.001, leak=0, initCoeffs=None, N=None):
+def multichannel_nlms_ideal(input_signal, desired_output, filter_taps, step, eps=0.001, leak=0, initCoeffs=None, N=None, plot = False):
 
     d = desired_output
     M = filter_taps
@@ -166,7 +166,8 @@ def multichannel_nlms_ideal(input_signal, desired_output, filter_taps, step, eps
 
             normFactor = 1./(np.dot(x, x) + eps)
             w = leakstep * w + step * normFactor * x * e[channel][n]
-        # nlsp.common.plots.plot_simplearray(range(len(e[channel])),e[channel],"x","y","e")
+        if plot is True:
+            nlsp.common.plots.plot_simplearray(range(len(e[channel])),e[channel],"x","y","e")
         d = d - np.dot(x, w)
         W.append(w)
     return W

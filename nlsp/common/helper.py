@@ -185,7 +185,7 @@ def get_mean(ip):
     energy_allchannels = []
     for c in ip.GetChannels():
         energy_singlechannel = []
-        c = reversed(c)
+        # c = reversed(c)
         for i,s in enumerate(c):
             # energy_singlechannel.append((abs(s)**2)*(1*(dummy**i)))
             energy_singlechannel.append(s)
@@ -429,6 +429,6 @@ def calculate_sdr_add(reference_kernel_array, identified_kernel_array, plot=Fals
         dummy_ref = dummy_ref + ref
     distortion = dummy_ref - dummy_iden
     if plot is True:
-        nlsp.common.plots.plot_sdrvsfreq(dummy_ref,dummy_iden,label="kernel difference",show=True)
+        nlsp.common.plots.plot_sdrvsfreq(dummy_ref,dummy_iden,label="kernel difference sum",show=True)
     print "distortion energy: %r" %nlsp.calculateenergy_betweenfreq_freq(distortion,[100,19000])
     return nlsp.calculateenergy_betweenfreq_freq(distortion,[100,19000])

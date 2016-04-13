@@ -15,32 +15,20 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot,label=Non
     expectation - utmost similarity between the two spectrums
     """
     input_signal = input_generator.GetOutput()
-
-    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
     # filter_spec_tofind = nlsp.create_bpfilter([2000,8000,30000],input_signal)
+    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
-
     found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
-    # nlsp.calculate_sdr_add(filter_spec_tofind,found_filter_spec,plot=False)
-    # sine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/test_signals/Speech.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
-    # ref_nlsystem.SetInput(sine.GetSignal())
-    # iden_nlsystem.SetInput(sine.GetSignal())
-    # for i in range(len(found_filter_spec)):
-    #     plot.plot(sumpf.modules.FourierTransform(found_filter_spec[i]).GetSpectrum(),show=False)
-    #     plot.plot(sumpf.modules.FourierTransform(filter_spec_tofind[i]).GetSpectrum(),show=False)
-    # plot.show()
     if Plot is True:
-        # plot.plot_sdrvsfreq(ref_nlsystem.GetOutput(), iden_nlsystem.GetOutput(), label=label, show=False)
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
-
     print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
@@ -52,7 +40,7 @@ def hgmwithoverlapfilter_evaluation(input_generator,branches,iden_method,Plot):
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    frequencies = [800,900,5000,7000,20000]
+    frequencies = [500,3000,5000,7000,20000]
     input_signal = input_generator.GetOutput()
     filter_spec_tofind = nlsp.create_bpfilter(frequencies,input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,

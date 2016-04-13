@@ -24,6 +24,8 @@ def k_matrix_calculate(input,total_branches):
             k = 0
         elif n == m:
             k = 1
+        if (n+m) % 2 == 1:
+            k = 0
         k_matrix[n-1][m-1] = round(k,2)
     return k_matrix
 
@@ -33,11 +35,23 @@ def wgn_hgm_decorrelate(input,total_branches):
     mu_matrix = []
     signal_matrix = []
     dummy = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=input.GetSamplingRate(),length=len(input)).GetSignal()
-    for branch in range(1,total_branches+1):
-        power = nlsp.NonlinearFunction.power_series(branch,input)
-        core = sumpf.modules.AmplifySignal(input=power.GetOutput(),factor=k_matrix[branch-1][total_branches-1]).GetOutput()
-        if branch %2 == 0:
-            mu = sumpf.modules.SignalMean(signal=input).GetMean()
+    signal_powers = []
+    for i in range(1,total_branches+1,1):
+        power = nlsp.NonlinearFunction.power_series(i,input)
+        signal_powers.append(power.GetOutput())
+    signal_powers_k = []
+    k_matrix_t = numpy.transpose(k_matrix)
+    for i in range(0,total_branches):
+        dummy_sig = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=input.GetSamplingRate(),length=len(input)).GetSignal()
+        for sig,k in zip(signal_powers,k_matrix_t[i]):
+            sig = sig * k
+            dummy_sig = sig + dummy_sig
+        signal_powers_k.append(dummy_sig)
+    for i in range(0,total_branches):
+        core = signal_powers_k[i]
+        if i %2 == 0:
+            power = nlsp.NonlinearFunction.power_series(i,input)
+            mu = sumpf.modules.SignalMean(signal=power.GetOutput()).GetMean()
             mu = sumpf.modules.ConstantSignalGenerator(value=float(mu[0]),samplingrate=core.GetSamplingRate(),length=len(core)).GetSignal()
             mu_matrix.append(sumpf.modules.FourierTransform(mu).GetSpectrum())
             comb = core + mu

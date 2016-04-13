@@ -163,7 +163,7 @@ def loudspeaker_model_adaptive():
     """
     Realworld nonlinear system(Loudspeaker) Model using adaptive system identification
     """
-    branches = 3
+    branches = 5
     filter_taps = 2**11
 
     # real world reference system, load input and output noise
@@ -253,5 +253,70 @@ def loudspeaker_model_sweep(Plot=True):
                                                                                              iden_nlsystem_sine.GetOutput())
     print "Distortion box, SNR between Reference and Identified output Sample,l: %r" %nlsp.snr(ref_sample,
                                                                                              linear_op)
-loudspeaker_model_adaptive()
-loudspeaker_model_sweep()
+
+def loudspeaker_model_sweepadaptive():
+
+    branches = 3
+    sampling_rate = 48000.0
+    length = 2**18
+    start_freq = 100.0
+    stop_freq = 20000.0
+    fade_out = 0.00
+    fade_in = 0.00
+    filter_taps = 2**11
+
+    # input generator
+    sine_g = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                       stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
+    cos_g = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                       stop_frequency=stop_freq, fade_out= fade_out,fade_in=fade_in)
+
+    # real world reference system, load input and output noise and sweeps
+    load_noise = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/Noise18.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+    load_sine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/sine.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+    load_cosine = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/cos.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+    output_noise = sumpf.modules.SplitSignal(data=load_noise.GetSignal(),channels=[1]).GetOutput()
+    input_noise = sumpf.modules.SplitSignal(data=load_noise.GetSignal(),channels=[0]).GetOutput()
+    output_sine = sumpf.modules.SplitSignal(data=load_sine.GetSignal(),channels=[1]).GetOutput()
+    output_cos = sumpf.modules.SplitSignal(data=load_cosine.GetSignal(),channels=[1]).GetOutput()
+    impulse = sumpf.modules.ImpulseGenerator(length=filter_taps,samplingrate=sampling_rate).GetSignal()
+
+    # initialize hgm
+    iden_nlsystem = nlsp.HammersteinGroupModel_up(max_harmonics=range(1,branches+1),nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                  filter_irs=[impulse,]*branches)
+
+    # only sine based system identification
+    found_filter_spec_sine, nl_function_sine = nlsp.nonlinearconvolution_powerseries_temporalreversal(sine_g,output_sine,branches)
+
+    # sine based as init coeff for noise based system identification
+    found_filter_spec_sine_reducedlength = nlsp.change_length_filterkernels(found_filter_spec_sine,length=filter_taps)
+    found_filter_spec_sineadapt, nl_function_sineadapt = nlsp.adaptive_identification(input_generator=input_noise,outputs=output_noise,iterations=1,branches=branches,
+                                                                   step_size=0.1,filtertaps=filter_taps,algorithm=nlsp.multichannel_nlms,Plot=False,init_coeffs=found_filter_spec_sine_reducedlength)
+    iden_nlsystem.SetInput(signal=input_noise)
+    iden_nlsystem.SetNLFunctions(nl_function_sineadapt)
+    iden_nlsystem.SetFilterIRS(found_filter_spec_sineadapt)
+    plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Adapt sine",show=False)
+    print "SNR between Reference and Identified output Noise signal: %r" %nlsp.snr(output_noise, iden_nlsystem.GetOutput())
+    plot.plot_sdrvsfreq(output_noise, iden_nlsystem.GetOutput(), label="noise", show=False)
+    plot.relabelandplot(sumpf.modules.FourierTransform(output_noise).GetSpectrum(),"Reference Noise",show=True)
+
+    load_sample = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/Speech1.npz", format=sumpf.modules.SignalFile.WAV_FLOAT)
+
+    output_sample = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[1]).GetOutput()
+    input_sample = sumpf.modules.SplitSignal(data=load_sample.GetSignal(),channels=[0]).GetOutput()
+
+    iden_nlsystem.SetInput(input_sample)
+
+    # save the output to the directory
+    iden = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_db/sim/sweepadaptive/identified",
+                                      signal=iden_nlsystem.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+    ref = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_db/sim/sweepadaptive/reference",
+                                      signal=output_sample,format=sumpf.modules.SignalFile.WAV_FLOAT)
+    inp = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_db/sim/sweepadaptive/input",
+                                      signal=input_sample,format=sumpf.modules.SignalFile.WAV_FLOAT)
+    print "Distortion box, SNR between Reference and Identified output Sample,nl: %r" %nlsp.snr(output_sample,
+                                                                                             iden_nlsystem.GetOutput())
+
+loudspeaker_model_sweepadaptive()
+# loudspeaker_model_adaptive()
+# loudspeaker_model_sweep()

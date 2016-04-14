@@ -2,7 +2,7 @@ import sumpf
 import nlsp
 import nlsp.common.plots as plot
 
-def filterkernel_evaluation(reference_kernels, identified_kernels, Plot=False):
+def filterkernel_evaluation_plot(reference_kernels, identified_kernels, Plot=False):
     identified_kernels = nlsp.change_length_filterkernels(identified_kernels,len(reference_kernels[0]))
     for i,(reference_kernel, identified_kernel) in enumerate(zip(reference_kernels,identified_kernels)):
         sub = identified_kernel - reference_kernel
@@ -12,6 +12,20 @@ def filterkernel_evaluation(reference_kernels, identified_kernels, Plot=False):
         plot.relabelandplot(sub,"kernel %d difference" %(i+1),show=False)
     plot.show()
 
+def filterkernel_evaluation_sum(reference_kernels, identified_kernels):
+    identified_kernels = nlsp.change_length_filterkernels(identified_kernels,len(reference_kernels[0]))
+    temp_identified = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=identified_kernels[0].GetSamplingRate(),
+                                                            length=len(identified_kernels[0])).GetSignal()
+    temp_reference = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=reference_kernels[0].GetSamplingRate(),
+                                                            length=len(reference_kernels[0])).GetSignal()
+    for i,(reference_kernel, identified_kernel) in enumerate(zip(reference_kernels,identified_kernels)):
+        temp_reference = temp_reference + reference_kernel
+        temp_identified = temp_identified + identified_kernel
+    temp_identified = sumpf.modules.FourierTransform(temp_identified).GetSpectrum()
+    temp_reference = sumpf.modules.FourierTransform(temp_reference).GetSpectrum()
+    plot.relabelandplot(temp_identified,"identified sum",show=False)
+    plot.relabelandplot(temp_reference,"reference sum",show=True)
+    print "SNR between reference and identified kernels %r" %nlsp.snr(temp_reference,temp_identified)
 
 def powerserieshgm_uniqueness_evaluation():
     for method,input_generator,label in zip(iden_method,excitation,labels):
@@ -26,7 +40,7 @@ def powerserieshgm_uniqueness_evaluation():
                                                      nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
-        filterkernel_evaluation(filter_spec_tofind,found_filter_spec)
+        filterkernel_evaluation_sum(filter_spec_tofind,found_filter_spec)
         if Plot is True:
             plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
             plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)

@@ -391,7 +391,7 @@ def change_length_filterkernels(filter_kernels,length=2**10):
     for filter in filter_kernels:
         if len(filter) > length:
             filter_kernels_modified.append(sumpf.modules.CutSignal(signal=filter,start=0,stop=length).GetOutput())
-        elif len(filter) < length:
+        else:
             filter_kernels_modified.append(nlsp.append_zeros(filter,length))
     return filter_kernels_modified
 

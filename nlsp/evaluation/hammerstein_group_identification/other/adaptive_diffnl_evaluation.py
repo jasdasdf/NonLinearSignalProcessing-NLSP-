@@ -4,6 +4,11 @@ import nlsp
 import nlsp.common.plots as plot
 import itertools
 
+# Applicable to only virtual nonlinear system
+# Find which Nonlinear function is better for adaptive system identification?
+# It varies based on the choice of input signal. Test all the possibilites to find the relation between the distribution and nonlinear function.
+# Orthogonal polynomials and their corresponding orthogonal probablity distribution is the best choice for adaptive identification.
+
 def filterkernel_evaluation_sum(reference_kernels, identified_kernels, Plot=False):
     identified_kernels = nlsp.change_length_filterkernels(identified_kernels,len(reference_kernels[0]))
     temp_identified = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=identified_kernels[0].GetSamplingRate(),
@@ -56,6 +61,7 @@ fade_in = 0.00
 branches = 3
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
+gamma = sumpf.modules.NoiseGenerator.GammaDistribution()
 
 Plot = False
 Save = False
@@ -68,7 +74,9 @@ wgn_normal = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=len
                                    stop_frequency=stop_freq, distribution=normal)
 wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, distribution=uniform)
-excitation = [wgn_normal, wgn_uniform]
+wgn_gamma = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, distribution=gamma)
+excitation = [wgn_gamma, wgn_normal, wgn_uniform]
 nl_functions = [nlsp.function_factory.power_series, nlsp.function_factory.chebyshev1_polynomial,
                 nlsp.function_factory.legrendre_polynomial, nlsp.function_factory.hermite_polynomial]
 adaptive_polynomial_evaluation()

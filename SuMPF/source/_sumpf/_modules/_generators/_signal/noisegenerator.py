@@ -203,3 +203,17 @@ class NoiseGenerator(SignalGenerator):
                 result.append(self._random.gauss(self.__mean, self.__standard_deviation))
             return result
 
+    class GammaDistribution(Distribution):
+        """
+        Generates samples that are gamma distributed with the given alpha
+        and beta values.
+        """
+        def __init__(self, alpha=0.1, beta=1.0):
+            self.__alpha = float(alpha)
+            self.__beta = float(beta)
+        def GetSamples(self, length):
+            result = []
+            for i in range(length):
+                result.append(self._random.gammavariate(self.__alpha, self.__beta))
+            return result
+

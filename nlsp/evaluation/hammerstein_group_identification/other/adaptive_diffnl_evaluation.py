@@ -9,25 +9,6 @@ import itertools
 # It varies based on the choice of input signal. Test all the possibilites to find the relation between the distribution and nonlinear function.
 # Orthogonal polynomials and their corresponding orthogonal probablity distribution is the best choice for adaptive identification.
 
-def filterkernel_evaluation_sum(reference_kernels, identified_kernels, Plot=False):
-    identified_kernels = nlsp.change_length_filterkernels(identified_kernels,len(reference_kernels[0]))
-    temp_identified = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=identified_kernels[0].GetSamplingRate(),
-                                                            length=len(identified_kernels[0])).GetSignal()
-    temp_reference = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=reference_kernels[0].GetSamplingRate(),
-                                                            length=len(reference_kernels[0])).GetSignal()
-    snr_diff = []
-    for i,(reference_kernel, identified_kernel) in enumerate(zip(reference_kernels,identified_kernels)):
-        snr_diff.append(nlsp.snr(reference_kernel,identified_kernel)[0])
-        temp_reference = temp_reference + reference_kernel
-        temp_identified = temp_identified + identified_kernel
-    temp_identified = sumpf.modules.FourierTransform(temp_identified).GetSpectrum()
-    temp_reference = sumpf.modules.FourierTransform(temp_reference).GetSpectrum()
-    if Plot is True:
-        plot.relabelandplot(temp_identified,"identified sum",show=False)
-        plot.relabelandplot(temp_reference,"reference sum",show=True)
-    print "SNR between summed reference and identified kernels %r" %nlsp.snr(temp_reference,temp_identified)
-    print "Mean SNR between reference and identified kernels %r" %numpy.mean(snr_diff)
-
 def adaptive_polynomial_evaluation():
     for input_generator,nlfunc in itertools.product(excitation,nl_functions):
         print input_generator
@@ -43,7 +24,7 @@ def adaptive_polynomial_evaluation():
                                                      nonlinear_functions=nl_func,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
-        filterkernel_evaluation_sum(filter_spec_tofind,found_filter_spec)
+        nlsp.filterkernel_evaluation_sum(filter_spec_tofind,found_filter_spec)
         if Plot is True:
             plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
             plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)

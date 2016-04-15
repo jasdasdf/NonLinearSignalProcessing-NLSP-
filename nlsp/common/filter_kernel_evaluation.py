@@ -8,6 +8,13 @@ import nlsp.common.plots as plot
 # Find Uniqueness between reference and identified nonlinear system
 
 def filterkernel_evaluation_plot(reference_kernels, identified_kernels, Plot="individual"):
+    """
+    plot the difference between te reference and identified filter kernels
+    :param reference_kernels: the array of reference filter kernels
+    :param identified_kernels: the array of identified filter kernels
+    :param Plot: either "individual" or "total"
+    :return:
+    """
     dummy_sum = sumpf.modules.ConstantSignalGenerator(value=0.0, samplingrate=reference_kernels[0].GetSamplingRate(),
                                                       length=len(reference_kernels[0])).GetSignal()
     identified_kernels = nlsp.change_length_filterkernels(identified_kernels,len(reference_kernels[0]))
@@ -26,6 +33,13 @@ def filterkernel_evaluation_plot(reference_kernels, identified_kernels, Plot="in
         plot.relabelandplot(dummy_sum,"diff_sum",show=True,line='g^')
 
 def filterkernel_evaluation_sum(reference_kernels, identified_kernels, Plot=False):
+    """
+    calculate the SNR of parallel filter kernels
+    :param reference_kernels: the array of reference filter kernel
+    :param identified_kernels: the array of identified filter kernel
+    :param Plot: either True or False
+    :return:
+    """
     identified_kernels = nlsp.change_length_filterkernels(identified_kernels,len(reference_kernels[0]))
     temp_identified = sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=identified_kernels[0].GetSamplingRate(),
                                                             length=len(identified_kernels[0])).GetSignal()

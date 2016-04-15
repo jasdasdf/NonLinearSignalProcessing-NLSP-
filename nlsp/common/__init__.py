@@ -44,3 +44,5 @@ from find_harmonics import FindHarmonicImpulseResponse_Novak
 from gaussian import WhiteGaussianGenerator
 
 from multichannel_adaptive_filter import multichannel_nlms,nlms,ap,lms,multichannel_ap_ideal,multichannel_nlms_ideal
+
+from filter_kernel_evaluation import filterkernel_evaluation_plot,filterkernel_evaluation_sum

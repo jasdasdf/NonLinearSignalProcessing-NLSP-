@@ -40,26 +40,26 @@ for method,input_generator,label in zip(iden_method,excitation,labels):
 
     # accuracy evaluation
 
-    nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot,label)
+    nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
     nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,method,Plot)
-    nlsp.linearmodel_evaluation(input_generator,branches,method,Plot)
-    nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot)
-    nlsp.hgmwithamplifiedfilter_evaluation(input_generator,branches,method,Plot)
-    nlsp.hgmallpass_evaluation(input_generator,branches,method,Plot)
-    nlsp.puretone_evaluation(input_generator,branches,method,Plot)
+    # nlsp.linearmodel_evaluation(input_generator,branches,method,Plot)
+    # nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot)
+    # nlsp.hgmwithamplifiedfilter_evaluation(input_generator,branches,method,Plot)
+    # nlsp.hgmallpass_evaluation(input_generator,branches,method,Plot)
+    # nlsp.puretone_evaluation(input_generator,branches,method,Plot)
 
-    nlsp.hardclipping_evaluation(input_generator,branches,method,Plot)
-    nlsp.softclipping_evaluation(input_generator,branches,method,Plot)
-    nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot)
+    # nlsp.hardclipping_evaluation(input_generator,branches,method,Plot)
+    # nlsp.softclipping_evaluation(input_generator,branches,method,Plot)
+    # nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot)
 
     # performance evaluation
 
-    nlsp.differentlength_evaluation(input_generator,branches,method,Plot)
-    nlsp.differentbranches_evaluation(input_generator,branches,method,Plot)
-    nlsp.computationtime_evaluation(input_generator,branches,method,Plot)
+    # nlsp.differentlength_evaluation(input_generator,branches,method,Plot)
+    # nlsp.differentbranches_evaluation(input_generator,branches,method,Plot)
+    # nlsp.computationtime_evaluation(input_generator,branches,method,Plot)
 
     # robustness evaluation
 
-    nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot)
-    nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot)
+    # nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot)
+    # nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot)
 plot.show()

@@ -30,7 +30,7 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot,label=Non
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
     print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
-                                                                                             iden_nlsystem.GetOutput())
+                                                                                             iden_nlsystem.GetOutput(),label=label)
 
 def hgmwithoverlapfilter_evaluation(input_generator,branches,iden_method,Plot):
     """

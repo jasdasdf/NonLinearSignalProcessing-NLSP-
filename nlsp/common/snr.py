@@ -190,9 +190,7 @@ def snr(input_signalorspectrum,output_signalorspectrum,type=3,freqrange=[20,2000
                 noise =  reference - identified
                 div = identified / noise
                 if plot is True:
-                    if label is None:
-                        label = "Noise"
-                    nlsp.common.plots.relabelandplot(noise/identified,label,show=show)
+                    nlsp.common.plots.relabelandplot(noise*noise,label,show=show)
                 div_energy = nlsp.calculateenergy_betweenfreq_freq(div,freqrange)
                 snr.append(10*math.log10(div_energy[0]))
         else:

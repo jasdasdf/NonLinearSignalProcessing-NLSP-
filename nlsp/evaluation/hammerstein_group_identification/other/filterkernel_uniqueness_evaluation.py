@@ -4,15 +4,26 @@ import sumpf
 import nlsp
 import nlsp.common.plots as plot
 
-def filterkernel_evaluation_plot(reference_kernels, identified_kernels, Plot=True):
+# Applicable to only virtual nonlinear system
+# Find Uniqueness between reference and identified nonlinear system
+
+def filterkernel_evaluation_plot(reference_kernels, identified_kernels, Plot="total"):
+    dummy_sum = sumpf.modules.ConstantSignalGenerator(value=0.0, samplingrate=reference_kernels[0].GetSamplingRate(),
+                                                      length=len(reference_kernels[0])).GetSignal()
     identified_kernels = nlsp.change_length_filterkernels(identified_kernels,len(reference_kernels[0]))
     for i,(reference_kernel, identified_kernel) in enumerate(zip(reference_kernels,identified_kernels)):
         sub = identified_kernel - reference_kernel
-        sub = sumpf.modules.FourierTransform(sub).GetSpectrum()
-        print nlsp.calculateenergy_freq(sub),i
-        print
-        plot.relabelandplot(sub,"kernel %d difference" %(i+1),show=False)
-    plot.show()
+        dummy_sum = sub + dummy_sum
+        # sub = sumpf.modules.FourierTransform(sub).GetSpectrum()
+        # print nlsp.calculateenergy_freq(sub),i
+        if Plot is "individual":
+            plot.relabelandplot(reference_kernel,"kernel %d reference"%(i+1),show=False)
+            plot.relabelandplot(identified_kernel,"kernel %d identified"%(i+1),show=False)
+            plot.relabelandplot(sub,"kernel %d difference" %(i+1),show=True)
+        elif Plot is "total":
+            plot.relabelandplot(sub,"kernel %d difference" %(i+1),show=False)
+    if Plot is "total":
+        plot.relabelandplot(dummy_sum,"diff_sum",show=True,line='g^')
 
 def filterkernel_evaluation_sum(reference_kernels, identified_kernels, Plot=False):
     identified_kernels = nlsp.change_length_filterkernels(identified_kernels,len(reference_kernels[0]))
@@ -31,7 +42,7 @@ def filterkernel_evaluation_sum(reference_kernels, identified_kernels, Plot=Fals
         plot.relabelandplot(temp_identified,"identified sum",show=False)
         plot.relabelandplot(temp_reference,"reference sum",show=True)
     print "SNR between summed reference and identified kernels %r" %nlsp.snr(temp_reference,temp_identified)
-    print "Mean SNR between reference and identified kernels %r" %numpy.mean(snr_diff)
+    print "Mean SNR between reference and identified kernels %r,Individual SNR: %r" %(numpy.mean(snr_diff),snr_diff)
 
 def uniqueness_evaluation_allexceptadaptive():
     for method,input_generator,label in zip(iden_method,excitation,labels):
@@ -50,6 +61,7 @@ def uniqueness_evaluation_allexceptadaptive():
                                                          filter_irs=found_filter_spec,
                                                          max_harmonics=range(1,branches+1))
             filterkernel_evaluation_sum(filter_spec_tofind,found_filter_spec)
+            filterkernel_evaluation_plot(filter_spec_tofind,found_filter_spec)
             if Plot is True:
                 plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
                 plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
@@ -79,6 +91,7 @@ def uniqueness_evaluation_adaptive():
                                                          filter_irs=found_filter_spec,
                                                          max_harmonics=range(1,branches+1))
             filterkernel_evaluation_sum(filter_spec_tofind,found_filter_spec)
+            filterkernel_evaluation_plot(filter_spec_tofind,found_filter_spec)
             if Plot is True:
                 plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
                 plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
@@ -91,7 +104,7 @@ def uniqueness_evaluation_adaptive():
 sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
-length = 2**18
+length = 2**16
 fade_out = 0.00
 fade_in = 0.00
 branches = 5

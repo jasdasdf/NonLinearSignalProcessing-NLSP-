@@ -5,7 +5,7 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 start_freq = 100.0
 stop_freq = 20000.0
-length = 2**14
+length = 2**16
 fade_out = 0.00
 fade_in = 0.00
 branches = 5
@@ -62,3 +62,4 @@ for method,input_generator,label in zip(iden_method,excitation,labels):
 
     nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot)
     nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot)
+plot.show()

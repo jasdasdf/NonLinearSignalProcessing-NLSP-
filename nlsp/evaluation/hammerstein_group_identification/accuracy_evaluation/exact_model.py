@@ -17,6 +17,7 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot,label=Non
     input_signal = input_generator.GetOutput()
     # filter_spec_tofind = nlsp.create_bpfilter([2000,8000,30000],input_signal)
     filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+    # filter_spec_tofind = nlsp.log_chebyfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,
@@ -26,6 +27,8 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot,label=Non
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
+    # nlsp.filterkernel_evaluation_plot(filter_spec_tofind,found_filter_spec)
+    # nlsp.filterkernel_evaluation_sum(filter_spec_tofind,found_filter_spec)
     if Plot is True:
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
@@ -105,8 +108,8 @@ def hgmwithreversedfilter_evaluation(input_generator,branches,iden_method,Plot):
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
     print "SNR between Reference and Identified output with reversed filter orders: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
@@ -131,8 +134,8 @@ def hgmwithamplifiedfilter_evaluation(input_generator,branches,iden_method,Plot)
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
     print "SNR between Reference and Identified output with differently amplified filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
@@ -158,9 +161,9 @@ def hgmallpass_evaluation(input_generator,branches,iden_method,Plot):
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
     if Plot is True:
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
-        plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
-    print "SNR between Reference and Identified output with differently amplified filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
+        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+    print "SNR between Reference and Identified output with all pass filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
 
@@ -183,7 +186,7 @@ def puretone_evaluation(input_generator,branches,iden_method,Plot):
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
     print "SNR between Reference and Identified output sweep: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
-    pure_tones = nlsp.generate_puretones([1000,5000,10000],input_signal.GetSamplingRate(),length=len(input_signal))
+    pure_tones = nlsp.generate_puretones([200,1000,3000,5000,10000,20000],input_signal.GetSamplingRate(),length=len(input_signal))
     ref_nlsystem.SetInput(pure_tones)
     iden_nlsystem.SetInput(pure_tones)
     if Plot is True:

@@ -55,16 +55,15 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot):
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
-        ref_nlsystem_scaled = sumpf.modules.AmplifySignal(input=ref_nlsystem.GetOutput(),factor=sample_amp)
-
         found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=sample_signal,
                                                      nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
+        ref_nlsystem.SetInput(sample_signal)
 
         if Plot is True:
-            nlsp.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem_scaled.GetOutput()).GetSpectrum(),"Reference Output Scaled",False)
+            nlsp.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output Scaled",False)
             nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
-        print "SNR between Scaled Reference(amp:%r) and Identified(amp:%r) output: %r" %(excitation_amp,sample_amp,nlsp.snr(ref_nlsystem.GetOutput(),
+        print "SNR between Scaled Identified with(amp:%r) and Tested with(amp:%r) output: %r" %(excitation_amp,sample_amp,nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                                  iden_nlsystem.GetOutput()))

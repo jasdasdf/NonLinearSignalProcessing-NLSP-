@@ -194,3 +194,21 @@ def puretone_evaluation(input_generator,branches,iden_method,Plot):
         plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
     print "SNR between Reference and Identified output puretone: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
+
+def hgmwithalphafilter_evaluation(input_generator,branches,iden_method,Plot,label=None):
+    input_signal = input_generator.GetOutput()
+    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+    ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 filter_irs=filter_spec_tofind,
+                                                 max_harmonics=range(1,branches+1))
+    found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
+    iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                 nonlinear_functions=nl_functions,
+                                                 filter_irs=found_filter_spec,
+                                                 max_harmonics=range(1,branches+1))
+    if Plot is True:
+        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
+    print "SNR between Reference and Identified output with weighted filtering: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
+                                                                                             iden_nlsystem.GetOutput())

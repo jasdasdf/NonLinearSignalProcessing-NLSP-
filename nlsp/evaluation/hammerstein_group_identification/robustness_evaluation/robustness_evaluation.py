@@ -15,7 +15,7 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot):
     noise_sd = [0.3,0.5]
     for mean,sd in itertools.product(noise_mean,noise_sd):
         input_signal = input_generator.GetOutput()
-        filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+        filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
@@ -50,7 +50,7 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot):
     for excitation_amp,sample_amp in itertools.product(excitation_signal_amp,sample_signal_amp):
         input_signal = sumpf.modules.AmplifySignal(input=input,factor=excitation_amp).GetOutput()
         sample_signal = sumpf.modules.AmplifySignal(input=input,factor=sample_amp).GetOutput()
-        filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+        filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,

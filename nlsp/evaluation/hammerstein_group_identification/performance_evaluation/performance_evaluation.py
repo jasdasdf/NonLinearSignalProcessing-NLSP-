@@ -20,7 +20,7 @@ def differentlength_evaluation(input_generator,branches,iden_method,Plot):
     for signal_length, ref_length in zip(length_iden,length_ref):
         input_generator_ref.SetLength(ref_length)
         input_ref = input_generator_ref.GetOutput()
-        filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_ref)
+        filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_ref)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_ref,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
@@ -50,7 +50,7 @@ def differentbranches_evaluation(input_generator,branches,iden_method,Plot):
     for branches in range(3,branches+2):
         input_signal = input_generator.GetOutput()
 
-        filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+        filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
@@ -75,16 +75,16 @@ def computationtime_evaluation(input_generator,branches,iden_method,Plot):
     length = reversed([2**17,2**18,2**19])
     for branches,signal_length in itertools.product(branch,length):
 
-        simulation_time_start = time.clock()
         inputgenerator.SetLength(signal_length)
         input_signal = inputgenerator.GetOutput()
-        filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+        filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
         nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nl_func,
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
 
+        simulation_time_start = time.clock()
         identification_time_start = time.clock()
         found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
         identification_time_stop = time.clock()

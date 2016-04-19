@@ -5,7 +5,7 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 start_freq = 100.0
 stop_freq = 20000.0
-length = 2**16
+length = 2**18
 fade_out = 0.00
 fade_in = 0.00
 branches = 5
@@ -26,14 +26,14 @@ wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=le
 excitation = [sine,
               cos,
               wgn_normal,
-              wgn_uniform,
-              wgn_normal]
+              wgn_normal,
+              wgn_uniform,]
 iden_method = [nlsp.nonlinearconvolution_powerseries_temporalreversal,
                nlsp.nonlinearconvolution_chebyshev_temporalreversal,
                nlsp.miso_identification,
-               nlsp.wiener_g_identification_corr,
-               nlsp.adaptive_identification]
-labels = ["NL_powerseries","NL_chebyshev","MISO","WienerG","adaptive"]
+               nlsp.adaptive_identification,
+               nlsp.wiener_g_identification_corr]
+labels = ["NL_powerseries","NL_chebyshev","MISO","adaptive","WienerG"]
 
 for method,input_generator,label in zip(iden_method,excitation,labels):
     print method,input_generator
@@ -42,24 +42,28 @@ for method,input_generator,label in zip(iden_method,excitation,labels):
 
     nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
     nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,method,Plot)
-    # nlsp.linearmodel_evaluation(input_generator,branches,method,Plot)
-    # nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot)
-    # nlsp.hgmwithamplifiedfilter_evaluation(input_generator,branches,method,Plot)
-    # nlsp.hgmallpass_evaluation(input_generator,branches,method,Plot)
-    # nlsp.puretone_evaluation(input_generator,branches,method,Plot)
+    nlsp.linearmodel_evaluation(input_generator,branches,method,Plot)
+    nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot)
+    nlsp.hgmwithamplifiedfilter_evaluation(input_generator,branches,method,Plot)
+    nlsp.hgmallpass_evaluation(input_generator,branches,method,Plot)
+    nlsp.puretone_evaluation(input_generator,branches,method,Plot)
+    nlsp.hgmwithalphafilter_evaluation(input_generator,branches,method,Plot)
 
-    # nlsp.hardclipping_evaluation(input_generator,branches,method,Plot)
-    # nlsp.softclipping_evaluation(input_generator,branches,method,Plot)
-    # nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot)
+    nlsp.symmetric_hardclipping_evaluation(input_generator,branches,method,Plot)
+    nlsp.nonsymmetric_hardclipping_evaluation(input_generator,branches,method,Plot)
+    nlsp.softclipping_evaluation(input_generator,branches,method,Plot)
+    nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot)
+    nlsp.doublehgm_different_evaluation(input_generator,branches,method,Plot)
+    nlsp.doublehgm_samefilter_evaluation(input_generator,branches,method,Plot)
+    nlsp.doublehgm_samenl_evaluation(input_generator,branches,method,Plot)
 
     # performance evaluation
 
-    # nlsp.differentlength_evaluation(input_generator,branches,method,Plot)
-    # nlsp.differentbranches_evaluation(input_generator,branches,method,Plot)
-    # nlsp.computationtime_evaluation(input_generator,branches,method,Plot)
+    nlsp.differentlength_evaluation(input_generator,branches,method,Plot)
+    nlsp.differentbranches_evaluation(input_generator,branches,method,Plot)
+    nlsp.computationtime_evaluation(input_generator,branches,method,Plot)
 
     # robustness evaluation
 
-    # nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot)
-    # nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot)
-plot.show()
+    nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot)
+    nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot)

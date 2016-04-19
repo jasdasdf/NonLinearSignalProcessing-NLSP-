@@ -180,5 +180,5 @@ def doublehgm_different_evaluation(input_generator,branches,iden_method,Plot):
     if Plot is True:
         plot.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput(2)).GetSpectrum(),"Reference System",show=False)
         plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
-    print "SNR between Reference and Identified output for double hgm same nl: %r" %nlsp.snr(ref_nlsystem.GetOutput(2),
+    print "SNR between Reference and Identified output for double hgm different: %r" %nlsp.snr(ref_nlsystem.GetOutput(2),
                                                                                              iden_nlsystem.GetOutput())

@@ -318,5 +318,5 @@ def loudspeaker_model_sweepadaptive():
                                                                                              iden_nlsystem.GetOutput())
 
 loudspeaker_model_sweepadaptive()
-# loudspeaker_model_adaptive()
-# loudspeaker_model_sweep()
+loudspeaker_model_adaptive()
+loudspeaker_model_sweep()

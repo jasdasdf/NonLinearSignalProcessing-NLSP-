@@ -5,6 +5,9 @@ import sumpf
 import nlsp
 import matplotlib.pyplot as pyplot
 import os
+import mpl_toolkits.mplot3d as mplot3d
+import matplotlib.collections as PolyCollection
+import matplotlib.colors as colors
 
 max_freq = 40000.0
 scale_log = False

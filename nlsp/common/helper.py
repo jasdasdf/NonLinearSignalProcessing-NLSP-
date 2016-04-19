@@ -146,6 +146,22 @@ def log_bpfilter(start_freq=20.0,stop_freq=20000.0,branches=5,input=sumpf.Signal
     # filter_spec = [i for i in reversed(filter_spec)]
     return filter_spec
 
+def log_weightingfilter(stop_freq=20000.0,branches=5,input=sumpf.Signal(),amplify=True):
+    ip_prp = sumpf.modules.ChannelDataProperties()
+    ip_prp.SetSignal(input)
+    frequencies = [stop_freq,]*branches
+    filter_spec = []
+    for i,freq in enumerate(frequencies):
+        alpha_filter = sumpf.modules.WeightingFilterGenerator(weighting=sumpf.modules.WeightingFilterGenerator.C,resolution=1.0,length=24000.0)
+        alpha_filter.SetMaximumFrequency(frequency=freq)
+        spec = alpha_filter.GetSpectrum()
+        if amplify is True:
+            amp = 1.0 / (i+1)
+            spec = sumpf.modules.AmplifySpectrum(input=spec,factor=amp).GetOutput()
+        filter_spec.append(sumpf.modules.InverseFourierTransform(spec).GetSignal())
+    # filter_spec = [i for i in reversed(filter_spec)]
+    return filter_spec
+
 def log_chebyfilter(start_freq=20.0,stop_freq=20000.0,branches=5,input=sumpf.Signal(),amplify=False):
     """
     Generates logarithmically seperated low pass filters between start and stop frequencies.
@@ -169,8 +185,12 @@ def log_chebyfilter(start_freq=20.0,stop_freq=20000.0,branches=5,input=sumpf.Sig
         frequencies.append(100 * (dummy**i))
     filter_spec = []
     for freq in frequencies:
-        spec =  (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.CHEBYCHEV1(order=2),
+        spec =  (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.CHEBYCHEV1(order=100),
                                             frequency=freq,
+                                            resolution=ip_prp.GetResolution(),
+                                            length=ip_prp.GetSpectrumLength()).GetSpectrum())*\
+                (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.CHEBYCHEV1(order=100),
+                                            frequency=freq/2,transform=True,
                                             resolution=ip_prp.GetResolution(),
                                             length=ip_prp.GetSpectrumLength()).GetSpectrum())
         if amplify is True:

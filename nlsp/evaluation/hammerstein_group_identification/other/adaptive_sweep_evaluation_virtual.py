@@ -73,10 +73,10 @@ def adaptive_initializedwith_sweep():
 sampling_rate = 48000.0
 start_freq = 100.0
 stop_freq = 20000.0
-length = 2**18
+length = 2**15
 fade_out = 0.00
 fade_in = 0.00
-filter_taps = 2**11
+filter_taps = 2**10
 branches = 3
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()

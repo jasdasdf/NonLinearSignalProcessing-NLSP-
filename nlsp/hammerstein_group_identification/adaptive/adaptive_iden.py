@@ -4,7 +4,7 @@ import numpy
 import nlsp.common.plots as plot
 import adaptfilt as adf
 
-def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.power_series, iterations=1, step_size=0.1, filtertaps=2**11,
+def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.hermite_polynomial, iterations=1, step_size=0.1, filtertaps=2**11,
                             algorithm=nlsp.multichannel_nlms, init_coeffs=None, Plot=False, label=None):
 
     if hasattr(input_generator,"GetOutput"):
@@ -40,9 +40,9 @@ def adaptive_identification(input_generator, outputs, branches=5, nonlinear_func
         SNR[i] = nlsp.snr(outputs,iden_nlsystem.GetOutput())[0]
         error_energy[i] = nlsp.calculateenergy_time(error)[0]
         iteration[i] = (i+1)*(len(input)-filtertaps+1)
-        print "SNR          %r, iteration %r" %(SNR[i],iteration[i])
-        print "Error energy %r, iteration %r" %(error_energy[i],iteration[i])
-        print
+        # print "SNR          %r, iteration %r" %(SNR[i],iteration[i])
+        # print "Error energy %r, iteration %r" %(error_energy[i],iteration[i])
+        # print
 
     # if Plot is True:
     #     # plot.plot_simplearray(iteration,SNR,"Iterations","SNR between ref and iden",show=False)

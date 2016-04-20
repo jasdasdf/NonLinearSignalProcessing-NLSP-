@@ -33,13 +33,13 @@ def wgnasreference():
     iden_nlsystem = nlsp.HammersteinGroupModel_up(max_harmonics=range(1,branches+1),nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                   filter_irs=[impulse,]*branches)
 
-    # # only sine based system identification
-    # found_filter_spec_sine, nl_function_sine = nlsp.nonlinearconvolution_powerseries_temporalreversal(sine_g,output_sine,branches)
-    # iden_nlsystem.SetInput(signal=input_noise)
-    # iden_nlsystem.SetNLFunctions(nl_function_sine)
-    # iden_nlsystem.SetFilterIRS(found_filter_spec_sine)
-    # plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified power noise",show=False)
-    # print "SNR between Reference and Identified output Sine: %r" %nlsp.snr(output_noise, iden_nlsystem.GetOutput())
+    # only sine based system identification
+    found_filter_spec_sine, nl_function_sine = nlsp.nonlinearconvolution_powerseries_temporalreversal(sine_g,output_sine,branches)
+    iden_nlsystem.SetInput(signal=input_noise)
+    iden_nlsystem.SetNLFunctions(nl_function_sine)
+    iden_nlsystem.SetFilterIRS(found_filter_spec_sine)
+    plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified power noise",show=False)
+    print "SNR between Reference and Identified output Sine: %r" %nlsp.snr(output_noise, iden_nlsystem.GetOutput())
 
     # only cosine based system identification
     found_filter_spec_cos, nl_function_cos = nlsp.nonlinearconvolution_chebyshev_temporalreversal(cos_g,output_cos,branches)
@@ -58,15 +58,15 @@ def wgnasreference():
     plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Adapt noise",show=False)
     print "SNR between Reference and Identified output Adapt: %r" %nlsp.snr(output_noise, iden_nlsystem.GetOutput())
 
-    # # sine based as init coeff for noise based system identification
-    # found_filter_spec_sine_reducedlength = nlsp.change_length_filterkernels(found_filter_spec_sine,length=filter_taps)
-    # found_filter_spec_sineadapt, nl_function_sineadapt = nlsp.adaptive_identification(input_generator=input_noise,outputs=output_noise,iterations=1,branches=branches,
-    #                                                                step_size=0.1,filtertaps=filter_taps,algorithm=nlsp.multichannel_nlms,Plot=False,init_coeffs=found_filter_spec_sine_reducedlength)
-    # iden_nlsystem.SetInput(signal=input_noise)
-    # iden_nlsystem.SetNLFunctions(nl_function_sineadapt)
-    # iden_nlsystem.SetFilterIRS(found_filter_spec_sineadapt)
-    # plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified power Adapt noise",show=False)
-    # print "SNR between Reference and Identified output Sine Adapt: %r" %nlsp.snr(output_noise, iden_nlsystem.GetOutput())
+    # sine based as init coeff for noise based system identification
+    found_filter_spec_sine_reducedlength = nlsp.change_length_filterkernels(found_filter_spec_sine,length=filter_taps)
+    found_filter_spec_sineadapt, nl_function_sineadapt = nlsp.adaptive_identification(input_generator=input_noise,outputs=output_noise,iterations=1,branches=branches,
+                                                                   step_size=0.1,filtertaps=filter_taps,algorithm=nlsp.multichannel_nlms,Plot=False,init_coeffs=found_filter_spec_sine_reducedlength)
+    iden_nlsystem.SetInput(signal=input_noise)
+    iden_nlsystem.SetNLFunctions(nl_function_sineadapt)
+    iden_nlsystem.SetFilterIRS(found_filter_spec_sineadapt)
+    plot.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified power Adapt noise",show=False)
+    print "SNR between Reference and Identified output Sine Adapt: %r" %nlsp.snr(output_noise, iden_nlsystem.GetOutput())
 
     # cos based as init coeff for noise based system identification
     found_filter_spec_cos_reducedlength = nlsp.change_length_filterkernels(found_filter_spec_cos,length=filter_taps)
@@ -317,6 +317,4 @@ def loudspeaker_model_sweepadaptive():
     print "Distortion box, SNR between Reference and Identified output Sample,nl: %r" %nlsp.snr(output_sample,
                                                                                              iden_nlsystem.GetOutput())
 
-loudspeaker_model_sweepadaptive()
-loudspeaker_model_adaptive()
-loudspeaker_model_sweep()
+wgnasreference()

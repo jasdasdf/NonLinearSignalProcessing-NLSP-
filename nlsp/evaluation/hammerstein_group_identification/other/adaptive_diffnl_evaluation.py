@@ -57,7 +57,7 @@ wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=le
                                    stop_frequency=stop_freq, distribution=uniform)
 wgn_gamma = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, distribution=gamma)
-excitation = [wgn_gamma, wgn_normal, wgn_uniform]
+excitation = [wgn_gamma]
 nl_functions = [nlsp.function_factory.power_series, nlsp.function_factory.chebyshev1_polynomial,
                 nlsp.function_factory.legrendre_polynomial, nlsp.function_factory.hermite_polynomial]
 adaptive_polynomial_evaluation()

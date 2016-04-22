@@ -14,7 +14,7 @@ def symmetric_hardclipping_evaluation(input_generator,branches,iden_method,Plot)
     plot - the virtual nl system output and the identified nl system output
     expectation - utmost similarity between the two outputs
     """
-    for t in range(8,11):
+    for t in range(6,13):
         t = t / 10.0
         thresholds = [-t,t]
         input_signal = input_generator.GetOutput()

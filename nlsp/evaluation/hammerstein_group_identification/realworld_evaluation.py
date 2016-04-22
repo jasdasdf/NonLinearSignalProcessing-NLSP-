@@ -1,6 +1,6 @@
 import nlsp
 
-branches = range(1,6,1)
+branches = range(5,6,1)
 
 for branch in branches:
     print "Number of branches %r" %branch

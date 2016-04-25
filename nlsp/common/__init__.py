@@ -33,7 +33,7 @@ from mse import mean_squared_error_freq,mean_squared_error_freq_range,mean_squar
 
 from soft_clipping import NLClipSignal
 
-from sweep import WindowedSweepGenerator, NovakSweepGenerator_Sine, NovakSweepGenerator_Cosine, SquareSweepGenerator
+from sweep import WindowedSweepGenerator, NovakSweepGenerator_Sine, NovakSweepGenerator_Cosine, SquareSweepGenerator, FarinaSweepGenerator_Sine
 
 from plots import *
 
@@ -46,3 +46,5 @@ from gaussian import WhiteGaussianGenerator
 from multichannel_adaptive_filter import multichannel_nlms,nlms,ap,lms,multichannel_ap_ideal,multichannel_nlms_ideal
 
 from filter_kernel_evaluation import filterkernel_evaluation_plot,filterkernel_evaluation_sum
+
+from harmonic import getnl_ir

@@ -3,7 +3,7 @@ import nlsp
 import itertools
 import nlsp.common.plots as plot
 
-def robustness_noise_evaluation(input_generator,branches,iden_method,Plot):
+def robustness_noise_evaluation(input_generator,branches,iden_method,Plot,reference=None):
     """
     Evaluation of System Identification method robustness by adding noise
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and bandpass filters
@@ -32,7 +32,11 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot):
                                                      nonlinear_functions=nl_functions,
                                                      filter_irs=noise_filter_spec,
                                                      max_harmonics=range(1,branches+1))
-
+        if reference is not None:
+            reference = nlsp.change_length_signal(reference,length=len(input_signal))
+            ref_nlsystem.SetInput(reference)
+            iden_nlsystem.SetInput(reference)
+            noise_iden_nlsystem.SetInput(reference)
         if Plot is True:
             nlsp.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",False)
             nlsp.relabelandplotphase(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",False)
@@ -42,7 +46,7 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot):
         print "SNR between Reference and Identified output with noise of sd %r and mean %r is %r" %(sd,mean,nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                                  noise_iden_nlsystem.GetOutput()))
 
-def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot):
+def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot,reference=None):
 
     excitation_signal_amp = [0.5,0.7,1.0,1.5,2.0]
     sample_signal_amp = [0.5,0.7,1.0,1.5,2.0]
@@ -61,7 +65,11 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot):
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         ref_nlsystem.SetInput(sample_signal)
-
+        if reference is not None:
+            reference = nlsp.change_length_signal(reference,length=len(input_signal))
+            reference = sumpf.modules.AmplifySignal(input=reference,factor=sample_amp).GetOutput()
+            ref_nlsystem.SetInput(reference)
+            iden_nlsystem.SetInput(reference)
         if Plot is True:
             nlsp.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output Scaled",False)
             nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)

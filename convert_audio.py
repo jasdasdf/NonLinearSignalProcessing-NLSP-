@@ -4,7 +4,7 @@ import os
 
 from_format = sumpf.modules.SignalFile.NUMPY_NPZ
 to_format = sumpf.modules.SignalFile.WAV_FLOAT
-directory = "C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/noise/"
+directory = "C:/Users/diplomand.8/Desktop/nl_recordings/rec_5_ls/noise/"
 
 def get_filepaths(directory):
     """
@@ -29,6 +29,7 @@ def convert_audio():
         print filename
         load = sumpf.modules.SignalFile(filename=filename,
                                         format=from_format)
+        print len(load.GetSignal())
         save = sumpf.modules.SignalFile(filename=filename,
                                         signal=load.GetSignal(),
                                         format=to_format)
@@ -37,24 +38,31 @@ def generate_audio():
     sampling_rate = 48000.0
     start_freq = 20.0
     stop_freq = 20000.0
-    length = 2**16
+    length = 2**18
     normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
     uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
     gamma = sumpf.modules.NoiseGenerator.GammaDistribution()
+    pink = sumpf.modules.NoiseGenerator.PinkNoise()
     wgn_normal = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                        stop_frequency=stop_freq, distribution=normal)
     wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                        stop_frequency=stop_freq, distribution=uniform)
     wgn_gamma = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                        stop_frequency=stop_freq, distribution=gamma)
-    save_normal = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/wgn_normal_16",
+    wgn_pink = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                       stop_frequency=stop_freq, distribution=pink)
+
+    save_normal = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/wgn_normal_18",
                                         signal=wgn_normal.GetOutput(),
                                         format=sumpf.modules.SignalFile.NUMPY_NPZ)
-    save_uniform = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/wgn_uniform_16",
+    save_uniform = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/wgn_uniform_18",
                                         signal=wgn_uniform.GetOutput(),
                                         format=sumpf.modules.SignalFile.NUMPY_NPZ)
-    save_gamma = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/wgn_gamma_16",
+    save_gamma = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/wgn_gamma_18",
                                         signal=wgn_gamma.GetOutput(),
+                                        format=sumpf.modules.SignalFile.NUMPY_NPZ)
+    save_pink = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/wgn_pink_18",
+                                        signal=wgn_pink.GetOutput(),
                                         format=sumpf.modules.SignalFile.NUMPY_NPZ)
 
 convert_audio()

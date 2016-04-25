@@ -1,5 +1,6 @@
 import numpy
 import mpmath
+import sumpf
 
 def power_series(degree):
     def func(channel):
@@ -47,4 +48,11 @@ def laguerre_polynomial(degree):
         for i in range(0,len(channel)):
             channell.append(float(mpmath.laguerre(degree,0,channel[i])))
         return numpy.asarray(channell)
+    return func
+
+def hardclip(threshold):
+    def func(channel):
+        signal = sumpf.Signal(channels=(channel,), samplingrate=48000, labels=("nl",))
+        clipped = sumpf.modules.ClipSignal(signal=signal,thresholds=threshold)
+        return numpy.asarray(clipped.GetOutput().GetChannels()[0])
     return func

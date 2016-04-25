@@ -5,14 +5,15 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 start_freq = 100.0
 stop_freq = 20000.0
-length = 2**12
+length = 2**15
 fade_out = 0.00
 fade_in = 0.00
-branches = 2
+branches = 3
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
+pink = sumpf.modules.NoiseGenerator.PinkNoise()
 
-Plot = True
+Plot = False
 Save = False
 
 sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
@@ -23,6 +24,8 @@ wgn_normal = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=len
                                    stop_frequency=stop_freq, distribution=normal)
 wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, distribution=uniform)
+wgn_pink = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, distribution=pink)
 excitation = [sine,
               cos,
               wgn_normal,
@@ -34,91 +37,96 @@ iden_method = [nlsp.nonlinearconvolution_powerseries_temporalreversal,
                nlsp.adaptive_identification,
                nlsp.wiener_g_identification_corr]
 labels = ["NL_powerseries","NL_chebyshev","MISO","adaptive","WienerG"]
+reference = wgn_pink.GetOutput()
 
 for method,input_generator,label in zip(iden_method,excitation,labels):
     print method,input_generator
     try:
-        nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot)
+        nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
     try:
-        nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,method,Plot)
+        nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
     try:
-        nlsp.linearmodel_evaluation(input_generator,branches,method,Plot)
+        nlsp.linearmodel_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
     try:
-        nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot)
+        nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
     try:
-        nlsp.hgmwithamplifiedfilter_evaluation(input_generator,branches,method,Plot)
+        nlsp.hgmwithamplifiedfilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
     try:
-        nlsp.hgmallpass_evaluation(input_generator,branches,method,Plot)
+        nlsp.hgmallpass_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
     try:
-        nlsp.puretone_evaluation(input_generator,branches,method,Plot)
+        nlsp.puretone_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
     try:
-        nlsp.hgmwithalphafilter_evaluation(input_generator,branches,method,Plot)
-    except:
-        continue
-
-
-
-    try:
-        nlsp.symmetric_hardclipping_evaluation(input_generator,branches,method,Plot)
-    except:
-        continue
-    try:
-        nlsp.nonsymmetric_hardclipping_evaluation(input_generator,branches,method,Plot)
-    except:
-        continue
-    try:
-        nlsp.softclipping_evaluation(input_generator,branches,method,Plot)
-    except:
-        continue
-    try:
-        nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot)
-    except:
-        continue
-    try:
-        nlsp.doublehgm_different_evaluation(input_generator,branches,method,Plot)
-    except:
-        continue
-    try:
-        nlsp.doublehgm_samefilter_evaluation(input_generator,branches,method,Plot)
-    except:
-        continue
-    try:
-        nlsp.doublehgm_samenl_evaluation(input_generator,branches,method,Plot)
+        nlsp.hgmwithalphafilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
 
 
 
-
-
     try:
-        nlsp.differentlength_evaluation(input_generator,branches,method,Plot)
+        nlsp.symmetric_hardclipping_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
     try:
-        nlsp.differentbranches_evaluation(input_generator,branches,method,Plot)
+        nlsp.clippingHGMevaluation(input_generator,branches,method,Plot,reference)
+    except:
+        continue
+    try:
+        nlsp.nonsymmetric_hardclipping_evaluation(input_generator,branches,method,Plot,reference)
+    except:
+        continue
+    try:
+        nlsp.softclipping_evaluation(input_generator,branches,method,Plot,reference)
+    except:
+        continue
+    try:
+        nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot,reference)
+    except:
+        continue
+    try:
+        nlsp.doublehgm_different_evaluation(input_generator,branches,method,Plot,reference)
+    except:
+        continue
+    try:
+        nlsp.doublehgm_samefilter_evaluation(input_generator,branches,method,Plot,reference)
+    except:
+        continue
+    try:
+        nlsp.doublehgm_samenl_evaluation(input_generator,branches,method,Plot,reference)
+    except:
+        continue
+
+
+
+
+
+    try:
+        nlsp.differentlength_evaluation(input_generator,branches,method,Plot,reference)
+    except:
+        continue
+    try:
+        nlsp.differentbranches_evaluation(input_generator,branches,method,Plot,reference)
     except:
         print "different branches exception"
     try:
-        nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot)
+        nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
     try:
-        nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot)
+        nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot,reference)
     except:
         continue
 

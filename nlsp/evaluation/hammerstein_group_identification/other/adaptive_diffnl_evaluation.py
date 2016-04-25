@@ -25,7 +25,8 @@ def adaptive_polynomial_evaluation_virtual():
                                                      nonlinear_functions=nl_func,
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
-        nlsp.filterkernel_evaluation_sum(filter_spec_tofind,found_filter_spec)
+        ref_nlsystem.SetInput(wgn_pink.GetOutput())
+        iden_nlsystem.SetInput(wgn_pink.GetOutput())
         if Plot is True:
             plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
             plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
@@ -39,12 +40,16 @@ def adaptive_polynomial_evaluation_realworld():
     load_wgn_normal = sumpf.modules.SignalFile(filename=os.path.join(source_dir,"wgn_normal_16.npz"), format=sumpf.modules.SignalFile.WAV_FLOAT)
     load_wgn_uniform = sumpf.modules.SignalFile(filename=os.path.join(source_dir,"wgn_uniform_16.npz"), format=sumpf.modules.SignalFile.WAV_FLOAT)
     load_wgn_gamma = sumpf.modules.SignalFile(filename=os.path.join(source_dir,"wgn_gamma_16.npz"), format=sumpf.modules.SignalFile.WAV_FLOAT)
+    load_wgn_pink = sumpf.modules.SignalFile(filename=os.path.join(source_dir,"wgn_pink_16.npz"), format=sumpf.modules.SignalFile.WAV_FLOAT)
     input_wgn_normal = sumpf.modules.SplitSignal(data=load_wgn_normal.GetSignal(),channels=[0]).GetOutput()
     output_wgn_normal = sumpf.modules.SplitSignal(data=load_wgn_normal.GetSignal(),channels=[1]).GetOutput()
     input_wgn_uniform = sumpf.modules.SplitSignal(data=load_wgn_uniform.GetSignal(),channels=[0]).GetOutput()
     output_wgn_uniform = sumpf.modules.SplitSignal(data=load_wgn_uniform.GetSignal(),channels=[1]).GetOutput()
     input_wgn_gamma = sumpf.modules.SplitSignal(data=load_wgn_gamma.GetSignal(),channels=[0]).GetOutput()
     output_wgn_gamma = sumpf.modules.SplitSignal(data=load_wgn_gamma.GetSignal(),channels=[1]).GetOutput()
+    input_wgn_pink = sumpf.modules.SplitSignal(data=load_wgn_pink.GetSignal(),channels=[0]).GetOutput()
+    output_wgn_pink = sumpf.modules.SplitSignal(data=load_wgn_pink.GetSignal(),channels=[1]).GetOutput()
+
     for nlfunc in nl_functions:
         print nlfunc
         found_filter_spec_normal, nl_func_normal = nlsp.adaptive_identification(input_wgn_normal,output_wgn_normal,branches,nonlinear_func=nlfunc)
@@ -62,34 +67,38 @@ def adaptive_polynomial_evaluation_realworld():
                                                              nonlinear_functions=nl_func_gamma,
                                                              filter_irs=found_filter_spec_gamma,
                                                              max_harmonics=range(1,branches+1))
+        iden_nlsystem_normal.SetInput(input_wgn_pink)
+        iden_nlsystem_gamma.SetInput(input_wgn_pink)
+        iden_nlsystem_uniform.SetInput(input_wgn_pink)
         if Plot is True:
-            plot.relabelandplot(sumpf.modules.FourierTransform(output_wgn_normal).GetSpectrum(),"Reference Output",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(output_wgn_pink).GetSpectrum(),"Reference Output",show=False)
             plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem_normal.GetOutput()).GetSpectrum(),"Identified Output",show=True)
-        print "SNR between Reference and Identified output without overlapping filters Normal: %r" %nlsp.snr(output_wgn_normal,
+        print "SNR between Reference and Identified output without overlapping filters Normal: %r" %nlsp.snr(output_wgn_pink,
                                                                                              iden_nlsystem_normal.GetOutput())
         if Plot is True:
-            plot.relabelandplot(sumpf.modules.FourierTransform(output_wgn_uniform).GetSpectrum(),"Reference Output",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(output_wgn_pink).GetSpectrum(),"Reference Output",show=False)
             plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem_uniform.GetOutput()).GetSpectrum(),"Identified Output",show=True)
-        print "SNR between Reference and Identified output without overlapping filters Uniform: %r" %nlsp.snr(output_wgn_uniform,
+        print "SNR between Reference and Identified output without overlapping filters Uniform: %r" %nlsp.snr(output_wgn_pink,
                                                                                              iden_nlsystem_uniform.GetOutput())
         if Plot is True:
-            plot.relabelandplot(sumpf.modules.FourierTransform(output_wgn_gamma).GetSpectrum(),"Reference Output",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(output_wgn_pink).GetSpectrum(),"Reference Output",show=False)
             plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem_gamma.GetOutput()).GetSpectrum(),"Identified Output",show=True)
-        print "SNR between Reference and Identified output without overlapping filters Gamma: %r" %nlsp.snr(output_wgn_gamma,
+        print "SNR between Reference and Identified output without overlapping filters Gamma: %r" %nlsp.snr(output_wgn_pink,
                                                                                              iden_nlsystem_gamma.GetOutput())
 
 
 sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
-length = 2**18
+length = 2**16
 fade_out = 0.00
 fade_in = 0.00
 branches = 5
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
 gamma = sumpf.modules.NoiseGenerator.GammaDistribution()
-source_dir = "C:/Users/diplomand.8/Desktop/nl_recordings/rec_4_ls/"
+pink = sumpf.modules.NoiseGenerator.PinkNoise()
+source_dir = "C:/Users/diplomand.8/Desktop/nl_recordings/rec_5_ls/"
 
 Plot = False
 Save = False
@@ -104,7 +113,10 @@ wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=le
                                    stop_frequency=stop_freq, distribution=uniform)
 wgn_gamma = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, distribution=gamma)
+wgn_pink = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                   stop_frequency=stop_freq, distribution=pink)
 excitation = [wgn_uniform,wgn_normal,wgn_gamma]
-nl_functions = [nlsp.function_factory.hermite_polynomial,nlsp.function_factory.legrendre_polynomial]
-# adaptive_polynomial_evaluation_virtual()
-adaptive_polynomial_evaluation_realworld()
+nl_functions = [nlsp.function_factory.hermite_polynomial,nlsp.function_factory.legrendre_polynomial,
+                nlsp.function_factory.power_series,nlsp.function_factory.chebyshev1_polynomial]
+adaptive_polynomial_evaluation_virtual()
+# adaptive_polynomial_evaluation_realworld()

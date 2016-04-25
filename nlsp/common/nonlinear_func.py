@@ -40,6 +40,11 @@ class NonlinearFunction(object):
         return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.laguerre_polynomial(degree),
                                  max_harm=degree)
 
+    @staticmethod
+    def clipping(threshold, signal=None):
+        return NonlinearFunction(signal=signal, nonlin_func=nlsp.function_factory.clipsignal(threshold),
+                                 max_harm=1)
+
 
     def __init__(self, signal=None, nonlin_func=lambda x: x, max_harm=1):
         """

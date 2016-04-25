@@ -441,6 +441,14 @@ def dot_product(signal1=None,signal2=None):
         energy_allchannels.append(numpy.sum(energy_singlechannel))
     return energy_allchannels
 
+def change_length_signal(signal,length=None):
+    if length is None:
+        length = len(signal)
+    if len(signal) > length:
+        signal = sumpf.modules.CutSignal(signal=filter,start=0,stop=length).GetOutput()
+    else:
+        signal = nlsp.append_zeros(signal,length)
+    return signal
 
 def change_length_filterkernels(filter_kernels,length=2**10):
     filter_kernels_modified = []

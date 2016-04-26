@@ -14,8 +14,8 @@ def differentlength_evaluation(input_generator,branches,iden_method,Plot,referen
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    length_ref = [2**15,2**16,2**17]
-    length_iden = [2**15,2**16,2**17]
+    length_ref = [2**15,2**16,2**17,2**18]
+    length_iden = [2**15,2**16,2**17,2**18]
     input_generator_ref = input_generator
     input_generator_iden = input_generator
     for signal_length, ref_length in zip(length_iden,length_ref):

@@ -8,7 +8,7 @@ stop_freq = 20000.0
 length = 2**15
 fade_out = 0.00
 fade_in = 0.00
-branches = 3
+branches = 5
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
 pink = sumpf.modules.NoiseGenerator.PinkNoise()
@@ -44,70 +44,70 @@ for method,input_generator,label in zip(iden_method,excitation,labels):
     try:
         nlsp.hgmwithfilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "hgm with filter exception"
     try:
         nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "hgm with overlap filter exception"
     try:
         nlsp.linearmodel_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "linear model exception"
     try:
         nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "hgm with reversed filter exception"
     try:
         nlsp.hgmwithamplifiedfilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "amplified filter exception"
     try:
         nlsp.hgmallpass_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "allpass filter exception"
     try:
         nlsp.puretone_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "puretone exception"
     try:
         nlsp.hgmwithalphafilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "weighted filtering exception"
 
 
 
     try:
         nlsp.symmetric_hardclipping_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "symmetric hardclipping exception"
     try:
         nlsp.clippingHGMevaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "symmetric clipping HGM exception"
     try:
         nlsp.nonsymmetric_hardclipping_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "nonsymmetric hardclipping exception"
     try:
         nlsp.softclipping_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "soft clipping exception"
     try:
         nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "double hgm all same exception"
     try:
         nlsp.doublehgm_different_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "double hgm all different exception"
     try:
         nlsp.doublehgm_samefilter_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "double hgm same filter exception"
     try:
         nlsp.doublehgm_samenl_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "double hgm same nl exception"
 
 
 
@@ -116,7 +116,7 @@ for method,input_generator,label in zip(iden_method,excitation,labels):
     try:
         nlsp.differentlength_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "different length exception"
     try:
         nlsp.differentbranches_evaluation(input_generator,branches,method,Plot,reference)
     except:
@@ -124,11 +124,11 @@ for method,input_generator,label in zip(iden_method,excitation,labels):
     try:
         nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "robustness excitation exception"
     try:
         nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot,reference)
     except:
-        continue
+        print "robustness noise exception"
 
 
 for method,input_generator in zip(iden_method,excitation):
@@ -136,9 +136,9 @@ for method,input_generator in zip(iden_method,excitation):
     try:
         nlsp.computationtime_evaluation(input_generator,branches,method,Plot)
     except:
-        continue
+        print "computation time evaluation exception"
 try:
     nlsp.computationtime_adaptive_evaluation(wgn_uniform,branches)
 except:
-    print "Error"
+    print "adaptive identification computation time evaluation exception"
 

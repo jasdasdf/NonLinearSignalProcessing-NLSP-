@@ -496,3 +496,16 @@ def calculate_sdr_add(reference_kernel_array, identified_kernel_array, plot=Fals
         nlsp.common.plots.plot_sdrvsfreq(dummy_ref,dummy_iden,label="kernel difference sum",show=True)
     print "distortion energy: %r" %nlsp.calculateenergy_betweenfreq_freq(distortion,[100,19000])
     return nlsp.calculateenergy_betweenfreq_freq(distortion,[100,19000])
+
+def multichanneltoarray(multichannelsignalorspectrum):
+    if isinstance(multichannelsignalorspectrum,sumpf.Signal):
+        s_array = []
+        for i in range(len(multichannelsignalorspectrum.GetChannels())):
+            s = sumpf.modules.SplitSignal(multichannelsignalorspectrum,channels=i).GetOutput()
+            s_array.append(s)
+    elif isinstance(multichannelsignalorspectrum,sumpf.Spectrum):
+        s_array = []
+        for i in range(len(multichannelsignalorspectrum.GetChannels())):
+            s = sumpf.modules.SplitSpectrum(multichannelsignalorspectrum,channels=i).GetOutput()
+            s_array.append(s)
+    return s_array

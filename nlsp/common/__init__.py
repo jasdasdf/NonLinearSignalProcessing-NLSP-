@@ -12,7 +12,7 @@ from helper import get_impulse_response, get_sweep_harmonics_ir, get_sweep_harmo
 
 from helper import cut_spectrum, relabel, nl_branches, add_noise, change_length_filterkernels, change_length_signal
 
-from helper import get_nl_impulse_response, get_nl_harmonics, harmonicsvsall_energyratio_nl, get_nl_harmonics_iden, dot_product
+from helper import get_nl_impulse_response, get_nl_harmonics, harmonicsvsall_energyratio_nl, get_nl_harmonics_iden, dot_product, multichanneltoarray
 
 from helper import harmonicsvsall_energyratio,create_bpfilter,binomial,get_mean,calculate_sdr,calculate_sdr_add
 
@@ -48,3 +48,5 @@ from multichannel_adaptive_filter import multichannel_nlms,nlms,ap,lms,multichan
 from filter_kernel_evaluation import filterkernel_evaluation_plot,filterkernel_evaluation_sum
 
 from harmonic import getnl_ir
+
+from saveandload import load_systemidentification, save_systemidentification, systemidentification

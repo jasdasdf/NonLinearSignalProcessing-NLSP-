@@ -444,8 +444,8 @@ def dot_product(signal1=None,signal2=None):
 def change_length_signal(signal,length=None):
     if length is None:
         length = len(signal)
-    if len(signal) > length:
-        signal = sumpf.modules.CutSignal(signal=filter,start=0,stop=length).GetOutput()
+    if len(signal) >= length:
+        signal = sumpf.modules.CutSignal(signal=signal,start=0,stop=length).GetOutput()
     else:
         signal = nlsp.append_zeros(signal,length)
     return signal

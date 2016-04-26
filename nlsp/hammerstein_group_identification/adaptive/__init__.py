@@ -1,2 +1,2 @@
-from .adaptive_iden import adaptive_identification
+from .adaptive_iden import adaptive_identification_powerseries, adaptive_identification_chebyshev, adaptive_identification_hermite, adaptive_identification_legendre
 

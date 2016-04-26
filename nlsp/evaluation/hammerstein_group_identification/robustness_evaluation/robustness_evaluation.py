@@ -72,3 +72,49 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot,r
             nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
         print "SNR between Scaled Identified with(amp:%r) and Tested with(amp:%r) output: %r" %(excitation_amp,sample_amp,nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                                  iden_nlsystem.GetOutput()))
+
+def robustness_differentexcitation_evaluation(input_generator,branches,iden_method,Plot):
+    input_signal = input_generator.GetOutput()
+    sampling_rate = input_signal.GetSamplingRate()
+    start_freq = input_generator.GetStartFrequency()
+    stop_freq = input_generator.GetStopFrequency()
+    length = len(input_signal)
+    normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
+    uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
+    pink = sumpf.modules.NoiseGenerator.PinkNoise()
+    laplace = sumpf.modules.NoiseGenerator.LaplaceDistribution(mean=0.0,scale=0.3)
+
+    sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                       stop_frequency=stop_freq)
+    cos = nlsp.NovakSweepGenerator_Cosine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                       stop_frequency=stop_freq)
+    wgn_normal = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                       stop_frequency=stop_freq, distribution=normal)
+    wgn_uniform = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                       stop_frequency=stop_freq, distribution=uniform)
+    wgn_pink = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                       stop_frequency=stop_freq, distribution=pink)
+    wgn_laplace = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
+                                       stop_frequency=stop_freq, distribution=laplace)
+    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+    ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 filter_irs=filter_spec_tofind,
+                                                 max_harmonics=range(1,branches+1))
+    found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
+    iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                  nonlinear_functions=nl_functions,
+                                                  filter_irs=found_filter_spec,
+                                                  max_harmonics=range(1,branches+1))
+    inputs = [sine,cos,wgn_normal,wgn_uniform,wgn_pink,wgn_laplace]
+    print "SNR between reference and identified output: %r" %(nlsp.snr(ref_nlsystem.GetOutput(),iden_nlsystem.GetOutput()))
+    for input in inputs:
+        ref_nlsystem.SetInput(input.GetOutput())
+        iden_nlsystem.SetInput(input.GetOutput())
+        if Plot is True:
+            nlsp.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output Scaled",False)
+            nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)
+        print "SNR between reference and identified output: %r for inputsignal: %r" %(nlsp.snr(ref_nlsystem.GetOutput(),
+                                                                                               iden_nlsystem.GetOutput()),str(input))
+        print
+        print

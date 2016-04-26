@@ -53,7 +53,9 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot,r
     input = input_generator.GetOutput()
     for excitation_amp,sample_amp in itertools.product(excitation_signal_amp,sample_signal_amp):
         input_signal = sumpf.modules.AmplifySignal(input=input,factor=excitation_amp).GetOutput()
-        sample_signal = sumpf.modules.AmplifySignal(input=input,factor=sample_amp).GetOutput()
+        sample_signal = nlsp.WhiteGaussianGenerator(sampling_rate=input_signal.GetSamplingRate(),length=len(input_signal),
+                                                    distribution=sumpf.modules.NoiseGenerator.UniformDistribution(minimum=-sample_amp,maximum=sample_amp))
+        sample_signal = sample_signal.GetOutput()
         filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
@@ -65,11 +67,6 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot,r
                                                      filter_irs=found_filter_spec,
                                                      max_harmonics=range(1,branches+1))
         ref_nlsystem.SetInput(sample_signal)
-        if reference is not None:
-            reference = nlsp.change_length_signal(reference,length=len(input_signal))
-            reference = sumpf.modules.AmplifySignal(input=reference,factor=sample_amp).GetOutput()
-            ref_nlsystem.SetInput(reference)
-            iden_nlsystem.SetInput(reference)
         if Plot is True:
             nlsp.relabelandplotphase(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output Scaled",False)
             nlsp.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",True)

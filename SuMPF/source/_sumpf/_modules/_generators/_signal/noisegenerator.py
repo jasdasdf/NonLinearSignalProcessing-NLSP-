@@ -217,3 +217,14 @@ class NoiseGenerator(SignalGenerator):
                 result.append(self._random.gammavariate(self.__alpha, self.__beta))
             return result
 
+    class LaplaceDistribution(Distribution):
+        """
+        Generates samples that are laplacian distributed with the given alpha
+        and beta values.
+        """
+        def __init__(self, mean=0.0, scale=0.2):
+            self.__mean = float(mean)
+            self.__scale = float(scale)
+        def GetSamples(self, length):
+            result = numpy.random.laplace(self.__mean, self.__scale, length)
+            return result

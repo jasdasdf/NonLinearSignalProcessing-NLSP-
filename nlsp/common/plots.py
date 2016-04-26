@@ -197,7 +197,7 @@ def plot_array(input_array,label_array=None,save=False,name=None):
 
 def plot_filterspec(input_array,show=True):
     for input in input_array:
-        # input = sumpf.modules.FourierTransform(input).GetSpectrum()
+        input = sumpf.modules.FourierTransform(input).GetSpectrum()
         plot(input,show=False)
     if show is True:
         _show()

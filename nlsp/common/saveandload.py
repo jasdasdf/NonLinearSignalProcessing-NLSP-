@@ -5,20 +5,20 @@ import os
 
 location = "C:/Users/diplomand.8/Desktop/evaluation/filter_kernel/"
 
-def save_systemidentification(method,nlsystem,filterkernels):
+def save_systemidentification(method,nlsystem,filterkernels,length):
     branches = len(filterkernels)
     str_method = str(method)
     f,func,rest,rest2 = str_method.split()
-    filename = '_'.join((nlsystem, func, str(branches)))
+    filename = '_'.join((nlsystem, func, str(branches), str(length)))
     file = os.path.join(location,filename)
     kernels = sumpf.modules.MergeSignals(signals=filterkernels).GetOutput()
     kernels.GetChannels()
     sumpf.modules.SignalFile(filename=file, signal=kernels, format=sumpf.modules.SignalFile.NUMPY_NPZ)
 
-def load_systemidentification(method,nlsystem,branches):
+def load_systemidentification(method,nlsystem,branches,length):
     str_method = str(method)
     f,func,rest,rest2 = str_method.split()
-    filename = '_'.join((nlsystem, func, str(branches)))
+    filename = '_'.join((nlsystem, func, str(branches), str(length)))
     filename = ''.join((filename,".npz"))
     file = os.path.join(location,filename)
     if os.path.isfile(file):
@@ -38,8 +38,18 @@ def load_systemidentification(method,nlsystem,branches):
     return filter_ir, nl_functions
 
 def systemidentification(nlsystem,method,branches,input_generator,output):
-    found_filter_spec,nl_functions = load_systemidentification(method,"powerhgm",branches)
+    found_filter_spec,nl_functions = load_systemidentification(method,nlsystem,branches,len(input_generator.GetOutput()))
     if found_filter_spec is None:
         found_filter_spec, nl_functions = method(input_generator,output,branches)
-        save_systemidentification(method,nlsystem,found_filter_spec)
+        save_systemidentification(method,nlsystem,found_filter_spec,len(input_generator.GetOutput()))
     return found_filter_spec, nl_functions
+
+def loadfile(location,*keywords):
+    files = os.listdir(location)
+    for file in files:
+        if keywords in file:
+            pass
+        else:
+            del file
+    return files
+

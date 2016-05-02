@@ -36,8 +36,8 @@ def computationtime_evaluation(input_generator,branches,iden_method,Plot,rangeva
                                                          max_harmonics=range(1,branches+1))
             iden_nlsystem.GetOutput()
             simulation_time_start = time.clock()
-            ref_nlsystem.SetInput(reference)
-            ref_nlsystem.GetOutput()
+            iden_nlsystem.SetInput(reference)
+            iden_nlsystem.GetOutput()
             simulation_time_stop = time.clock()
             simulation_time = simulation_time_stop - simulation_time_start
             identification_time = identification_time_stop - identification_time_start

@@ -4,6 +4,6 @@ from approximate_model import nonsymmetric_hardclipping_evaluation,symmetric_har
 from exact_model import hgmwithfilter_evaluation,hgmwithoverlapfilter_evaluation,linearmodel_evaluation,\
     hgmwithreversedfilter_evaluation, hgmwithamplifiedfilter_evaluation, hgmallpass_evaluation, puretone_evaluation, hgmwithalphafilter_evaluation
 
-from realworld_model import loudspeaker_evaluation_all, distortionbox_evaluation_all
+from realworld_model import loudspeaker_evaluation_all
 
 from differentlengthandbranches import differentlength_evaluation,differentbranches_evaluation

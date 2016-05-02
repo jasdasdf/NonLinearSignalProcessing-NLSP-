@@ -49,4 +49,4 @@ from filter_kernel_evaluation import filterkernel_evaluation_plot,filterkernel_e
 
 from harmonic import getnl_ir
 
-from saveandload import load_systemidentification, save_systemidentification, systemidentification
+from saveandload import load_systemidentification, save_systemidentification, systemidentification, construct_hgm

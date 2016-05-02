@@ -96,7 +96,7 @@ def robustness_differentexcitation_evaluation(input_generator,branches,iden_meth
                                        stop_frequency=stop_freq, distribution=pink)
     wgn_laplace = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                        stop_frequency=stop_freq, distribution=laplace)
-    filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+    filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                  filter_irs=filter_spec_tofind,

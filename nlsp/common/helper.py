@@ -154,7 +154,7 @@ def log_weightingfilter(stop_freq=20000.0,branches=5,input=sumpf.Signal(),amplif
     for i,freq in enumerate(frequencies):
         alpha_filter = sumpf.modules.WeightingFilterGenerator(weighting=sumpf.modules.WeightingFilterGenerator.A,resolution=ip_prp.GetResolution(),
                                                               length=ip_prp.GetSpectrumLength())
-        alpha_filter.SetMaximumFrequency(frequency=freq/(i+1))
+        alpha_filter.SetMaximumFrequency(frequency=freq)
         spec = alpha_filter.GetSpectrum()
         if amplify is True:
             amp = 1.0 / (i+1)

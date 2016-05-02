@@ -53,3 +53,18 @@ def loadfile(location,*keywords):
             del file
     return files
 
+def construct_hgm(kernelfile):
+    path, file = os.path.split(kernelfile)
+    filter_impulse_response = sumpf.modules.SignalFile(filename=kernelfile, format=sumpf.modules.SignalFile.NUMPY_NPZ).GetSignal()
+    filter_ir = nlsp.multichanneltoarray(filter_impulse_response)
+    branches = len(filter_ir)
+    if "powerseries" in file:
+        nl_functions = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
+    elif "chebyshev" in file:
+        nl_functions = nlsp.nl_branches(nlsp.function_factory.chebyshev1_polynomial,branches)
+    elif "legendre" in file:
+        nl_functions = nlsp.nl_branches(nlsp.function_factory.legrendre_polynomial,branches)
+    elif "hermite" in file:
+        nl_functions = nlsp.nl_branches(nlsp.function_factory.hermite_polynomial,branches)
+    hgm = nlsp.HammersteinGroupModel_up(nonlinear_functions=nl_functions,filter_irs=filter_ir)
+    return hgm

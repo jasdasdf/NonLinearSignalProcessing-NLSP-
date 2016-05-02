@@ -53,7 +53,7 @@ class SA_HammersteinGroupModel(object):
             print "not local kernel 1"
             self.__kernel1 = [sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=self.__input_stage.GetOutput().GetSamplingRate(),
                                                                     length=self.__filtertaps).GetSignal(),]*self.__branches
-        self.__kernel1,nl = nlsp.adaptive_identification(self.__input_stage.GetOutput(),self.__output_stage.GetOutput(),branches=self.__branches,
+        self.__kernel1,nl = nlsp.adaptive_identification_powerseries(self.__input_stage.GetOutput(),self.__output_stage.GetOutput(),branches=self.__branches,
                                                  nonlinear_func=self.__nl_function, iterations=1, init_coeffs=self.__kernel1)
         self.__hgm.SetInput(self.__input_stage.GetOutput())
         self.__hgm.SetFilterIRS(self.__kernel1)
@@ -64,7 +64,7 @@ class SA_HammersteinGroupModel(object):
             print "not local kernel 2"
             self.__kernel2 = [sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=self.__input_stage.GetOutput().GetSamplingRate(),
                                                              length=self.__filtertaps).GetSignal(),]*2
-        self.__kernel2,nl = nlsp.adaptive_identification(input_hm,self.__output_stage.GetOutput(),branches=2,
+        self.__kernel2,nl = nlsp.adaptive_identification_powerseries(input_hm,self.__output_stage.GetOutput(),branches=2,
                                                          nonlinear_func=self.__nl_function, iterations=1, init_coeffs=self.__kernel2)
         self.__hm.SetInput(input_hm)
         self.__hm.SetFilterIRS(self.__kernel2)
@@ -94,7 +94,7 @@ ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                              nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                              filter_irs=filter_spec_tofind,
                                              max_harmonics=range(1,branches+1))
-ec = SA_HammersteinGroupModel(input_signal=input_generator.GetOutput(),output_signal=ref_nlsystem.GetOutput(),nonlinear_function=nlsp.function_factory.laguerre_polynomial)
+ec = SA_HammersteinGroupModel(input_signal=input_generator.GetOutput(),output_signal=ref_nlsystem.GetOutput(),nonlinear_function=nlsp.function_factory.power_series)
 for i in range(iteration):
     ec.SetInputOutput(input_generator.GetOutput(),ref_nlsystem.GetOutput())
 plot.relabelandplot(ref_nlsystem.GetOutput(),"ref",show=False)

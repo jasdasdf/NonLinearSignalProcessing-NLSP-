@@ -9,30 +9,56 @@ def theoretical_evaluation():
                                                  phase=0.0,
                                                  samplingrate=sampling_rate,
                                                  length=length)
-    ip_sine = input_tone.GetSignal()
+    sine = input_tone.GetSignal()
+    input_tone.SetFrequency(2*puretone_freq)
+    sine_2 = input_tone.GetSignal()
+    input_tone.SetFrequency(3*puretone_freq)
+    sine_3 = input_tone.GetSignal()
     input_tone.SetPhaseInDegrees(90)
-    input_tone.SetFrequency(puretone_freq*2)
-    theoreticl_op = sumpf.modules.ConstantSignalGenerator(value=0.5,samplingrate=ip_sine.GetSamplingRate(),length=len(ip_sine)).GetSignal() - \
-                    sumpf.modules.AmplifySignal(factor=0.5,input=input_tone.GetSignal()).GetOutput()
-    branch_simple = nlsp.HammersteinModel(input_signal=ip_sine,
+    cos = input_tone.GetSignal()
+    input_tone.SetFrequency(2*puretone_freq)
+    cos_2 = input_tone.GetSignal()
+    input_tone.SetFrequency(3*puretone_freq)
+    cos_3 = input_tone.GetSignal()
+
+    theoreticl_op_2 = sumpf.modules.ConstantSignalGenerator(value=0.5,samplingrate=sine.GetSamplingRate(),length=len(sine)).GetSignal() - \
+                    sumpf.modules.AmplifySignal(factor=0.5,input=cos_2).GetOutput()
+    theoreticl_op_3 = sumpf.modules.AmplifySignal(factor=3.0/4.0,input=sine).GetOutput() - \
+                      sumpf.modules.AmplifySignal(factor=3.0/4.0,input=sine_3).GetOutput()
+
+    branch_simple_2 = nlsp.HammersteinModel(input_signal=sine,
                                           nonlin_func=nlsp.function_factory.power_series(2))
-    branch_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=ip_sine,
+    branch_simple_3 = nlsp.HammersteinModel(input_signal=sine,
+                                          nonlin_func=nlsp.function_factory.power_series(3))
+    branch_up_2 = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=sine,
                                                                 nonlin_func=nlsp.function_factory.power_series(2),
                                                                 max_harm=2)
-    branch_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sine,
+    branch_up_3 = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=sine,
+                                                                nonlin_func=nlsp.function_factory.power_series(3),
+                                                                max_harm=3)
+    branch_lp_2 = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=sine,
                                                               nonlin_func=nlsp.function_factory.power_series(2),
                                                               max_harm=2)
-    snr_simple = nlsp.snr(theoreticl_op,branch_simple.GetOutput())
-    snr_up = nlsp.snr(theoreticl_op,branch_up.GetOutput())
-    snr_lp = nlsp.snr(theoreticl_op,branch_lp.GetOutput())
+    branch_lp_3 = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=sine,
+                                                              nonlin_func=nlsp.function_factory.power_series(3),
+                                                              max_harm=3)
+    snr_simple_2 = nlsp.snr(theoreticl_op_2,branch_simple_2.GetOutput())
+    snr_simple_3 = nlsp.snr(theoreticl_op_3,branch_simple_3.GetOutput())
+    snr_up_2 = nlsp.snr(theoreticl_op_2,branch_up_2.GetOutput())
+    snr_up_3 = nlsp.snr(theoreticl_op_3,branch_up_3.GetOutput())
+    snr_lp_2 = nlsp.snr(theoreticl_op_2,branch_lp_2.GetOutput())
+    snr_lp_3 = nlsp.snr(theoreticl_op_3,branch_lp_3.GetOutput())
     # plot.relabelandplot(sumpf.modules.FourierTransform(branch_simple.GetOutput()).GetSpectrum(),"simpleout",show=False)
-    plot.relabelandplot(sumpf.modules.FourierTransform(branch_up.GetOutput()).GetSpectrum(),"upout",show=False)
-    plot.relabelandplot(sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum(),"lpout",show=False)
-    plot.relabelandplot(sumpf.modules.FourierTransform(theoreticl_op).GetSpectrum(),"theoryout",show=True)
+    # plot.relabelandplot(sumpf.modules.FourierTransform(branch_up.GetOutput()).GetSpectrum(),"upout",show=False)
+    # plot.relabelandplot(sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum(),"lpout",show=False)
+    # plot.relabelandplot(sumpf.modules.FourierTransform(theoreticl_op).GetSpectrum(),"theoryout",show=True)
     # plot.relabelandplot(sumpf.modules.FourierTransform(ip_sine).GetSpectrum(),"input",show=True)
-    print snr_simple
-    print snr_up
-    print snr_lp
+    print snr_simple_2
+    print snr_simple_3
+    print snr_up_2
+    print snr_up_3
+    print snr_lp_2
+    print snr_lp_3
 
 def puretone_evaluation():
     """
@@ -152,13 +178,13 @@ def lowpass_evaluation():
             plot.plot(chebyshev_spec,show=True)
 
 def harmonics_evaluation():
-    degree = 5
-    length = 2**16
+    degree = 4
+    length = 2**18
     input_signal = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=sweep_start_freq,
                                        stop_frequency=sweep_stop_freq)
     input_sweep_signal = input_signal.GetOutput()
 
-    for i in range(5,degree+1):
+    for i in range(degree,degree+1):
         prp = sumpf.modules.ChannelDataProperties()
         prp.SetSignal(input_sweep_signal)
         filter = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
@@ -185,12 +211,13 @@ def harmonics_evaluation():
 
 def higher_nonlinearity_evaluation():
     sampling_rate = 48000
-    sweep_start_freq = 10.0
+    sweep_start_freq = 20.0
     sweep_stop_freq = 24000.0
     length = 2**15
     degree = 5
     input_signal = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=sweep_start_freq,
                                        stop_frequency=sweep_stop_freq)
+    # input_signal = sumpf.modules.SweepGenerator(samplingrate=sampling_rate,length=length)
     normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
     wgn_normal = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=20.0,
                                              stop_frequency=24000.0, distribution=normal)
@@ -205,7 +232,7 @@ def higher_nonlinearity_evaluation():
                                                                      max_harm=degree)
     model_up_ref = model_up_ref.GetOutput()
     model_lp_ref = model_lp_ref.GetOutput()
-    for factor in range(1,10):
+    for factor in range(degree-2,degree+2):
         model_up = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=input_sweep_signal,
                                                                     nonlin_func=nlsp.function_factory.power_series(degree),
                                                                     max_harm=factor)
@@ -334,9 +361,9 @@ def reliability_evaluation_sweep():
         # plot.relabelandplot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),"upsampling",show=False)
         # plot.relabelandplot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),"lowpass",show=True)
 
-        plot.relabelandplot(model_simple.GetOutput(),"simple",show=False)
-        plot.relabelandplot(model_up.GetOutput(),"upsampling",show=False)
-        plot.relabelandplot(model_lp.GetOutput(),"lowpass",show=True)
+        # plot.relabelandplot(model_simple.GetOutput(),"simple",show=False)
+        # plot.relabelandplot(model_up.GetOutput(),"upsampling",show=False)
+        # plot.relabelandplot(model_lp.GetOutput(),"lowpass",show=True)
 
         print "maxharmonics: %r" %max_harm
         print "snr between simple HGM and upsampling HGM: %r" %nlsp.snr(model_simple.GetOutput(),model_up.GetOutput())

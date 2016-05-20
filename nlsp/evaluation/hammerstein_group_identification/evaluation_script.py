@@ -93,10 +93,10 @@ for method,input_generator in zip(iden_method,excitation):
     #     nlsp.nonsymmetric_hardclipping_evaluation(input_generator,branches,method,Plot,reference)
     # except:
     #     print "nonsymmetric hardclipping exception"
-    # try:
-    #     nlsp.softclipping_evaluation(input_generator,branches,method,Plot,reference)
-    # except:
-    #     print "soft clipping exception"
+    try:
+        nlsp.softclipping_evaluation(input_generator,branches,method,Plot,reference)
+    except:
+        print "soft clipping exception"
     # try:
     #     nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot,reference)
     # except:

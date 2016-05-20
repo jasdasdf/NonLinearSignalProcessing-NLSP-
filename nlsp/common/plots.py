@@ -3,6 +3,7 @@ import collections
 import math
 import sumpf
 import nlsp
+from scipy import signal
 import matplotlib.pyplot as pyplot
 import os
 import mpl_toolkits.mplot3d as mplot3d
@@ -121,7 +122,15 @@ def plot_groupdelayandmagnitude(data, legend=True, show=True, save=False, name=N
         if show:
             _show()
 
-def plot_timeandfreq(data_time, data_freq, legend=True, show=True):
+def plot_timeandfreq(data, legend=True, show=True):
+    if isinstance(data,sumpf.Signal):
+        data_freq = sumpf.modules.FourierTransform(data).GetSpectrum()
+        data_time = data
+    elif isinstance(data,sumpf.Spectrum):
+        data_time = sumpf.modules.InverseFourierTransform(data).GetSignal()
+        data_freq = data
+    else:
+        print "not sumpf signal or spectrum"
     if not isinstance(data_time, collections.Iterable):
         data_time = [data_time]
     if not isinstance(data_freq, collections.Iterable):
@@ -321,3 +330,12 @@ def plot_sdrvsfreq(input_signalorspectrum,output_signalorspectrum,label=None,sho
             nlsp.common.plots.plot(noise,show=show)
         else:
             print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
+
+def plot_spectrogram(data):
+    f_s = data.GetSamplingRate()
+    x = data.GetChannels()[0]
+    f, t, Sxx = signal.spectrogram(x,f_s,nperseg=2**11,window=('tukey', 0.1))
+    pyplot.pcolormesh(t, f, Sxx)
+    pyplot.ylabel('Frequency [Hz]')
+    pyplot.xlabel('Time [sec]')
+    pyplot.show()

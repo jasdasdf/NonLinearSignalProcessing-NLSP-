@@ -14,7 +14,7 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
     """
     def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1), max_harm=1,
                  filter_impulseresponse=None,
-                 filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                 filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=200),
                  attenuation=0.0001):
         """
         :param input_signal: the input signal instance to the Alias compensated Hammerstein model

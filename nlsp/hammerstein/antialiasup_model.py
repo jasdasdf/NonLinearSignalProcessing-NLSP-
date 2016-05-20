@@ -2,6 +2,7 @@ import sumpf
 import nlsp
 from .hammerstein_model import HammersteinModel
 import collections
+import math
 
 class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
     """
@@ -79,11 +80,14 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
 
     @sumpf.Output(float)
     def _GetSamplingRate(self):
-        return self._prp.GetSamplingRate()*self._GetMaximumHarmonic()
+        # temp = self._prp.GetSamplingRate() * self._GetMaximumHarmonic()
+        temp = self._prp.GetSamplingRate()*math.ceil((self._GetMaximumHarmonic()+1.0)/2.0)
+        return temp
 
     @sumpf.Output(float)
     def _Getattenuation(self):
-        return (1/float(self._GetMaximumHarmonic()))
+        return self._prp.GetSamplingRate()/self._GetSamplingRate()
+        # return (1/float(self._GetMaximumHarmonic()))
 
     @sumpf.Output(sumpf.Signal)
     def GetNLOutput(self):

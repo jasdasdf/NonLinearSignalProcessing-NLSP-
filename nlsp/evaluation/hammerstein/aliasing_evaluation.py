@@ -49,16 +49,16 @@ def theoretical_evaluation():
     snr_lp_2 = nlsp.snr(theoreticl_op_2,branch_lp_2.GetOutput())
     snr_lp_3 = nlsp.snr(theoreticl_op_3,branch_lp_3.GetOutput())
     # plot.relabelandplot(sumpf.modules.FourierTransform(branch_simple.GetOutput()).GetSpectrum(),"simpleout",show=False)
-    # plot.relabelandplot(sumpf.modules.FourierTransform(branch_up.GetOutput()).GetSpectrum(),"upout",show=False)
+    plot.relabelandplot(branch_up_2.GetOutput(),"upout",show=False)
     # plot.relabelandplot(sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum(),"lpout",show=False)
-    # plot.relabelandplot(sumpf.modules.FourierTransform(theoreticl_op).GetSpectrum(),"theoryout",show=True)
+    plot.relabelandplot(theoreticl_op_2,"theoryout",show=True)
     # plot.relabelandplot(sumpf.modules.FourierTransform(ip_sine).GetSpectrum(),"input",show=True)
-    print snr_simple_2
-    print snr_simple_3
-    print snr_up_2
-    print snr_up_3
-    print snr_lp_2
-    print snr_lp_3
+    # print "simple,2nd degree:%r" %snr_simple_2
+    # print "simple,3rd degree:%r" %snr_simple_3
+    print "up,2nd degree:%r" %snr_up_2
+    print "up,3rd degree:%r" %snr_up_3
+    print "lp,2nd degree:%r" %snr_lp_2
+    print "lp,3rd degree:%r" %snr_lp_3
 
 def puretone_evaluation():
     """
@@ -368,16 +368,18 @@ def reliability_evaluation_sweep():
         print "maxharmonics: %r" %max_harm
         print "snr between simple HGM and upsampling HGM: %r" %nlsp.snr(model_simple.GetOutput(),model_up.GetOutput())
         print "snr between simple HGM and lowpass HGM: %r" %nlsp.snr(model_simple.GetOutput(),model_lp.GetOutput())
+        print "snr between simple HGM and upsampling HGM magnitude: %r" %nlsp.snr_magnitude(model_simple.GetOutput(),model_up.GetOutput())
+        print "snr between simple HGM and lowpass HGM magnitude: %r" %nlsp.snr_magnitude(model_simple.GetOutput(),model_lp.GetOutput())
         print
 
 def reliability_evaluation_noise():
-    length = 2**16
+    length = 2**18
     normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
     wgn_normal = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=20.0,
                                              stop_frequency=2000.0, distribution=normal)
     # wgn_normal = sumpf.modules.NoiseGenerator(distribution=normal,samplingrate=sampling_rate,length=length)
     ip_signal = wgn_normal.GetOutput()
-    for max_harm in range(1,6):
+    for max_harm in range(2,3):
         nl_degree = max_harm
         model_simple = nlsp.HammersteinModel(input_signal=ip_signal,
                                              nonlin_func=nlsp.function_factory.power_series(nl_degree))
@@ -417,11 +419,11 @@ input_signal = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length
 input_sweep_signal = input_signal.GetOutput()
 
 # lowpass_evaluation()
-# theoretical_evaluation()
+theoretical_evaluation()
 # puretone_evaluation()
 # sweep_evaluation()
 # harmonics_evaluation()
-higher_nonlinearity_evaluation()
+# higher_nonlinearity_evaluation()
 # wgn_evaluation()
 # linearity_evaluation()
 # reliability_evaluation_puretone()

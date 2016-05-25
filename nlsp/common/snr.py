@@ -1,6 +1,7 @@
 import math
 import sumpf
 import nlsp
+import numpy
 
 def signal_to_noise_ratio_time(input_signalorspectrum, output_signalorspectrum):
     """
@@ -194,6 +195,56 @@ def snr(ref_signalorspectrum,iden_signalorspectrum,type=3,freqrange=[20,20000],p
                         nlsp.common.plots.relabelandplot(noise*noise,label,show=show)
                     div_energy = nlsp.calculateenergy_betweenfreq_freq(div,freqrange)
                     snr.append(10*math.log10(div_energy[0]))
+            else:
+                print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
+    except ZeroDivisionError:
+        snr = [float("inf"),]
+    return snr
+
+def snr_magnitude(ref_signalorspectrum,iden_signalorspectrum,type=3,freqrange=[20,20000],plot=False,show=False,label=None):
+    try:
+        if isinstance(ref_signalorspectrum, list) != True:
+            observed_l = []
+            observed_l.append(ref_signalorspectrum)
+        else:
+            observed_l = ref_signalorspectrum
+        if isinstance(iden_signalorspectrum, list) != True:
+            identified_l = []
+            identified_l.append(iden_signalorspectrum)
+        else:
+            identified_l = iden_signalorspectrum
+        snr = []
+        for observed,identified in zip(observed_l,identified_l):
+            if isinstance(observed,(sumpf.Signal,sumpf.Spectrum)) and isinstance(observed,(sumpf.Signal,sumpf.Spectrum)):
+                if isinstance(observed,sumpf.Signal):
+                    observed = sumpf.modules.FourierTransform(observed).GetSpectrum()
+                if isinstance(identified,sumpf.Signal):
+                    identified = sumpf.modules.FourierTransform(identified).GetSpectrum()
+                if len(observed) != len(identified):
+                    merged_spectrum = sumpf.modules.MergeSpectrums(spectrums=[observed,identified],
+                                                       on_length_conflict=sumpf.modules.MergeSpectrums.FILL_WITH_ZEROS).GetOutput()
+                    observed = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[0]).GetOutput()
+                    identified = sumpf.modules.SplitSpectrum(data=merged_spectrum,channels=[1]).GetOutput()
+                reference = observed
+                reference = nlsp.cut_spectrum(reference,freqrange)
+                identified = nlsp.cut_spectrum(identified,freqrange)
+                if type == 1:
+                    reference_energy = nlsp.calculateenergy_betweenfreq_freq(reference,freqrange)
+                    identified_energy = nlsp.calculateenergy_betweenfreq_freq(identified,freqrange)
+                    noise_energy = abs(reference_energy[0] - identified_energy[0])
+                    snr.append(10*math.log10(identified_energy[0]/noise_energy))
+                elif type == 2:
+                    noise =  reference - identified
+                    noise_energy = nlsp.calculateenergy_betweenfreq_freq(noise,freqrange)
+                    input_energy = nlsp.calculateenergy_betweenfreq_freq(identified,freqrange)
+                    snr.append(10*math.log10(input_energy[0]/noise_energy[0]))
+                elif type == 3:
+                    noise =  numpy.subtract(reference.GetMagnitude()[0],identified.GetMagnitude()[0])
+                    div = numpy.divide(identified.GetMagnitude()[0],noise)
+                    div = numpy.nan_to_num(div)
+                    div_power = numpy.power(div,2.0)
+                    div_energy = numpy.sum(div_power)
+                    snr.append(10*math.log10(div_energy))
             else:
                 print "The given arguments is not a sumpf.Signal or sumpf.Spectrum"
     except ZeroDivisionError:

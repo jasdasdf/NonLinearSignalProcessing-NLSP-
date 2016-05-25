@@ -14,8 +14,8 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
     """
     def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1), max_harm=1,
                  filter_impulseresponse=None,
-                 filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=200),
-                 attenuation=0.0001):
+                 filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                 attenuation=50.0):
         """
         :param input_signal: the input signal instance to the Alias compensated Hammerstein model
         :param nonlin_func: the nonlinear function-instance for the nonlinear block
@@ -77,5 +77,7 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
 
     @sumpf.Output(float)
     def _GetCutoffFrequency(self):
-        return ((self._ampsignal.GetOutput().GetSamplingRate()/2)/self._GetMaximumHarmonic())/\
-               (2**(20*math.log(self._attenuation,10)/(6*self._filterorder)))
+        # return ((self._ampsignal.GetOutput().GetSamplingRate()/2.0)/self._GetMaximumHarmonic())/\
+        #        (2.0**((20.0*math.log(self._attenuation,10))/(6.0*self._filterorder)))
+        return ((self._ampsignal.GetOutput().GetSamplingRate()/2.0)/self._GetMaximumHarmonic())\
+               /(2.0**(self._attenuation/(6.0*self._filterorder)))

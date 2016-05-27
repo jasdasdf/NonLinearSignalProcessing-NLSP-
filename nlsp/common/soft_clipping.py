@@ -6,14 +6,14 @@ class NLClipSignal(object):
     The input signal is clipped nonlinearly based on the power parameter. The lower the power parameter the higher
     the function of clipping is f(x) = (1-(abs(x)/power))*x
     """
-    def __init__(self, signal=None, thresholds=(-1,1), power=1.0):
+    def __init__(self, signal=None, power=1/2.0):
         """
         :param thresholds: a tuple of thresholds to clip the signal
         :param signal: the input signal
         :param power: the power by which the input signal should be clipped. The lower the power the higher the clipping
         :return:
         """
-        self.__thresholds = thresholds
+        self.__thresholds = (-1.0,1.0)
         if signal is None:
             self.__signal = sumpf.Signal()
         else:
@@ -31,11 +31,11 @@ class NLClipSignal(object):
             channel = []
             for s in c:
                 if s <= self.__thresholds[0]:
-                    channel.append(self.__thresholds[0])
+                    channel.append(-1.0+self.__power)
                 elif s >= self.__thresholds[1]:
-                    channel.append(self.__thresholds[1])
+                    channel.append(1.0-self.__power)
                 else:
-                    channel.append((1-(abs(s)/self.__power))*s)
+                    channel.append((1-abs(s)*self.__power)*s)
             channels.append(tuple(channel))
         return sumpf.Signal(channels=tuple(channels), labels=self.__signal.GetLabels())
 

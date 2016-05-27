@@ -79,24 +79,39 @@ def linearmodel_evaluation(input_generator,branches,iden_method,Plot,reference=N
     expectation - utmost similarity between the two outputs
     """
     input_signal = input_generator.GetOutput()
-    amplification = 1.0
-    ref_nlsystem = sumpf.modules.AmplifySignal(factor=amplification)
+    prp = sumpf.modules.ChannelDataProperties()
+    prp.SetSignal(input_signal)
+    filter_ir = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=10),
+            frequency=10000.0,transform=False,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
+    ref_nlsystem = nlsp.AliasCompensatingHammersteinModelUpandDown(filter_impulseresponse=sumpf.modules.InverseFourierTransform(filter_ir).GetSignal())
     ref_nlsystem.SetInput(input_signal)
 
+    # nonlinear system identification
     found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
                                                  max_harmonics=range(1,branches+1))
+
+    # linear system identification
+    sweep = nlsp.NovakSweepGenerator_Sine(length=len(input_signal),sampling_rate=input_signal.GetSamplingRate())
+    ref_nlsystem.SetInput(sweep.GetOutput())
+    kernel_linear = nlsp.linear_identification_temporalreversal(sweep,ref_nlsystem.GetOutput())
+    iden_linsystem = nlsp.AliasCompensatingHammersteinModelUpandDown(filter_impulseresponse=kernel_linear)
+
     if reference is not None:
         reference = nlsp.change_length_signal(reference,length=len(input_signal))
         ref_nlsystem.SetInput(reference)
+        iden_linsystem.SetInput(reference)
         iden_nlsystem.SetInput(reference)
     if Plot is True:
         plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
-        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=True)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=False)
+        plot.relabelandplot(sumpf.modules.FourierTransform(iden_linsystem.GetOutput()).GetSpectrum(),"Identified linear System",show=True)
     print "SNR between Reference and Identified output for linear systems: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
+    print "SNR between Reference and Identified output for linear systems(linear identification): %r" %nlsp.snr(ref_nlsystem.GetOutput(),
+                                                                                             iden_linsystem.GetOutput())
 
 def hgmwithreversedfilter_evaluation(input_generator,branches,iden_method,Plot,reference=None):
     """

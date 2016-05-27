@@ -26,7 +26,7 @@ def linear_identification_spectralinversion(sweep_generator, output_sweep, input
     model = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=inputsignal,nonlin_func=nlsp.function_factory.power_series(1),filter_impulseresponse=ir_sweep)
     return model.GetOutput()
 
-def linear_identification_temporalreversal(sweep_generator, output_sweep, inputsignal):
+def linear_identification_temporalreversal(sweep_generator, output_sweep):
 
     sweep_length = sweep_generator.GetLength()
     sweep_start_freq = sweep_generator.GetStartFrequency()
@@ -40,9 +40,8 @@ def linear_identification_temporalreversal(sweep_generator, output_sweep, inputs
     out_spec = out_spec / output_sweep.GetSamplingRate()
     tf = rev_spec * out_spec
     ir_sweep = sumpf.modules.InverseFourierTransform(tf).GetSignal()
-    ir_sweep = sumpf.modules.CutSignal(signal=ir_sweep, start=0, stop=len(ir_sweep)/4).GetOutput()
-    model = nlsp.AliasCompensatingHammersteinModelUpandDown(input_signal=inputsignal,nonlin_func=nlsp.function_factory.power_series(1),filter_impulseresponse=ir_sweep)
-    return model.GetOutput()
+    ir_sweep = sumpf.modules.CutSignal(signal=ir_sweep, start=0, stop=len(ir_sweep)/8).GetOutput()
+    return ir_sweep
 
 def linear_identification_kernel(sweep_generator, output_sweep):
 

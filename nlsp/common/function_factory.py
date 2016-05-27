@@ -1,6 +1,7 @@
 import numpy
 import mpmath
 import sumpf
+import nlsp
 
 def power_series(degree):
     def func(channel):
@@ -54,5 +55,12 @@ def hardclip(threshold):
     def func(channel):
         signal = sumpf.Signal(channels=(channel,), samplingrate=48000, labels=("nl",))
         clipped = sumpf.modules.ClipSignal(signal=signal,thresholds=threshold)
+        return numpy.asarray(clipped.GetOutput().GetChannels()[0])
+    return func
+
+def softclip(power):
+    def func(channel):
+        signal = sumpf.Signal(channels=(channel,), samplingrate=48000, labels=("nl",))
+        clipped = nlsp.NLClipSignal(signal=signal,power=power)
         return numpy.asarray(clipped.GetOutput().GetChannels()[0])
     return func

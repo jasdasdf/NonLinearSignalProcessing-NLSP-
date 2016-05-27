@@ -5,14 +5,14 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
-length = 2**16
+length = 2**15
 fade_out = 0.00
 fade_in = 0.00
 branches = 5
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
 pink = sumpf.modules.NoiseGenerator.PinkNoise()
-laplace = sumpf.modules.NoiseGenerator.LaplaceDistribution(mean=0.0,scale=0.3)
+laplace = sumpf.modules.NoiseGenerator.LaplaceDistribution(mean=0.0,scale=0.2)
 
 Plot = False
 Save = False
@@ -42,7 +42,8 @@ iden_method = [nlsp.nonlinearconvolution_powerseries_temporalreversal,
                nlsp.adaptive_identification_hermite,
                nlsp.miso_identification,
                nlsp.wiener_g_identification_corr]
-reference = sumpf.modules.ClipSignal(wgn_laplace.GetOutput()).GetOutput()
+reference = nlsp.RemoveOutliers(thresholds=[-1.0,1.0],value=0,signal=wgn_laplace.GetOutput())
+reference = reference.GetOutput()
 
 for method,input_generator in zip(iden_method,excitation):
     print method,input_generator
@@ -80,23 +81,26 @@ for method,input_generator in zip(iden_method,excitation):
     #     print "weighted filtering exception"
 
 
-
+    try:
+        nlsp.clippingHGMevaluation(input_generator,branches,method,Plot,reference)
+    except:
+        print "symmetric clipping HGM exception"
+    try:
+        nlsp.softclippingHGMevaluation(input_generator,branches,method,Plot,reference)
+    except:
+        print "symmetric soft clipping HGM exception"
     # try:
     #     nlsp.symmetric_hardclipping_evaluation(input_generator,branches,method,Plot,reference)
     # except:
     #     print "symmetric hardclipping exception"
     # try:
-    #     nlsp.clippingHGMevaluation(input_generator,branches,method,Plot,reference)
-    # except:
-    #     print "symmetric clipping HGM exception"
-    # try:
     #     nlsp.nonsymmetric_hardclipping_evaluation(input_generator,branches,method,Plot,reference)
     # except:
     #     print "nonsymmetric hardclipping exception"
-    try:
-        nlsp.softclipping_evaluation(input_generator,branches,method,Plot,reference)
-    except:
-        print "soft clipping exception"
+    # try:
+    #     nlsp.softclipping_evaluation(input_generator,branches,method,Plot,reference)
+    # except:
+    #     print "soft clipping exception"
     # try:
     #     nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot,reference)
     # except:
@@ -118,14 +122,14 @@ for method,input_generator in zip(iden_method,excitation):
 
 
 
-    try:
-        nlsp.differentlength_evaluation(input_generator,branches,method,Plot,reference)
-    except:
-       print "different length exception"
-    try:
-        nlsp.differentbranches_evaluation(input_generator,branches,method,Plot,reference)
-    except:
-        print "different branches exception"
+    # try:
+    #     nlsp.differentlength_evaluation(input_generator,branches,method,Plot,reference)
+    # except:
+    #    print "different length exception"
+    # try:
+    #     nlsp.differentbranches_evaluation(input_generator,branches,method,Plot,reference)
+    # except:
+    #     print "different branches exception"
     # try:
     #     nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
     # except:

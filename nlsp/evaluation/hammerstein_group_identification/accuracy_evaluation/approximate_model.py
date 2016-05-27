@@ -223,7 +223,7 @@ def clippingHGMevaluation(input_generator,branches,iden_method,Plot,reference=No
     plot - the virtual nl system output and the identified nl system output
     expectation - utmost similarity between the two outputs
     """
-    for t in range(6,13):
+    for t in range(8,11):
         t = t / 10.0
         thresholds = [-t,t]
         input_signal = input_generator.GetOutput()
@@ -252,4 +252,42 @@ def clippingHGMevaluation(input_generator,branches,iden_method,Plot,reference=No
             plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
             plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=False)
         print "SNR between Reference and Identified output for symmetric hardclipping HGM(thresholds:%r): %r" %(thresholds,nlsp.snr(ref_nlsystem.GetOutput(),
+                                                                                             iden_nlsystem.GetOutput()))
+
+def softclippingHGMevaluation(input_generator,branches,iden_method,Plot,reference=None):
+    """
+    Evaluation of System Identification method by hard clipping system
+    nonlinear system - virtual clipping systems which hard clips the signal amplitute which are not in the threshold range
+    plot - the virtual nl system output and the identified nl system output
+    expectation - utmost similarity between the two outputs
+    """
+    for t in range(8,11):
+        t = t / 10.0
+        p = 1.0 - t
+        input_signal = input_generator.GetOutput()
+        nl_functions = [nlsp.function_factory.softclip(power=p),]*branches
+        filter_spec_tofind = nlsp.log_bpfilter(branches=branches, input=input_signal)
+        ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                 nonlinear_functions=nl_functions,
+                                                 filter_irs=filter_spec_tofind,
+                                                 max_harmonics=range(1,branches+1))
+
+        found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
+        iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
+                                                     nonlinear_functions=nl_functions,
+                                                     filter_irs=found_filter_spec,
+                                                     max_harmonics=range(1,branches+1))
+        # sine = sumpf.modules.SineWaveGenerator(frequency=5000.0,phase=0.0,samplingrate=input_signal.GetSamplingRate(),length=len(input_signal)).GetSignal()
+        sine = sumpf.modules.SweepGenerator(samplingrate=input_signal.GetSamplingRate(),length=len(input_signal)).GetSignal()
+        ref_nlsystem.SetInput(sine)
+        iden_nlsystem.SetInput(sine)
+        if reference is not None:
+            reference = nlsp.change_length_signal(reference,length=len(input_signal))
+            ref_nlsystem.SetInput(reference)
+            iden_nlsystem.SetInput(reference)
+
+        if Plot is True:
+            plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference System",show=False)
+            plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified System",show=False)
+        print "SNR between Reference and Identified output for symmetric hardclipping HGM(threshold:%r): %r" %(t,nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput()))

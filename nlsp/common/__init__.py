@@ -52,3 +52,5 @@ from harmonic import getnl_ir
 from saveandload import load_systemidentification, save_systemidentification, systemidentification, construct_hgm
 
 from spectogram import plotstft
+
+from remove_outliers import RemoveOutliers

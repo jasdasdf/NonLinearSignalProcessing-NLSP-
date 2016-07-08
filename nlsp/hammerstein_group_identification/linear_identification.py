@@ -43,12 +43,13 @@ def linear_identification_temporalreversal(sweep_generator, output_sweep):
     ir_sweep = sumpf.modules.CutSignal(signal=ir_sweep, start=0, stop=len(ir_sweep)/8).GetOutput()
     return ir_sweep
 
-def linear_identification_kernel(sweep_generator, output_sweep):
+def linear_identification(sweep_generator, output_sweep, branches):
 
     sweep_length = sweep_generator.GetLength()
     sweep_start_freq = sweep_generator.GetStartFrequency()
     sweep_stop_freq = sweep_generator.GetStopFrequency()
     ip_signal = sweep_generator.GetOutput()
+    srate = output_sweep.GetSamplingRate()
 
     # output_sweep = nlsp.append_zeros(output_sweep)
     rev = sweep_generator.GetReversedOutput()
@@ -58,4 +59,20 @@ def linear_identification_kernel(sweep_generator, output_sweep):
     tf = rev_spec * out_spec
     ir_sweep = sumpf.modules.InverseFourierTransform(tf).GetSignal()
     ir_sweep = sumpf.modules.CutSignal(signal=ir_sweep, start=0, stop=2**12).GetOutput()
-    return ir_sweep
+    nl_func = nlsp.function_factory.power_series(1)
+    length = len(ir_sweep)
+    ir_sweep = [ir_sweep,]
+    nl_func = nlsp.nl_branches(nlsp.function_factory.power_series,branches)
+    for i in range(1,branches):
+        ir_sweep.append(sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=srate,length=length).GetSignal())
+    return ir_sweep,nl_func
+
+def linear_identification_powerhgm(sweep_generator, output_sweep, branches):
+    srate = output_sweep.GetSamplingRate()
+    filter_kernels, nl_func = nlsp.nonlinearconvolution_powerseries_temporalreversal(sweep_generator,output_sweep,branches)
+    ir_sweep = []
+    ir_sweep.append(filter_kernels[0])
+    length = len(filter_kernels[0])
+    for i in range(1,branches):
+        ir_sweep.append(sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=srate,length=length).GetSignal())
+    return ir_sweep,nl_func

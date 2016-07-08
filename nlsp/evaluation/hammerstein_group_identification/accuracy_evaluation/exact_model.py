@@ -6,7 +6,7 @@ import sumpf
 import nlsp
 import nlsp.common.plots as plot
 
-def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot,reference=None):
+def hgmwithfilter_evaluation(input_generator,branches,nlfuntion,iden_method,Plot,reference=None):
     """
     Evaluation of System Identification method by hgm virtual nl system
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and bandpass filters
@@ -19,7 +19,7 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot,reference
     filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
     # filter_spec_tofind = nlsp.log_chebyfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 nonlinear_functions=nlsp.nl_branches(nlfuntion,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
     found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
@@ -39,7 +39,7 @@ def hgmwithfilter_evaluation(input_generator,branches,iden_method,Plot,reference
     print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
-def hgmwithoverlapfilter_evaluation(input_generator,branches,iden_method,Plot,reference=None):
+def hgmwithoverlapfilter_evaluation(input_generator,branches,nlfunction,iden_method,Plot,reference=None):
     """
     Evaluation of System Identification method by hgm virtual nl system
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and overlapping
@@ -51,7 +51,7 @@ def hgmwithoverlapfilter_evaluation(input_generator,branches,iden_method,Plot,re
     input_signal = input_generator.GetOutput()
     filter_spec_tofind = nlsp.create_bpfilter(frequencies,input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 nonlinear_functions=nlsp.nl_branches(nlfunction,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
 
@@ -70,7 +70,7 @@ def hgmwithoverlapfilter_evaluation(input_generator,branches,iden_method,Plot,re
     print "SNR between Reference and Identified output with overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
-def linearmodel_evaluation(input_generator,branches,iden_method,Plot,reference=None):
+def linearmodel_evaluation(input_generator,branches,nlfunction,iden_method,Plot,reference=None):
     """
     Evaluation of System Identification method by linear amplification
     nonlinear system - no nonlinearity, linear amplifier as linear system
@@ -113,7 +113,7 @@ def linearmodel_evaluation(input_generator,branches,iden_method,Plot,reference=N
     print "SNR between Reference and Identified output for linear systems(linear identification): %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_linsystem.GetOutput())
 
-def hgmwithreversedfilter_evaluation(input_generator,branches,iden_method,Plot,reference=None):
+def hgmwithreversedfilter_evaluation(input_generator,branches,nlfunction,iden_method,Plot,reference=None):
     """
     Evaluation of System Identification method by hgm virtual nl system
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and bandpass filters
@@ -125,7 +125,7 @@ def hgmwithreversedfilter_evaluation(input_generator,branches,iden_method,Plot,r
     filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
     filter_spec_tofind = [i for i in reversed(filter_spec_tofind)]
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 nonlinear_functions=nlsp.nl_branches(nlfunction,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
 
@@ -174,7 +174,7 @@ def hgmwithamplifiedfilter_evaluation(input_generator,branches,iden_method,Plot,
     print "SNR between Reference and Identified output with differently amplified filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
-def hgmallpass_evaluation(input_generator,branches,iden_method,Plot,reference=None):
+def hgmallpass_evaluation(input_generator,branches,nlfunction,iden_method,Plot,reference=None):
     """
     Evaluation of System Identification method by hgm virtual nl system
     nonlinear system - virtual hammerstein group model with power series polynomials as nl function and allpass filters
@@ -186,7 +186,7 @@ def hgmallpass_evaluation(input_generator,branches,iden_method,Plot,reference=No
     allpass = sumpf.modules.ImpulseGenerator(samplingrate=input_signal.GetSamplingRate(),length=len(input_signal)).GetSignal()
     filter_spec_tofind = [allpass,]*branches
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 nonlinear_functions=nlsp.nl_branches(nlfunction,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
 
@@ -234,11 +234,11 @@ def puretone_evaluation(input_generator,branches,iden_method,Plot,reference=None
     print "SNR between Reference and Identified output puretone: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
 
-def hgmwithalphafilter_evaluation(input_generator,branches,iden_method,Plot,label=None,reference=None):
+def hgmwithalphafilter_evaluation(input_generator,branches,nlfunction,iden_method,Plot,label=None,reference=None):
     input_signal = input_generator.GetOutput()
     filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
+                                                 nonlinear_functions=nlsp.nl_branches(nlfunction,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
     found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)

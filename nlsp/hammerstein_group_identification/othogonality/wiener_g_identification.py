@@ -39,5 +39,5 @@ def wiener_g_identification_corr(input_gen, output, branches):
         factor = sumpf.modules.ConstantSignalGenerator(value=factor,samplingrate=cross_corr.GetSamplingRate(),length=len(cross_corr)).GetSignal()
         k = cross_corr * factor
         kernels.append(k)
-    nl_func = nlsp.nl_branches(nlsp.function_factory.legrendre_polynomial,branches)
+    nl_func = nlsp.nl_branches(nlsp.function_factory.hermite_polynomial,branches)
     return kernels, nl_func

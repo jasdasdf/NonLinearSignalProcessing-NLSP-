@@ -11,8 +11,8 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot,refere
     plot - the original filter spectrum and the identified filter spectrum, the reference output and identified output
     expectation - utmost similarity between the two spectrums
     """
-    noise_mean = [0,0.3,0.5,0.7]
-    noise_sd = [0.3,0.5,0.7,1.0]
+    noise_mean = [0,0.5]
+    noise_sd = [0.5,0.7]
     for mean,sd in itertools.product(noise_mean,noise_sd):
         input_signal = input_generator.GetOutput()
         filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
@@ -48,8 +48,8 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot,refere
 
 def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot,reference=None):
 
-    excitation_signal_amp = [0.5,0.7,1.0,1.5,2.0]
-    sample_signal_amp = [0.5,0.7,1.0,1.5,2.0]
+    excitation_signal_amp = [0.5,1.0]
+    sample_signal_amp = [0.5,1.0,2.0]
     input = input_generator.GetOutput()
     for excitation_amp,sample_amp in itertools.product(excitation_signal_amp,sample_signal_amp):
         input_signal = sumpf.modules.AmplifySignal(input=input,factor=excitation_amp).GetOutput()

@@ -96,7 +96,7 @@ def adaptive_identification_chebyshev(input_generator, outputs, branches=5, nonl
     nl_func = nlsp.nl_branches(nonlinear_func,branches)
     return kernel,nl_func
 
-def adaptive_identification_legendre(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.legrendre_polynomial, iterations=1, step_size=0.1, filtertaps=2**11,
+def adaptive_identification_legendre(input_generator, outputs, branches=5, nonlinear_func=nlsp.function_factory.legrendre_polynomial, iterations=1, step_size=0.1, filtertaps=2**9,
                             algorithm=nlsp.multichannel_nlms, init_coeffs=None, Plot=False, label=None, Print=False):
 
     if hasattr(input_generator,"GetOutput"):

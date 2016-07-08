@@ -25,7 +25,7 @@ class HammersteinGroupModel_up(object):
         self.inputstage = sumpf.modules.AmplifySignal(input=self.__signal)
         self.__nlfunctions = nonlinear_functions
         if filter_irs is None:
-            self.__filter_irs = (sumpf.modules.ImpulseGenerator(length=len(self.__signal)).GetSignal(),)
+            self.__filter_irs = (sumpf.modules.ImpulseGenerator(length=len(self.__signal)).GetSignal(),)*len(self.__nlfunctions)
         else:
             self.__filter_irs = filter_irs
         self.__resampling_algorithm = resampling_algorithm

@@ -94,10 +94,10 @@ def puretone_evaluation():
             plot.plot(branch_simple_spectrum,show=False)
             branch_up_spectrum = nlsp.relabel(sumpf.modules.FourierTransform(branch_up.GetOutput()).GetSpectrum(),
                                                   "%d Upsampling Hammerstein Branch"%i)
-            plot.plot(branch_up_spectrum,show=True)
-            # branch_lp_spectrum = nlsp.relabel(sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum(),
-            #                                       "%d Lowpass Hammerstein Branch"%i)
-            # plot.plot(branch_lp_spectrum,show=True)
+            plot.plot(branch_up_spectrum,show=False)
+            branch_lp_spectrum = nlsp.relabel(sumpf.modules.FourierTransform(branch_lp.GetOutput()).GetSpectrum(),
+                                                  "%d Lowpass Hammerstein Branch"%i)
+            plot.plot(branch_lp_spectrum,show=True)
 
 def sweep_evaluation():
     """
@@ -131,6 +131,7 @@ def sweep_evaluation():
         print snr_up
         print snr_lp
         print
+
     # energy_full_lp = nlsp.calculateenergy_freq(branch_lp.GetOutput())
     # energy_full_up = nlsp.calculateenergy_freq(branch_up.GetOutput())
     # energy_full = nlsp.calculateenergy_freq(branch.GetOutput())
@@ -178,7 +179,7 @@ def lowpass_evaluation():
             plot.plot(chebyshev_spec,show=True)
 
 def harmonics_evaluation():
-    degree = 4
+    degree = 5
     length = 2**18
     input_signal = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=sweep_start_freq,
                                        stop_frequency=sweep_stop_freq)
@@ -203,6 +204,11 @@ def harmonics_evaluation():
                                                                   max_harm=i,
                                                                   filter_impulseresponse=filter_ir)
         harm_simple = nlsp.get_nl_impulse_response(input_signal,branch_simple.GetOutput())
+        harm_up = nlsp.get_nl_impulse_response(input_signal,branch_up.GetOutput())
+        harm_lowpass = nlsp.get_nl_impulse_response(input_signal,branch_lp.GetOutput())
+        plot.relabelandplot(harm_simple,"simple HM",show=True)
+        plot.relabelandplot(harm_up,"upsampling HM",show=True)
+        plot.relabelandplot(harm_lowpass,"lowpass HM",show=True)
         print nlsp.harmonicsvsall_energyratio_nl(input_signal,branch_simple.GetOutput(),i)
         print nlsp.harmonicsvsall_energyratio_nl(input_signal,branch_up.GetOutput(),i)
         print nlsp.harmonicsvsall_energyratio_nl(input_signal,branch_lp.GetOutput(),i)
@@ -316,8 +322,8 @@ def linearity_evaluation():
             plot.relabelandplot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),"Lowpass HM",show=True)
 
 def reliability_evaluation_puretone():
-    length = 2**18
-    for max_harm in range(2,6):
+    length = 2**15
+    for max_harm in range(3,6):
         frequencies = [100,500,1000,2000,4000]
         puretones = nlsp.generate_puretones(frequencies,sampling_rate,length)
         ip_signal = puretones
@@ -330,13 +336,13 @@ def reliability_evaluation_puretone():
         model_lp = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_signal,
                                                                  nonlin_func=nlsp.function_factory.power_series(nl_degree),
                                                                  max_harm=max_harm)
-        # plot.relabelandplot(sumpf.modules.FourierTransform(model_simple.GetOutput()).GetSpectrum(),"simple",show=False)
-        # plot.relabelandplot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),"upsampling",show=False)
-        # plot.relabelandplot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),"lowpass",show=True)
+        # plot.relabelandplot(sumpf.modules.FourierTransform(model_simple.GetOutput()).GetSpectrum(),"Uncompensated",show=False)
+        # plot.relabelandplot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),"Upsampling",show=False)
+        # plot.relabelandplot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),"Lowpass filtering",show=True)
 
-        # plot.relabelandplot(model_simple.GetOutput(),"simple",show=False)
-        # plot.relabelandplot(model_up.GetOutput(),"upsampling",show=False)
-        # plot.relabelandplot(model_lp.GetOutput(),"lowpass",show=True)
+        plot.relabelandplot(model_simple.GetOutput(),"Uncompensated",show=False)
+        plot.relabelandplot(model_up.GetOutput(),"upsampling",show=False)
+        plot.relabelandplot(model_lp.GetOutput(),"lowpass",show=True)
 
         print "maxharmonics: %r" %max_harm
         print "snr between simple HGM and upsampling HGM: %r" %nlsp.snr(model_simple.GetOutput(),model_up.GetOutput())
@@ -344,7 +350,7 @@ def reliability_evaluation_puretone():
         print
 
 def reliability_evaluation_sweep():
-    length = 2**18
+    length = 2**15
     for max_harm in range(1,6):
         sweep = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate,length=length,start_frequency=20.0,stop_frequency=2000.0)
         ip_signal = sweep.GetOutput()
@@ -361,9 +367,9 @@ def reliability_evaluation_sweep():
         # plot.relabelandplot(sumpf.modules.FourierTransform(model_up.GetOutput()).GetSpectrum(),"upsampling",show=False)
         # plot.relabelandplot(sumpf.modules.FourierTransform(model_lp.GetOutput()).GetSpectrum(),"lowpass",show=True)
 
-        # plot.relabelandplot(model_simple.GetOutput(),"simple",show=False)
-        # plot.relabelandplot(model_up.GetOutput(),"upsampling",show=False)
-        # plot.relabelandplot(model_lp.GetOutput(),"lowpass",show=True)
+        plot.relabelandplot(model_simple.GetOutput(),"Uncompensated",show=False)
+        plot.relabelandplot(model_up.GetOutput(),"Upsampling",show=False)
+        plot.relabelandplot(model_lp.GetOutput(),"Lowpass filtering",show=True)
 
         print "maxharmonics: %r" %max_harm
         print "snr between simple HGM and upsampling HGM: %r" %nlsp.snr(model_simple.GetOutput(),model_up.GetOutput())
@@ -412,14 +418,14 @@ Plot = False
 silence_duration = 0.00
 fade_out = 0.00
 fade_in = 0.00
-Plot = False
+Plot = True
 
 input_signal = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=sweep_start_freq,
                                    stop_frequency=sweep_stop_freq, fade_in=fade_in,fade_out= fade_out)
 input_sweep_signal = input_signal.GetOutput()
 
 # lowpass_evaluation()
-theoretical_evaluation()
+# theoretical_evaluation()
 # puretone_evaluation()
 # sweep_evaluation()
 # harmonics_evaluation()
@@ -427,5 +433,5 @@ theoretical_evaluation()
 # wgn_evaluation()
 # linearity_evaluation()
 # reliability_evaluation_puretone()
-# reliability_evaluation_sweep()
+reliability_evaluation_sweep()
 # reliability_evaluation_noise()

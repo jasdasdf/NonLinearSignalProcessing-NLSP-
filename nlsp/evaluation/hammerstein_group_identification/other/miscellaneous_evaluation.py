@@ -15,7 +15,7 @@ def hardvssoft():
     power = 1.0/3.0
     ref_nlsystem_hard_symmetric = sumpf.modules.ClipSignal(thresholds=[-0.7,0.7])
     ref_nlsystem_hard_nonsymmetric = sumpf.modules.ClipSignal(thresholds=[-0.6,0.8])
-    ref_nlsystem_soft = nlsp.NLClipSignal(thresholds=thresholds, power=power)
+    ref_nlsystem_soft = nlsp.NLClipSignal(power=power)
     ref_nlsystem_hard_nonsymmetric.SetInput(sine.GetOutput())
     ref_nlsystem_hard_symmetric.SetInput(sine.GetOutput())
     ref_nlsystem_soft.SetInput(sine.GetOutput())
@@ -24,9 +24,9 @@ def hardvssoft():
     hard_symm_ir = nlsp.getnl_ir(sine,ref_nlsystem_hard_symmetric.GetOutput())
     hard_nonsymm_ir = nlsp.getnl_ir(sine,ref_nlsystem_hard_nonsymmetric.GetOutput())
 
-    plot.relabelandplot(soft_ir,"soft clipping IR",show=False)
-    plot.relabelandplot(hard_nonsymm_ir,"nonsymmetric hard clipping IR",show=False)
-    plot.relabelandplot(hard_symm_ir,"symmetric hard clipping IR",show=True)
+    # plot.relabelandplot(soft_ir,"soft clipping IR",show=False)
+    # plot.relabelandplot(hard_nonsymm_ir,"nonsymmetric hard clipping IR",show=False)
+    # plot.relabelandplot(hard_symm_ir,"symmetric hard clipping IR",show=True)
 
     sine = sumpf.modules.SineWaveGenerator(frequency=1000.0,samplingrate=sampling_rate,length=length)
     ref_nlsystem_hard_nonsymmetric.SetInput(sine.GetSignal())

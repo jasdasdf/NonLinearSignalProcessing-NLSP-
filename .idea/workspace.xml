@@ -5,28 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="39d02c43-234b-4a09-97b1-e6ee0ba2638c" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/noisegenerator.py" afterPath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/noisegenerator.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/sweepgenerator.py" afterPath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/sweepgenerator.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/filtergenerator.py" afterPath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/filtergenerator.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/findharmonicimpulseresponse.py" afterPath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/findharmonicimpulseresponse.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_metadata/channeldataproperties.py" afterPath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_metadata/channeldataproperties.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/deconvolution_evaluation.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/deconvolution_evaluation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein/aliasing_evaluation.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein/aliasing_evaluation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/__init__.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/differentlengthandbranches.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/differentlengthandbranches.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/exact_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/realworld_model.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/realworld_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/evaluation_script.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/evaluation_script.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/other/miscellaneous_evaluation.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/other/miscellaneous_evaluation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/other/sweep comparison.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/other/sweep comparison.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/realworld_evaluation.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/realworld_evaluation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/robustness_evaluation/robustness_evaluation.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/robustness_evaluation/robustness_evaluation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/hammerstein_group/hammerstein_group_model_up.py" afterPath="$PROJECT_DIR$/nlsp/hammerstein_group/hammerstein_group_model_up.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/__init__.py" afterPath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py" afterPath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/linear_identification.py" afterPath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/linear_identification.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/othogonality/wiener_g_identification.py" afterPath="$PROJECT_DIR$/nlsp/hammerstein_group_identification/othogonality/wiener_g_identification.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/nlaec/simple_nlaec.py" afterPath="$PROJECT_DIR$/nlsp/nlaec/simple_nlaec.py" />
     </list>
     <ignored path="Loudspeakermodel.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -79,7 +63,6 @@
         <option value="$PROJECT_DIR$/nlsp/nl_echocancellers/generate_nlecho.py" />
         <option value="$PROJECT_DIR$/nlsp/common/saveandload.py" />
         <option value="$PROJECT_DIR$/nlsp/nlaec/sa-nl-aec.py" />
-        <option value="$PROJECT_DIR$/nlsp/nlaec/simple_nlaec.py" />
         <option value="$PROJECT_DIR$/nlsp/common/calculate_energy.py" />
         <option value="$PROJECT_DIR$/nlsp/common/sweep.py" />
         <option value="$PROJECT_DIR$/generate_audio.py" />
@@ -113,6 +96,7 @@
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/realworld_evaluation.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/sweepinitializedadaptiveevaluation.py" />
         <option value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/accuracy_evaluation/realworld_model.py" />
+        <option value="$PROJECT_DIR$/nlsp/nlaec/simple_nlaec.py" />
       </list>
     </option>
   </component>
@@ -229,7 +213,7 @@
       <recent name="O:\Diplomanden\Logeshwaran.Thamilselvan\Loudspeaker nonlinearity\Source Code\Loudspeakermodel\nlsp\evaluation\hammerstein" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.realworld_evaluation">
+  <component name="RunManager" selected="Python.simple_nlaec">
     <configuration default="false" name="aliasing_evaluation" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -264,23 +248,6 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
     </configuration>
-    <configuration default="false" name="sweep comparison" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/other" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="Loudspeakermodel" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/other/sweep comparison.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <method />
-    </configuration>
     <configuration default="false" name="deconvolution_evaluation" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -311,6 +278,23 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="Loudspeakermodel" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/sweepinitializedadaptiveevaluation.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <method />
+    </configuration>
+    <configuration default="false" name="simple_nlaec" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/nlsp/nlaec" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="Loudspeakermodel" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/nlsp/nlaec/simple_nlaec.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <method />
@@ -609,17 +593,17 @@
       <item index="8" class="java.lang.String" itemvalue="Python.evaluation_script" />
       <item index="9" class="java.lang.String" itemvalue="Python.aliasing_evaluation" />
       <item index="10" class="java.lang.String" itemvalue="Python.realworld_evaluation" />
-      <item index="11" class="java.lang.String" itemvalue="Python.sweep comparison" />
-      <item index="12" class="java.lang.String" itemvalue="Python.deconvolution_evaluation" />
-      <item index="13" class="java.lang.String" itemvalue="Python.sweepinitializedadaptiveevaluation" />
+      <item index="11" class="java.lang.String" itemvalue="Python.deconvolution_evaluation" />
+      <item index="12" class="java.lang.String" itemvalue="Python.sweepinitializedadaptiveevaluation" />
+      <item index="13" class="java.lang.String" itemvalue="Python.simple_nlaec" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.realworld_evaluation" />
-        <item index="1" class="java.lang.String" itemvalue="Python.sweepinitializedadaptiveevaluation" />
-        <item index="2" class="java.lang.String" itemvalue="Python.aliasing_evaluation" />
-        <item index="3" class="java.lang.String" itemvalue="Python.deconvolution_evaluation" />
-        <item index="4" class="java.lang.String" itemvalue="Python.sweep comparison" />
+        <item index="0" class="java.lang.String" itemvalue="Python.simple_nlaec" />
+        <item index="1" class="java.lang.String" itemvalue="Python.realworld_evaluation" />
+        <item index="2" class="java.lang.String" itemvalue="Python.sweepinitializedadaptiveevaluation" />
+        <item index="3" class="java.lang.String" itemvalue="Python.aliasing_evaluation" />
+        <item index="4" class="java.lang.String" itemvalue="Python.deconvolution_evaluation" />
       </list>
     </recent_temporary>
   </component>
@@ -654,25 +638,25 @@
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25922024" sideWeight="0.49069768" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19494204" sideWeight="0.49069768" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3274648" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46244133" sideWeight="0.38988408" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35682818" sideWeight="0.20906201" order="12" side_tool="true" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37995595" sideWeight="0.21232876" order="12" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.41079813" sideWeight="0.47615263" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37995595" sideWeight="0.7876712" order="5" side_tool="false" content_ui="tabs" x="1019" y="538" width="637" height="479" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24960254" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3278328" sideWeight="0.49789253" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18914647" sideWeight="0.5093023" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5017585" sideWeight="0.48251194" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3802817" sideWeight="0.790938" order="5" side_tool="false" content_ui="tabs" x="1019" y="538" width="637" height="479" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32942554" sideWeight="0.4936407" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5017585" sideWeight="0.48251194" order="2" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -703,20 +687,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/functions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33333334">
-          <caret line="44" column="0" selection-start-line="44" selection-start-column="0" selection-end-line="44" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/common/nonlinear_func.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6135531">
-          <caret line="59" column="13" selection-start-line="59" selection-start-column="13" selection-end-line="59" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/signalformats.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.722449">
@@ -948,13 +918,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/common/multichannel_adaptive_filter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.39029536">
-          <caret line="246" column="0" selection-start-line="246" selection-start-column="0" selection-end-line="246" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/other/adaptive_sweep_evaluation_virtual.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.7531645">
@@ -1001,13 +964,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.1584327">
           <caret line="45" column="4" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3321976">
-          <caret line="98" column="178" selection-start-line="98" selection-start-column="178" selection-end-line="98" selection-end-column="178" />
         </state>
       </provider>
     </entry>
@@ -1063,6 +1019,40 @@
           <folding>
             <marker date="1466605262830" expanded="true" signature="2807:2966" placeholder="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/common/saveandload.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.35791367">
+          <caret line="55" column="4" selection-start-line="55" selection-start-column="4" selection-end-line="55" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/common/multichannel_adaptive_filter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.059813086">
+          <caret line="33" column="4" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/nlaec/simple_nlaec.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="2.033645">
+          <caret line="64" column="40" selection-start-line="64" selection-start-column="40" selection-end-line="64" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/hammerstein_group_identification/adaptive/adaptive_iden.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.1719626">
+          <caret line="142" column="13" selection-start-line="142" selection-start-column="13" selection-end-line="143" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>

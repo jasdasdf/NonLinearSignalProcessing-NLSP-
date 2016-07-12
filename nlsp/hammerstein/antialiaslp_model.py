@@ -5,25 +5,26 @@ from .hammerstein_model import HammersteinModel
 import common
 import math
 
-class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
+class AliasingCompensatedHM_lowpass(HammersteinModel):
     """
-    A class to generate the output of the Aliasing compensated Hammerstein model.
-    This extends the functionality of simple hammerstein model by introducing a lowpass filter prior to applying nonlinear function
-    on the input signal.
-    It imports the sumpf modules to do the signal processing functions.
+    This class is derived from HammersteinModel class. This compensates the aliasing problem of the HammersteinModel.
+    In this aliasing compensated Hammerstein model, a lowpass filter is used to compensate the aliasing.
+    The cut-off frequency of the lowpass filter is chosen based on the degree of the polynomials used in nonlinear block.
+    It uses sumpf modules to do the signal processing stuff.
     """
-    def __init__(self, input_signal=None, nonlin_func=nlsp.NonlinearFunction.power_series(1), max_harm=1,
+    def __init__(self, input_signal=None,
+                 nonlin_func=nlsp.NonlinearFunction.power_series(1),
+                 max_harm=1,
                  filter_impulseresponse=None,
                  filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
                  attenuation=50.0):
         """
-        :param input_signal: the input signal instance to the Alias compensated Hammerstein model
-        :param nonlin_func: the nonlinear function-instance for the nonlinear block
+        :param input_signal: the input signal
+        :param nonlin_func: the nonlinear function
         :param filter_impulseresponse: the impulse response of the linear filter block
         :param filterorder: the order of the filter function used to lowpass the signal
-        :param filterfunction: the type of filter used for lowpass operation. eg. BUTTERWORTH,CHEBYSHEV1,CHEBYSHEV2 etc
-        :param attenuation: the attenuation of the cutoff frequency
-        :return:
+        :param filterfunction: the type of filter used for lowpass operation. eg. sumpf.modules.FilterGenerator.BUTTERWORTH(order=100}
+        :param attenuation: the attenuation required at the cutoff frequency
         """
 
         self._filterfunction = filterfunction
@@ -40,7 +41,7 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
         self.SetNLFunction = self._nonlin_function.SetNonlinearFunction
 
         # call the base classes constructor (which also calls _Connect)
-        super(AliasCompensatingHammersteinModelLowpass, self).__init__(input_signal=input_signal,
+        super(AliasingCompensatedHM_lowpass, self).__init__(input_signal=input_signal,
                                                                          nonlin_func=None,
                                                                          filter_impulseresponse=filter_impulseresponse)
         self.GetOutput = self._itransform.GetSignal
@@ -68,6 +69,11 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
 
     @sumpf.Input(collections.Callable, ("_GetMaximumHarmonic", "_GetCutoffFrequency"))
     def SetMaximumHarmonic(self, max_harmonic):
+        """
+        Set the maximum order of harmonics produced by the nonlinear function. The aliasing compensation is performed
+        based on this value.
+        :param max_harmonic: the maximum order of harmonics introduced by the nonlinear function
+        """
         self._max_harmonic = max_harmonic
         self._nonlin_function.SetMaximumHarmonic(max_harmonic)
 
@@ -81,3 +87,11 @@ class AliasCompensatingHammersteinModelLowpass(HammersteinModel):
         #        (2.0**((20.0*math.log(self._attenuation,10))/(6.0*self._filterorder)))
         return ((self._ampsignal.GetOutput().GetSamplingRate()/2.0)/self._GetMaximumHarmonic())\
                /(2.0**(self._attenuation/(6.0*self._filterorder)))
+
+    @sumpf.Output(sumpf.Signal)
+    def GetNLOutput(self):
+        """
+        Gets the output of the nonlinear block of the Hammerstein model.
+        :return: the output of the nonlinear block of the Hammerstein model
+        """
+        return self._nonlin_function.GetOutput()

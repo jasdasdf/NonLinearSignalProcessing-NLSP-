@@ -7,18 +7,17 @@ import collections
 
 class HammersteinModel(object):
     """
-    A class to generate the output of simple hammerstein model.
-    The simple hammerstein model consists of a nonlinear block followed by the linear filter block. The nonlinear block
-    can be defined by power series or some other polynomial functions.
-    It uses sumpf modules to do the signal processing stuff and function_factory functions to generate the nonlinear
-    outputs. But also other functions like clipsignal, nonlinear clipping etc can also be used.
+    A class to construct a Hammerstein model.
+    The simple Hammerstein model consists of a nonlinear block followed by the linear filter block. The nonlinear block
+    can be defined by power series or some other polynomial functions. It uses sumpf modules to do the signal processing
+    stuff and function_factory functions to generate the nonlinear outputs. But also other functions like clipsignal,
+    nonlinear clipping etc can also be used.
     """
     def __init__(self,input_signal=None, nonlin_func=nlsp.function_factory.power_series(1),filter_impulseresponse=None):
         """
-        :param input_signal: the input signal-instance to the Hammerstein model
-        :param nonlin_func: the nonlinear function for the nonlinear block
+        :param input_signal: the input signal
+        :param nonlin_func: the nonlinear function
         :param filter_impulseresponse: the impulse response of the linear filter block
-        :return:
         """
         # interpret the input parameters
         if input_signal is None:

@@ -4,11 +4,12 @@ from .hammerstein_model import HammersteinModel
 import collections
 import math
 
-class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
+class AliasingCompensatedHM_upsampling(HammersteinModel):
     """
-    A class which is derived from HammersteinModel class and this compensates the aliasing problem of the HammersteinModel.
-    This extends the signal processing blocks of simple hammerstein model by upsampling the input signal prior to the
-    nonlinear block and then downsampling at the end of the branch.
+    This class is derived from HammersteinModel class. This compensates the aliasing problem of the HammersteinModel.
+    In this aliasing compensated Hammerstein model, an upsampler is used to compensate the aliasing. The upsampled
+    signal is downsampled again to the original sampling rate. The upsampling rate is chosen based on the degree of the
+    polynomials used.
     It uses sumpf modules to do the signal processing stuff.
     """
     def __init__(self, input_signal=None, nonlin_func=nlsp.function_factory.power_series(1), max_harm=1,
@@ -16,11 +17,10 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
                  resampling_algorithm=sumpf.modules.ResampleSignal.SPECTRUM,
                  downsampling_position=1):
         """
-        :param input_signal: the input signal instance to the Alias compensated Hammerstein model
-        :param nonlin_func: the nonlinear function for the nonlinear block
+        :param input_signal: the input signal
+        :param nonlin_func: the nonlinear function
         :param filter_impulseresponse: the impulse response of the linear filter block
         :param resampling_algorithm: the algorithm which can be used to downsample and upsample the signal
-        :return:
         """
         # interpret the input parameters
         self._resampling_algorithm = resampling_algorithm
@@ -38,7 +38,7 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
         self.SetNLFunction = self._nonlin_function.SetNonlinearFunction
 
         # call the base classes constructor (which also calls _Connect)
-        super(AliasCompensatingHammersteinModelUpandDown, self).__init__(input_signal=input_signal,
+        super(AliasingCompensatedHM_upsampling, self).__init__(input_signal=input_signal,
                                                                          nonlin_func=None,
                                                                          filter_impulseresponse=filter_impulseresponse)
         if self._downsampling_position == 1:
@@ -71,6 +71,11 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
 
     @sumpf.Input(collections.Callable, ("_GetMaximumHarmonic", "_GetSamplingRate", "_Getattenuation"))
     def SetMaximumHarmonic(self, max_harmonic):
+        """
+        Set the maximum order of harmonics produced by the nonlinear function. The aliasing compensation is performed
+        based on this value.
+        :param max_harmonic: the maximum order of harmonics introduced by the nonlinear function
+        """
         self._max_harmonic = max_harmonic
         self._nonlin_function.SetMaximumHarmonic(max_harmonic)
 
@@ -80,8 +85,8 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
 
     @sumpf.Output(float)
     def _GetSamplingRate(self):
-        # temp = self._prp.GetSamplingRate() * self._GetMaximumHarmonic()
-        temp = self._prp.GetSamplingRate()*math.ceil((self._GetMaximumHarmonic()+1.0)/2.0)
+        # temp = self._prp.GetSamplingRate() * self._GetMaximumHarmonic() # Full resampling
+        temp = self._prp.GetSamplingRate()*math.ceil((self._GetMaximumHarmonic()+1.0)/2.0) # Reduced resampling
         return temp
 
     @sumpf.Output(float)
@@ -91,6 +96,11 @@ class AliasCompensatingHammersteinModelUpandDown(HammersteinModel):
 
     @sumpf.Output(sumpf.Signal)
     def GetNLOutput(self):
+        """
+        Gets the output of the nonlinear block of the Hammerstein model. The output of the nonlinear block is downsampled
+        to the original sampling rate.
+        :return: the output of the nonlinear block of the Hammerstein model
+        """
         sumpf.connect(self._nonlin_function.GetOutput,self._downnloutput.SetInput)
         sumpf.connect(self._prp.GetSamplingRate, self._downnloutput.SetSamplingRate)
         return self._downnloutput.GetOutput()

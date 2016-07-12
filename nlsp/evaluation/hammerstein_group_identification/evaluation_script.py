@@ -5,7 +5,7 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
-length = 2**18
+length = 2**15
 fade_out = 0.02
 fade_in = 0.02
 branches = 5
@@ -30,31 +30,16 @@ wgn_pink = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=lengt
 wgn_laplace = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
                                    stop_frequency=stop_freq, distribution=laplace)
 
-excitation = [sine,
-              sine,
-              sine,
-              cos,
-              wgn_uniform,
-              wgn_normal,
-              wgn_uniform]
-iden_method = [nlsp.nonlinearconvolution_powerseries_temporalreversal,
-               nlsp.nonlinearconvolution_chebyshev_temporalreversal,
-               nlsp.adaptive_identification_legendre,
-               nlsp.miso_identification,
-               nlsp.wiener_g_identification_corr]
-nonlinear_function = [nlsp.function_factory.power_series,
-                      nlsp.function_factory.power_series,
-                      nlsp.function_factory.power_series,
-                      nlsp.function_factory.chebyshev1_polynomial,
-                      nlsp.function_factory.legrendre_polynomial,
-                      nlsp.function_factory.power_series,
-                      nlsp.function_factory.hermite_polynomial]
+excitation = [wgn_uniform,]
+iden_method = [nlsp.adaptive_identification,]
+nonlinear_function = [nlsp.function_factory.power_series,]
 reference = nlsp.RemoveOutliers(thresholds=[-1.0,1.0],value=0,signal=wgn_laplace.GetOutput())
 reference = reference.GetOutput()
 
 
 for method,input_generator,nlfunction in zip(iden_method,excitation,nonlinear_function):
     print method,input_generator
+    nlsp.hgmwithfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
     try:
         nlsp.hgmwithfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
     except:

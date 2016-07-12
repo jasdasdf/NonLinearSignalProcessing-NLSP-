@@ -1,0 +1,4 @@
+from .nlconvolution_powerseries import sine_sweepbased_spectralinversion,sine_sweepbased_temporalreversal
+
+from .nlconvolution_chebyshev import cosine_sweepbased_spectralinversion,cosine_sweepbased_temporalreversal
+

@@ -4,6 +4,12 @@ import sumpf
 import nlsp
 
 def k_matrix_calculate(input,total_branches):
+    """
+    Find the k matrix for the input signal
+    :param input: the input signal
+    :param total_branches: the total number of branches
+    :return: the k matrix
+    """
     row_array = range(0,total_branches)
     column_array = range(0,total_branches)
     k_matrix = numpy.zeros((total_branches,total_branches))
@@ -31,6 +37,12 @@ def k_matrix_calculate(input,total_branches):
 
 
 def wgn_hgm_decorrelate(input,total_branches):
+    """
+    Decorrelate the output signals of the powerseries expansion.
+    :param input: the input signal
+    :param total_branches: the total number of branches
+    :return: the decorrelated signal, the k matrix and the mu matrix
+    """
     k_matrix = k_matrix_calculate(input,total_branches)
     mu_matrix = []
     signal_matrix = []
@@ -63,7 +75,14 @@ def wgn_hgm_decorrelate(input,total_branches):
         signal_matrix.append(core)
     return signal_matrix,k_matrix,mu_matrix
 
-def miso_identification(input_generator,output_wgn,branches):
+def miso_identification(input_generator, output_wgn, branches):
+    """
+    MISO approach of system identification.
+    :param input_generator: the input generator or the input signal
+    :param output_wgn: the response of the nonlinear system
+    :param branches: the number of branches
+    :return: the filter kernels and the nonlinear function of a HGM
+    """
     if hasattr(input_generator,"GetOutput"):
         input_wgn = input_generator.GetOutput()
     else:

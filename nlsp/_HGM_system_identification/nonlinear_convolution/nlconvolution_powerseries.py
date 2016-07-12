@@ -4,11 +4,12 @@ import numpy
 import math
 import common.plot as plot
 
-def nonlinearconvolution_powerseries_spectralinversion(sweep_generator, output_sweep, branches=5):
+def sine_sweepbased_spectralinversion(sweep_generator, output_sweep, branches=5):
     """
-    System Identification using Nonlinear Convolution (spectral Inversion method)
-    :param sweep_generator: the object of sweep generator class
-    :param output_sweep: the output signal from the reference nonlinear system
+    Sweep-based system identification using spectral inversion technique and using sine sweep signal.
+    :param sweep_generator: the sweep generator object
+    :param output_sweep: the output sweep of the nonlinear system
+    :param branches: the total number of output branches
     :return: the parameters of HGM (filter kernels and nonlinear functions)
     """
     sweep_length = sweep_generator.GetLength()
@@ -31,12 +32,6 @@ def nonlinearconvolution_powerseries_spectralinversion(sweep_generator, output_s
     tf_sweep = sumpf.modules.MultiplySpectrums(spectrum1=inversed_ip, spectrum2=op_spectrum).GetOutput()
     ir_sweep = sumpf.modules.InverseFourierTransform(spectrum=tf_sweep).GetSignal()
     # nlsp.common.plots.plot(ir_sweep)
-
-    # Novaks method
-    # ir_harmonics_all = nlsp.FindHarmonicImpulseResponse_Novak(ir_sweep,harmonic_order=branches,sweep_generator=sweep_generator)
-    # ir_merger = ir_harmonics_all.GetHarmonicImpulseResponse()
-
-    # Jonas method
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
@@ -78,18 +73,15 @@ def nonlinearconvolution_powerseries_spectralinversion(sweep_generator, output_s
     return B,nl_func
 
 
-def nonlinearconvolution_powerseries_temporalreversal(sweep_generator, output_sweep, branches=5):
+def sine_sweepbased_temporalreversal(sweep_generator, output_sweep, branches=5):
     """
-    System Identification using Nonlinear Convolution (Temporal Reversal method)
-    :param sweep_generator: the object of sweep generator class
-    :param output_sweep: the output signal from the reference nonlinear system
+    Sweep-based system identification using temporal reversal technique and using sine sweep signal.
+    :param sweep_generator: the sweep generator object
+    :param output_sweep: the output sweep of the nonlinear system
+    :param branches: the total number of output branches
     :return: the parameters of HGM (filter kernels and nonlinear functions)
     """
     sweep_length = sweep_generator.GetLength()
-    sweep_start_freq = sweep_generator.GetStartFrequency()
-    sweep_stop_freq = sweep_generator.GetStopFrequency()
-    ip_signal = sweep_generator.GetOutput()
-
     # output_sweep = nlsp.append_zeros(output_sweep)
     rev = sweep_generator.GetReversedOutput()
     rev_spec = sumpf.modules.FourierTransform(rev).GetSpectrum()
@@ -98,13 +90,6 @@ def nonlinearconvolution_powerseries_temporalreversal(sweep_generator, output_sw
     tf = rev_spec * out_spec
     ir_sweep = sumpf.modules.InverseFourierTransform(tf).GetSignal()
     # nlsp.common.plots.plot(ir_sweep)
-    # ir_sweep = sumpf.modules.ShiftSignal(signal=ir_sweep,shift=250,circular=True).GetOutput()
-
-    # Novaks method of seperating harmonic impulses
-    # ir_harmonics_all = nlsp.FindHarmonicImpulseResponse_Novak(ir_sweep,harmonic_order=branches,sweep_generator=sweep_generator)
-    # ir_merger = ir_harmonics_all.GetHarmonicImpulseResponse()
-
-    # Jonas method of seperating harmonic impulses
     ir_sweep_direct = sumpf.modules.CutSignal(signal=ir_sweep,start=0,stop=int(sweep_length/4)).GetOutput()
     ir_sweep_direct = nlsp.append_zeros(ir_sweep_direct)
     ir_merger = sumpf.modules.MergeSignals(on_length_conflict=sumpf.modules.MergeSignals.FILL_WITH_ZEROS)
@@ -117,7 +102,6 @@ def nonlinearconvolution_powerseries_temporalreversal(sweep_generator, output_sw
         ir_merger.AddInput(sumpf.Signal(channels=split_harm.GetChannels(),
                                         samplingrate=ir_sweep.GetSamplingRate(), labels=split_harm.GetLabels()))
     ir_merger = ir_merger.GetOutput()
-
     # nlsp.common.plots.plot(ir_merger)
     tf_harmonics_all = sumpf.modules.FourierTransform(ir_merger).GetSpectrum()
     harmonics_tf = []

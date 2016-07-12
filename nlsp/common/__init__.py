@@ -43,8 +43,6 @@ from find_harmonics import FindHarmonicImpulseResponse_Novak
 
 from gaussian import WhiteGaussianGenerator
 
-from multichannel_adaptive_filter import multichannel_nlms,nlms,ap,lms,multichannel_ap_ideal,multichannel_nlms_ideal
-
 from filter_kernel_evaluation import filterkernel_evaluation_plot,filterkernel_evaluation_sum
 
 from harmonic import getnl_ir
@@ -54,3 +52,7 @@ from saveandload import load_systemidentification, save_systemidentification, sy
 from spectogram import plotstft
 
 from remove_outliers import RemoveOutliers
+
+# adaptive filtering functions
+from multichannel_adaptive_filter import miso_nlms_multichannel, siso_nlms_multichannel, multichannel_ap_ideal
+from singlechannel_adaptive_filter import nlms, lms, ap

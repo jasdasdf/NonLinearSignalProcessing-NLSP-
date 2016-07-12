@@ -4,4 +4,4 @@ from hammerstein_group_model_up import HammersteinGroupModel_up
 
 from hammerstein_group_model_lp import HammersteinGroupModel_lp
 
-from hammerstein_group_series import HammersteinGroup_Series
+from hammerstein_group_model_series import HammersteinGroupModel_Series

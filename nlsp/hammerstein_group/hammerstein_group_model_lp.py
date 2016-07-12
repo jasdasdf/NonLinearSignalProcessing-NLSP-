@@ -3,9 +3,7 @@ import nlsp
 
 class HammersteinGroupModel_lp(object):
     """
-    A class to generate the output of hammerstein group model with given nonlinear functions, filter impulse responses
-    and maximum harmonics
-    It uses Hammerstein model with lowpass filter alias compensation.
+    Lowpass aliasing compensated Hammerstein group model.
     """
 
     def __init__(self, input_signal=None, nonlinear_functions=(nlsp.function_factory.power_series(1),),
@@ -14,11 +12,11 @@ class HammersteinGroupModel_lp(object):
                  attenuation=0.0001):
         """
         :param signal: the input signal
-        :param nonlinear_functions: the tuple of nonlinear functions of hammerstein group models
-        :param filter_irs: the tuple of filter impulse responses
-        :param max_harmonics: the tuple of maximum harmonics
-        :param filterfunction: the type of filter used for lowpass operation. eg. BUTTERWORTH,CHEBYSHEV1,CHEBYSHEV2 etc
-        :param attenuation: the attenuation of the cutoff frequency
+        :param nonlinear_functions: the tuple of nonlinear functions eg. (nlsp.function_factory.power_series(1),...)
+        :param filter_irs: the tuple of filter impulse responses eg. (IR1,...)
+        :param max_harmonics: the tuple of maximum harmonics eg. (1,...)
+        :param filterfunction: the type of filter used for lowpass operation eg. sumpf.modules.FilterGenerator.BUTTERWORTH(order=20)
+        :param attenuation: the attenuation required at the cutoff frequency eg. 0.001
         :return:
         """
         if input_signal is None:
@@ -45,7 +43,7 @@ class HammersteinGroupModel_lp(object):
         self.__sums = [None] * self.__branches
 
         for nl,ir,mh in zip(self.__nlfunctions,self.__filter_irs,self.__max_harmonics):
-            h = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=self.inputstage.GetOutput(),
+            h = nlsp.AliasingCompensatedHM_lowpass(input_signal=self.inputstage.GetOutput(),
                                                               nonlin_func=nl, max_harm=mh,
                                                               filter_impulseresponse=ir,
                                                               filterfunction=self.__filterfunction,
@@ -68,6 +66,10 @@ class HammersteinGroupModel_lp(object):
 
     @sumpf.Input(sumpf.Signal)
     def SetInput(self, signal):
+        """
+        Sets the input to the Hammerstein group model.
+        :param signal: the input signal
+        """
         inputs = []
         for i in range(len(self.hmodels)):
             inputs.append((self.hmodels[i].SetInput, signal))
@@ -75,6 +77,10 @@ class HammersteinGroupModel_lp(object):
 
     @sumpf.Input(tuple)
     def SetNLFunctions(self, nonlinearfunctions):
+        """
+        Sets the nonlinear functions of the Hammerstein group model.
+        :param nonlinearfunctions: the tuple of nonlinear functions eg. (nlsp.function_factory.power_series(1),...)
+        """
         nonlinfunc = []
         for i in range(len(self.hmodels)):
             nonlinfunc.append((self.hmodels[i].SetNLFunction, nonlinearfunctions[i]))
@@ -82,6 +88,11 @@ class HammersteinGroupModel_lp(object):
 
     @sumpf.Input(tuple)
     def SetFilterIRS(self, impulseresponse):
+        """
+        Sets the impulse response of the linear blocks of the Hammerstein group model.
+        :param impulseresponse: the tuple of filter impulse responses eg. (IR1,...)
+        :return:
+        """
         irs = []
         for i in range(len(self.hmodels)):
             irs.append((self.hmodels[i].SetFilterIR, impulseresponse[i]))
@@ -89,6 +100,10 @@ class HammersteinGroupModel_lp(object):
 
     @sumpf.Input(tuple)
     def SetMaximumHarmonics(self, maxharmonics):
+        """
+        Sets the maximum orders of distortions produced by the nonlinear function.
+        :param maxharmonics:  the tuple of maximum harmonics eg. (1,...)
+        """
         harmonics = []
         for i in range(len(self.hmodels)):
             harmonics.append((self.hmodels[i].SetMaximumHarmonic, maxharmonics[i]))
@@ -96,7 +111,24 @@ class HammersteinGroupModel_lp(object):
 
     @sumpf.Output(sumpf.Signal)
     def GetHammersteinBranchOutput(self, branchnumber):
+        """
+        Get the output of the individual branches of the Hammerstein group model.
+        :param branchnumber: the branch number
+        :return: the output of the particular branch of the Hammerstein group model
+        """
         if branchnumber > self.__branches:
             print "The branch doesnot exists"
         else:
             return self.hmodels[branchnumber-1].GetOutput()
+
+    @sumpf.Input(int)
+    def GetHammersteinBranchNLOutput(self, branchnumber):
+        """
+        Get the output of the nonlinear block of certain branch of the Hammerstein group model.
+        :param branchnumber: the branch number
+        :return: the output of the nonlinear block of certain branch of the Hammerstein group model
+        """
+        if branchnumber > self.__branches:
+            print "The branch doesnot exists"
+        else:
+            return self.hmodels[branchnumber-1].GetNLOutput()

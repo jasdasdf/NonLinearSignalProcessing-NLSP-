@@ -1,8 +1,8 @@
 import sumpf
 
-class HammersteinGroup_Series(object):
+class HammersteinGroupModel_Series(object):
     """
-    Class to connect Hammerstein Group Models in series
+    Serial connection of the Hammerstein group model.
     """
     def __init__(self, input_signal=None,
                  nonlinear_functions=None,

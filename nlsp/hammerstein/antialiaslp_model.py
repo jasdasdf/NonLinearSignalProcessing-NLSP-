@@ -2,8 +2,6 @@ import collections
 import sumpf
 import nlsp
 from .hammerstein_model import HammersteinModel
-import common
-import math
 
 class AliasingCompensatedHM_lowpass(HammersteinModel):
     """

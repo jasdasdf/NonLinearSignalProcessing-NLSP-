@@ -1,23 +1,20 @@
 import sumpf
 import nlsp
 
-import functools
-
 class HammersteinGroupModel(object):
     """
     A class to generate the output of hammerstein group model with given nonlinear functions, filter impulse responses
     and maximum harmonics.
-    It uses simple Hammerstein branch without aliasing compensation.
+    It uses uncompensated Hammerstein model.
     """
 
     def __init__(self, input_signal=None, nonlinear_functions=(nlsp.function_factory.power_series(1),),
                  filter_irs=None, max_harmonics=None):
         """
         :param signal: the input signal
-        :param nonlinear_functions: the tuple of nonlinear functions of hammerstein group models
-        :param filter_irs: the tuple of filter impulse responses
-        :param max_harmonics: the tuple of maximum harmonics
-        :return:
+        :param nonlinear_functions: the tuple of nonlinear functions eg. (nlsp.function_factory.power_series(1),...)
+        :param filter_irs: the tuple of filter impulse responses eg. (IR1,...)
+        :param max_harmonics: the tuple of maximum harmonics eg. (1,...)
         """
         if input_signal is None:
             self.__signal = sumpf.Signal()
@@ -57,6 +54,10 @@ class HammersteinGroupModel(object):
 
     @sumpf.Input(sumpf.Signal)
     def SetInput(self, signal):
+        """
+        Sets the input to the Hammerstein group model.
+        :param signal: the input signal
+        """
         inputs = []
         for i in range(len(self.hmodels)):
             inputs.append((self.hmodels[i].SetInput, signal))
@@ -64,6 +65,10 @@ class HammersteinGroupModel(object):
 
     @sumpf.Input(tuple)
     def SetNLFunctions(self, nonlinearfunctions):
+        """
+        Sets the nonlinear functions of the Hammerstein group model.
+        :param nonlinearfunctions: the tuple of nonlinear functions eg. (nlsp.function_factory.power_series(1),...)
+        """
         nonlinfunc = []
         for i in range(len(self.hmodels)):
             nonlinfunc.append((self.hmodels[i].SetNLFunction, nonlinearfunctions[i]))
@@ -71,6 +76,11 @@ class HammersteinGroupModel(object):
 
     @sumpf.Input(tuple)
     def SetFilterIRS(self, impulseresponse):
+        """
+        Sets the impulse response of the linear blocks of the Hammerstein group model.
+        :param impulseresponse: the tuple of filter impulse responses eg. (IR1,...)
+        :return:
+        """
         irs = []
         for i in range(len(self.hmodels)):
             irs.append((self.hmodels[i].SetFilterIR, impulseresponse[i]))
@@ -78,6 +88,11 @@ class HammersteinGroupModel(object):
 
     @sumpf.Output(sumpf.Signal)
     def GetHammersteinBranchOutput(self, branchnumber):
+        """
+        Get the output of the individual branches of the Hammerstein group model.
+        :param branchnumber: the branch number
+        :return: the output of the particular branch of the Hammerstein group model
+        """
         if branchnumber > self.__branches:
             print "The branch doesnot exists"
         else:

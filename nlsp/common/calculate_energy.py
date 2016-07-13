@@ -20,6 +20,7 @@ def calculateenergy_time(input):
         energy_singlechannel = []
         for s in c:
             energy_singlechannel.append(abs(s)**2)
+            # energy_singlechannel.append(math.log10((abs(s)/0.02)+1))
         energy_allchannels.append(numpy.sum(energy_singlechannel))
     return energy_allchannels
 

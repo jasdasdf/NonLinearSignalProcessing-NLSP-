@@ -85,56 +85,6 @@ def generate_sweep():
                                               signal=sine_right,
                                               format=sumpf.modules.SignalFile.WAV_FLOAT)
 
-def analyze_for_thomas():
-    sampling_rate = 48000.0
-    length = 2**16
-    branches = 3
-    path = "C:/Users/diplomand.8/Desktop/thomas_sweep/new/"
 
-    file_input = "C:/Users/diplomand.8/Desktop/thomas_sweep/new/input.wav"
-    load_input = sumpf.modules.SignalFile(filename=file_input, format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
-    sweep_input = load_input
-
-    listdir = os.listdir(path)
-    for file in listdir:
-
-        file_output = os.path.join(path,file)
-        load_output = sumpf.modules.SignalFile(filename=file_output, format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
-        load_output = nlsp.change_length_signal(load_output,len(load_input))
-        sweep_output = load_output
-        print file_output
-        sweep_output_spec = sumpf.modules.FourierTransform(sweep_output).GetSpectrum()
-        rev_spec = sumpf.modules.RegularizedSpectrumInversion(spectrum=sumpf.modules.FourierTransform(sweep_input).GetSpectrum(),start_frequency=20.0,stop_frequency=20000.0).GetOutput()
-        nl_tf = sumpf.modules.MultiplySpectrums(rev_spec,sweep_output_spec)
-        nl_ir = sumpf.modules.InverseFourierTransform(nl_tf.GetOutput()).GetSignal()
-        # nlsp.common.plots.plot(nl_ir)
-
-        direct = sumpf.modules.CutSignal(nl_ir,stop=int(3*nl_ir.GetSamplingRate())).GetOutput()
-        harmonics = sumpf.modules.CutSignal(nl_ir,start=int(3*nl_ir.GetSamplingRate())).GetOutput()
-        print len(harmonics)
-
-        print nlsp.calculateenergy_time(harmonics)
-        print
-
-branches = 5
-file_input = "C:/Users/diplomand.8/Desktop/thomas_sweep/temp/sinesweep_double.wav"
-load_input = sumpf.modules.SignalFile(filename=file_input, format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
-signal = sumpf.modules.SplitSignal(data=load_input,channels=[0]).GetOutput()
-sampling_rate = 44100
-length = 2**18
-fade_in = 0.0
-fade_out = 0.0
-sine_sweep = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate,length=length,fade_in=fade_in,fade_out=fade_out)
-filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=signal)
-ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=signal,
-                                                 nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
-                                                 filter_irs=filter_spec_tofind,
-                                                 max_harmonics=range(1,branches+1))
-filter,func = nlsp.nonlinearconvolution_powerseries_temporalreversal(sine_sweep,ref_nlsystem.GetOutput(),branches)
-iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=signal,
-                                                 nonlinear_functions=func,
-                                                 filter_irs=filter,
-                                                 max_harmonics=range(1,branches+1))
-print nlsp.snr(ref_nlsystem.GetOutput(),iden_nlsystem.GetOutput())
 # generate_sweep()
 # convert_audio()

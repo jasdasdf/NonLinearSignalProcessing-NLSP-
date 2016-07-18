@@ -64,6 +64,9 @@ def system_identification_algorithm(excitations,branches=5):
                 input = nlsp.check_even(input)
                 output = nlsp.change_length_signal(output,len(input))
                 filterk, nl = nlsp.adaptive_identification(input,output,branches=branches)
+                file_name = ''.join([file_name,'Adaptive'])
+                filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
+                sumpf.modules.SignalFile(filename=file_name,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
             elif code is 'LogeshSweep': # sweep based system identification
                 input = nlsp.NovakSweepGenerator_Sine(sampling_rate=44100,length=2**18,start_frequency=20.0,
                                                       stop_frequency=20000.0,fade_out=0.00,fade_in=0.00)
@@ -72,8 +75,20 @@ def system_identification_algorithm(excitations,branches=5):
                 output = nlsp.change_length_signal(output,len(input.GetOutput()))
                 output = sumpf.modules.ShiftSignal(signal=output,shift=1000,circular=False).GetOutput()
                 filterk, nl = nlsp.sine_sweepbased_temporalreversal(input,output,branches=branches)
-            filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
-            sumpf.modules.SignalFile(filename=file_name,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
+                file_name = ''.join([file_name,'SineSweep'])
+                filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
+                sumpf.modules.SignalFile(filename=file_name,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
+                # Linear system identification
+                input = nlsp.NovakSweepGenerator_Sine(sampling_rate=44100,length=2**18,start_frequency=20.0,
+                                                      stop_frequency=20000.0,fade_out=0.00,fade_in=0.00)
+                output = sumpf.modules.SignalFile(filename=response,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
+                output = sumpf.modules.SplitSignal(data=output,channels=[0]).GetOutput()
+                output = nlsp.change_length_signal(output,len(input.GetOutput()))
+                output = sumpf.modules.ShiftSignal(signal=output,shift=1000,circular=False).GetOutput()
+                filterk, nl = nlsp.linear_identification(input,output,branches=branches)
+                file_name = ''.join([file_name,'Linear'])
+                filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
+                sumpf.modules.SignalFile(filename=file_name,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
 
 
 # Test the model using samples
@@ -91,12 +106,12 @@ def read_inputs():
     output_files = os.listdir(output_path)
     input_files_club = []
     output_files_club = []
-    for inputs in input_files:
-        name = inputs.split('_')[2]
-        input_file = os.path.join(input_path,inputs)
-        for outputs in output_files:
-            if name in outputs:
-                output_file = os.path.join(output_path,outputs)
+    for outputs in output_files:
+        name = outputs.split('_')[2]
+        output_file = os.path.join(output_path,outputs)
+        for inputs in input_files:
+            if name in inputs:
+                input_file = os.path.join(input_path,inputs)
         input_files_club.append(input_file)
         output_files_club.append(output_file)
     inputs = zip(input_files_club, output_files_club)
@@ -106,35 +121,56 @@ def construct_models():
     model_path = os.path.join(source_directory,"Models")
     car_names = []
     constructed_models = []
+    Method_name = []
     for model_kernel in os.listdir(model_path):
         filter_kernels = sumpf.modules.SignalFile(filename=os.path.join(model_path,model_kernel),
                                  format=sumpf.modules.SignalFile.NUMPY_NPZ).GetSignal()
         spec = sumpf.modules.FourierTransform(filter_kernels).GetSpectrum()
         filter_kernels = nlsp.multichanneltoarray(filter_kernels)
         car_name = model_kernel.split('_')[0]
-        if 'LogeshSweep' in model_kernel:
+        if 'SineSweep' in model_kernel:
+            method = 'SineSweep'
             nl_functions = nlsp.nl_branches(nlsp.function_factory.power_series,branches=branches)
-        elif 'MLS' in model_kernel:
+        elif 'Adaptive' in model_kernel:
+            method = 'Adaptive'
             nl_functions = nlsp.nl_branches(nlsp.function_factory.laguerre_polynomial,branches=branches)
+        elif 'Linear' in model_kernel:
+            method = 'Linear'
+            nl_functions = nlsp.nl_branches(nlsp.function_factory.power_series,branches=branches)
         filter_kernels = nlsp.change_length_filterkernels(filter_kernels=filter_kernels,length=2**11)
         model_constructed = nlsp.HammersteinGroupModel_up(input_signal=sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=44100,length=2**10).GetSignal(),
                                                           nonlinear_functions=nl_functions,
                                                           filter_irs=filter_kernels,max_harmonics=range(1,branches+1))
         car_names.append(car_name)
         constructed_models.append(model_constructed)
-    Models = zip(car_names,constructed_models)
+        Method_name.append(method)
+    Models = zip(car_names,constructed_models,Method_name)
     return Models
 
 def check_accuracy(models, inputs):
     for input,output in inputs:
-        inp_file = sumpf.modules.SignalFile(filename=input,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
-        out_file = sumpf.modules.SignalFile(filename=output,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
-        print output
-        # for car_name, model in models:
-        #     if car_name in output:
-        #         print output
-        #         print car_name
+        inp_signal = sumpf.modules.SignalFile(filename=input,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
+        out_signal = sumpf.modules.SignalFile(filename=output,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
+        inp_signal = sumpf.modules.CutSignal(signal=inp_signal,stop=2**16).GetOutput()
+        out_signal = sumpf.modules.CutSignal(signal=out_signal,stop=2**16).GetOutput()
+        for car_name, model, method in models:
+            if car_name in output:
+                model.SetInput(inp_signal)
+                model_output = model.GetOutput()
+                system_output = out_signal
+                system_output = sumpf.modules.SplitSignal(data=system_output, channels=[0]).GetOutput()
+                print method
+                print output
+                print nlsp.snr(system_output,model_output)
+                del system_output
+                del model_output
+        del inp_signal
+        del out_signal
 
 
-# system_identification_algorithm(read_excitations())
-check_accuracy(models=construct_models(),inputs=read_inputs())
+def main():
+    system_identification_algorithm(read_excitations())
+    check_accuracy(models=construct_models(),inputs=read_inputs())
+
+
+main()

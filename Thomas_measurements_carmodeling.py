@@ -64,9 +64,15 @@ def system_identification_algorithm(excitations,branches=5):
                 input = nlsp.check_even(input)
                 output = nlsp.change_length_signal(output,len(input))
                 filterk, nl = nlsp.adaptive_identification(input,output,branches=branches)
-                file_name = ''.join([file_name,'Adaptive'])
+                file_name_a = ''.join([file_name,'Adaptive'])
                 filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
-                sumpf.modules.SignalFile(filename=file_name,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
+                sumpf.modules.SignalFile(filename=file_name_a,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
+                # clipping adaptive system identification
+                filterk, nl = nlsp.clipping_adaptive_identification(input,output,branches=branches)
+                file_name_ca = ''.join([file_name,'ClippingAdaptive'])
+                filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
+                sumpf.modules.SignalFile(filename=file_name_ca,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
+
             elif code is 'LogeshSweep': # sweep based system identification
                 input = nlsp.NovakSweepGenerator_Sine(sampling_rate=44100,length=2**18,start_frequency=20.0,
                                                       stop_frequency=20000.0,fade_out=0.00,fade_in=0.00)
@@ -75,9 +81,14 @@ def system_identification_algorithm(excitations,branches=5):
                 output = nlsp.change_length_signal(output,len(input.GetOutput()))
                 output = sumpf.modules.ShiftSignal(signal=output,shift=1000,circular=False).GetOutput()
                 filterk, nl = nlsp.sine_sweepbased_temporalreversal(input,output,branches=branches)
-                file_name = ''.join([file_name,'SineSweep'])
+                file_name_s = ''.join([file_name,'SineSweep'])
                 filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
-                sumpf.modules.SignalFile(filename=file_name,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
+                sumpf.modules.SignalFile(filename=file_name_s,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
+                # Linear HGM system identification
+                filterk, nl = nlsp.linear_identification_powerhgm(input,output,branches=branches)
+                file_name_lh = ''.join([file_name,'LinearHGM'])
+                filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
+                sumpf.modules.SignalFile(filename=file_name_lh,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
                 # Linear system identification
                 input = nlsp.NovakSweepGenerator_Sine(sampling_rate=44100,length=2**18,start_frequency=20.0,
                                                       stop_frequency=20000.0,fade_out=0.00,fade_in=0.00)
@@ -86,9 +97,9 @@ def system_identification_algorithm(excitations,branches=5):
                 output = nlsp.change_length_signal(output,len(input.GetOutput()))
                 output = sumpf.modules.ShiftSignal(signal=output,shift=1000,circular=False).GetOutput()
                 filterk, nl = nlsp.linear_identification(input,output,branches=branches)
-                file_name = ''.join([file_name,'Linear'])
+                file_name_l = ''.join([file_name,'Linear'])
                 filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
-                sumpf.modules.SignalFile(filename=file_name,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
+                sumpf.modules.SignalFile(filename=file_name_l,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
 
 
 # Test the model using samples
@@ -134,8 +145,14 @@ def construct_models():
         elif 'Adaptive' in model_kernel:
             method = 'Adaptive'
             nl_functions = nlsp.nl_branches(nlsp.function_factory.laguerre_polynomial,branches=branches)
+        elif 'ClippingAdaptive' in model_kernel:
+            method = 'ClippingAdaptive'
+            nl_functions = nlsp.nl_branches(nlsp.function_factory.laguerre_polynomial,branches=branches)
         elif 'Linear' in model_kernel:
             method = 'Linear'
+            nl_functions = nlsp.nl_branches(nlsp.function_factory.power_series,branches=branches)
+        elif 'LinearHGM' in model_kernel:
+            method = 'LinearHGM'
             nl_functions = nlsp.nl_branches(nlsp.function_factory.power_series,branches=branches)
         filter_kernels = nlsp.change_length_filterkernels(filter_kernels=filter_kernels,length=2**11)
         model_constructed = nlsp.HammersteinGroupModel_up(input_signal=sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=44100,length=2**10).GetSignal(),
@@ -151,8 +168,8 @@ def check_accuracy(models, inputs):
     for input,output in inputs:
         inp_signal = sumpf.modules.SignalFile(filename=input,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
         out_signal = sumpf.modules.SignalFile(filename=output,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
-        inp_signal = sumpf.modules.CutSignal(signal=inp_signal,stop=2**16).GetOutput()
-        out_signal = sumpf.modules.CutSignal(signal=out_signal,stop=2**16).GetOutput()
+        inp_signal = sumpf.modules.CutSignal(signal=inp_signal,stop=2**18).GetOutput()
+        out_signal = sumpf.modules.CutSignal(signal=out_signal,stop=2**18).GetOutput()
         for car_name, model, method in models:
             if car_name in output:
                 model.SetInput(inp_signal)

@@ -450,6 +450,13 @@ def change_length_signal(signal,length=None):
         signal = nlsp.append_zeros(signal,length)
     return signal
 
+def check_even(signal):
+    if len(signal) % 2 != 0:
+        signal = sumpf.modules.CutSignal(signal=signal,start=0,stop=len(signal)-1).GetOutput()
+    else:
+        pass
+    return signal
+
 def change_length_filterkernels(filter_kernels,length=2**10):
     filter_kernels_modified = []
     for filter in filter_kernels:

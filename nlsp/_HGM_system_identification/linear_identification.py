@@ -55,7 +55,7 @@ def linear_identification_powerhgm(sweep_generator, output_sweep, branches):
     :return: the filter kernels and the nonlinear functions of the HGM
     """
     srate = output_sweep.GetSamplingRate()
-    filter_kernels, nl_func = nlsp.nonlinearconvolution_powerseries_temporalreversal(sweep_generator,output_sweep,branches)
+    filter_kernels, nl_func = nlsp.sine_sweepbased_temporalreversal(sweep_generator,output_sweep,branches)
     ir_sweep = []
     ir_sweep.append(filter_kernels[0])
     length = len(filter_kernels[0])

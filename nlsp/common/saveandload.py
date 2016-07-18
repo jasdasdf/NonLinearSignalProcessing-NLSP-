@@ -5,11 +5,11 @@ import os
 
 location = "C:/Users/diplomand.8/Desktop/evaluation/filter_kernel/"
 
-def save_systemidentification(method,nlsystem,filterkernels,length):
+def save_systemidentification(method,nonlinearfunc,filterkernels,excitation_length):
     branches = len(filterkernels)
     str_method = str(method)
     f,func,rest,rest2 = str_method.split()
-    filename = '_'.join((nlsystem, func, str(branches), str(length)))
+    filename = '_'.join((nonlinearfunc, func, str(branches), str(excitation_length)))
     file = os.path.join(location,filename)
     kernels = sumpf.modules.MergeSignals(signals=filterkernels).GetOutput()
     kernels.GetChannels()

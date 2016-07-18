@@ -3,7 +3,7 @@ import sumpf
 import numpy
 
 def adaptive_identification(input_generator, outputs, branches=5, iterations=1, step_size=0.1,
-                                        filtertaps=2**9, algorithm=nlsp.miso_nlms_multichannel, init_coeffs=None,
+                                        filtertaps=2**11, algorithm=nlsp.miso_nlms_multichannel, init_coeffs=None,
                                         Plot_SERvsIteration = False, Print_SER = False,
                                         nonlinear_func = nlsp.function_factory.legrendre_polynomial):
     """

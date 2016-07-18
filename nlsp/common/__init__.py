@@ -14,7 +14,7 @@ from helper import cut_spectrum, relabel, nl_branches, add_noise, change_length_
 
 from helper import get_nl_impulse_response, get_nl_harmonics, harmonicsvsall_energyratio_nl, get_nl_harmonics_iden, dot_product, multichanneltoarray
 
-from helper import harmonicsvsall_energyratio,create_bpfilter,binomial,get_mean,calculate_sdr,calculate_sdr_add
+from helper import harmonicsvsall_energyratio,create_bpfilter,binomial,get_mean,calculate_sdr,calculate_sdr_add,check_even
 
 from calculate_aliasing import calculate_aliasing_percentage
 

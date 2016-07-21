@@ -5,7 +5,7 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
-length = 2**15
+length = 2**18
 fade_out = 0.02
 fade_in = 0.02
 branches = 5
@@ -14,7 +14,7 @@ uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
 pink = sumpf.modules.NoiseGenerator.PinkNoise()
 laplace = sumpf.modules.NoiseGenerator.LaplaceDistribution(mean=0.0,scale=0.2)
 
-Plot = True
+Plot = False
 Save = False
 
 sine = nlsp.NovakSweepGenerator_Sine(sampling_rate=sampling_rate, length=length, start_frequency=start_freq,
@@ -31,41 +31,66 @@ wgn_laplace = nlsp.WhiteGaussianGenerator(sampling_rate=sampling_rate, length=le
                                    stop_frequency=stop_freq, distribution=laplace)
 
 excitation = [sine,
-              wgn_uniform]
-iden_method = [nlsp.sine_sweepbased_temporalreversal,
-               nlsp.clipping_adaptive_identification]
-nonlinear_function = [nlsp.function_factory.laguerre_polynomial,
-                      nlsp.function_factory.laguerre_polynomial]
+              sine,
+              sine,
+              cos,
+              wgn_uniform,
+              wgn_normal,
+              wgn_normal]
+iden_method = [nlsp.linear_identification,
+               nlsp.linear_identification_powerhgm,
+               nlsp.sine_sweepbased_temporalreversal,
+               nlsp.cosine_sweepbased_temporalreversal,
+               nlsp.adaptive_identification,
+               nlsp.miso_identification,
+               nlsp.wiener_g_identification]
+nonlinear_function = [nlsp.function_factory.power_series,
+                      nlsp.function_factory.power_series,
+                      nlsp.function_factory.power_series,
+                      nlsp.function_factory.chebyshev1_polynomial,
+                      nlsp.function_factory.legrendre_polynomial,
+                      nlsp.function_factory.power_series,
+                      nlsp.function_factory.hermite_polynomial]
 reference = nlsp.RemoveOutliers(thresholds=[-1.0,1.0],value=0,signal=wgn_laplace.GetOutput())
 reference = reference.GetOutput()
 
 
 for method,input_generator,nlfunction in zip(iden_method,excitation,nonlinear_function):
     print method,input_generator
-    try:
-        nlsp.hgmwithfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
-    except:
-        print "hgm with filter exception"
-    try:
-        nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
-    except:
-        print "hgm with overlap filter exception"
     # try:
-    #     nlsp.linearmodel_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
+    #     nlsp.hgmwithfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
     # except:
-    #     print "linear model exception"
+    #     print "hgm with filter exception"
+    # try:
+    #     nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
+    # except:
+    #     print "hgm with overlap filter exception"
     # try:
     #     nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
     # except:
     #     print "hgm with reversed filter exception"
     # try:
+    #     nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
+    # except:
+    #     print "robustness excitation exception"
+    # try:
+    #     nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot,reference)
+    # except:
+    #     print "robustness noise exception"
+
+
+    # try:
+    #     nlsp.linearmodel_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
+    # except:
+    #     print "linear model exception"
+    # try:
     #     nlsp.hgmallpass_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
     # except:
     #     print "allpass filter exception"
-    try:
-        nlsp.hgmwithalphafilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
-    except:
-        print "weighted filtering exception"
+    # try:
+    #     nlsp.hgmwithalphafilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
+    # except:
+    #     print "weighted filtering exception"
     # try:
     #     nlsp.clippingHGMevaluation(input_generator,branches,method,Plot,reference)
     # except:
@@ -93,14 +118,7 @@ for method,input_generator,nlfunction in zip(iden_method,excitation,nonlinear_fu
     #
     #
     #
-    # try:
-    #     nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
-    # except:
-    #     print "robustness excitation exception"
-    # try:
-    #     nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot,reference)
-    # except:
-    #     print "robustness noise exception"
+
 
 
 # for method,input_generator in zip(iden_method,excitation):

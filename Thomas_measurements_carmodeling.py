@@ -9,6 +9,9 @@ import pickle
 source_directory = "C:\Users\diplomand.8\Desktop\car_modeling"
 model_save_directory = "C:\Users\diplomand.8\Desktop\car_modeling\Models"
 branches = 5
+shift = 800
+length_inputs = 2**18
+kernel_length = 2**11
 
 # Determine the model for the system to be identified
 # 1. Read excitation and response files
@@ -63,13 +66,13 @@ def system_identification_algorithm(excitations,branches=5):
                 output = sumpf.modules.SplitSignal(data=output,channels=[0]).GetOutput()
                 input = nlsp.check_even(input)
                 output = nlsp.change_length_signal(output,len(input))
-                filterk, nl = nlsp.adaptive_identification(input,output,branches=branches)
+                filterk, nl = nlsp.adaptive_identification(input,output,branches=branches,filtertaps=kernel_length)
                 file_name_a = ''.join([file_name,'Adaptive'])
                 filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
                 sumpf.modules.SignalFile(filename=file_name_a,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
                 # clipping adaptive system identification
-                filterk, nl = nlsp.clipping_adaptive_identification(input,output,branches=branches)
-                file_name_ca = ''.join([file_name,'ClippingAdaptive'])
+                filterk, nl = nlsp.clipping_adaptive_identification(input,output,branches=branches,filtertaps=kernel_length)
+                file_name_ca = ''.join([file_name,'ClippingAdap'])
                 filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
                 sumpf.modules.SignalFile(filename=file_name_ca,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
 
@@ -79,14 +82,14 @@ def system_identification_algorithm(excitations,branches=5):
                 output = sumpf.modules.SignalFile(filename=response,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
                 output = sumpf.modules.SplitSignal(data=output,channels=[0]).GetOutput()
                 output = nlsp.change_length_signal(output,len(input.GetOutput()))
-                output = sumpf.modules.ShiftSignal(signal=output,shift=1000,circular=False).GetOutput()
+                output = sumpf.modules.ShiftSignal(signal=output,shift=shift,circular=False).GetOutput()
                 filterk, nl = nlsp.sine_sweepbased_temporalreversal(input,output,branches=branches)
                 file_name_s = ''.join([file_name,'SineSweep'])
                 filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
                 sumpf.modules.SignalFile(filename=file_name_s,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
                 # Linear HGM system identification
                 filterk, nl = nlsp.linear_identification_powerhgm(input,output,branches=branches)
-                file_name_lh = ''.join([file_name,'LinearHGM'])
+                file_name_lh = ''.join([file_name,'LinHGM'])
                 filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
                 sumpf.modules.SignalFile(filename=file_name_lh,signal=filterk,format=sumpf.modules.SignalFile.NUMPY_NPZ)
                 # Linear system identification
@@ -95,7 +98,7 @@ def system_identification_algorithm(excitations,branches=5):
                 output = sumpf.modules.SignalFile(filename=response,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
                 output = sumpf.modules.SplitSignal(data=output,channels=[0]).GetOutput()
                 output = nlsp.change_length_signal(output,len(input.GetOutput()))
-                output = sumpf.modules.ShiftSignal(signal=output,shift=1000,circular=False).GetOutput()
+                output = sumpf.modules.ShiftSignal(signal=output,shift=shift,circular=False).GetOutput()
                 filterk, nl = nlsp.linear_identification(input,output,branches=branches)
                 file_name_l = ''.join([file_name,'Linear'])
                 filterk = sumpf.modules.MergeSignals(signals=filterk).GetOutput()
@@ -145,14 +148,14 @@ def construct_models():
         elif 'Adaptive' in model_kernel:
             method = 'Adaptive'
             nl_functions = nlsp.nl_branches(nlsp.function_factory.laguerre_polynomial,branches=branches)
-        elif 'ClippingAdaptive' in model_kernel:
-            method = 'ClippingAdaptive'
+        elif 'ClippingAdap' in model_kernel:
+            method = 'ClippingAdap'
             nl_functions = nlsp.nl_branches(nlsp.function_factory.laguerre_polynomial,branches=branches)
         elif 'Linear' in model_kernel:
             method = 'Linear'
             nl_functions = nlsp.nl_branches(nlsp.function_factory.power_series,branches=branches)
-        elif 'LinearHGM' in model_kernel:
-            method = 'LinearHGM'
+        elif 'LinHGM' in model_kernel:
+            method = 'LinHGM'
             nl_functions = nlsp.nl_branches(nlsp.function_factory.power_series,branches=branches)
         filter_kernels = nlsp.change_length_filterkernels(filter_kernels=filter_kernels,length=2**11)
         model_constructed = nlsp.HammersteinGroupModel_up(input_signal=sumpf.modules.ConstantSignalGenerator(value=0.0,samplingrate=44100,length=2**10).GetSignal(),
@@ -168,8 +171,8 @@ def check_accuracy(models, inputs):
     for input,output in inputs:
         inp_signal = sumpf.modules.SignalFile(filename=input,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
         out_signal = sumpf.modules.SignalFile(filename=output,format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
-        inp_signal = sumpf.modules.CutSignal(signal=inp_signal,stop=2**18).GetOutput()
-        out_signal = sumpf.modules.CutSignal(signal=out_signal,stop=2**18).GetOutput()
+        inp_signal = sumpf.modules.CutSignal(signal=inp_signal,stop=length_inputs).GetOutput()
+        out_signal = sumpf.modules.CutSignal(signal=out_signal,stop=length_inputs).GetOutput()
         for car_name, model, method in models:
             if car_name in output:
                 model.SetInput(inp_signal)
@@ -186,7 +189,7 @@ def check_accuracy(models, inputs):
 
 
 def main():
-    system_identification_algorithm(read_excitations())
+    # system_identification_algorithm(read_excitations())
     check_accuracy(models=construct_models(),inputs=read_inputs())
 
 

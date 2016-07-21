@@ -16,6 +16,7 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot,refere
     for mean,sd in itertools.product(noise_mean,noise_sd):
         input_signal = input_generator.GetOutput()
         filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
+        filter_length = len(filter_spec_tofind[0])
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
@@ -23,6 +24,8 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot,refere
         ref_nlsystem_noise = nlsp.add_noise(ref_nlsystem.GetOutput(),sumpf.modules.NoiseGenerator.GaussianDistribution(mean,sd))
         found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
         noise_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem_noise,branches)
+        found_filter_spec = nlsp.change_length_filterkernels(found_filter_spec,length=filter_length)
+        noise_filter_spec = nlsp.change_length_filterkernels(noise_filter_spec,length=filter_length)
 
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nl_functions,
@@ -55,13 +58,16 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot,r
         input_signal = sumpf.modules.AmplifySignal(input=input,factor=excitation_amp).GetOutput()
         sample_signal = nlsp.WhiteGaussianGenerator(sampling_rate=input_signal.GetSamplingRate(),length=len(input_signal),
                                                     distribution=sumpf.modules.NoiseGenerator.UniformDistribution(minimum=-sample_amp,maximum=sample_amp))
+        sample_signal = nlsp.RemoveOutliers(thresholds=[-sample_amp,sample_amp],value=0,signal=sample_signal.GetOutput())
         sample_signal = sample_signal.GetOutput()
         filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
+        filter_length = len(filter_spec_tofind[0])
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
                                                      filter_irs=filter_spec_tofind,
                                                      max_harmonics=range(1,branches+1))
         found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
+        found_filter_spec = nlsp.change_length_filterkernels(found_filter_spec,length=filter_length)
         iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=sample_signal,
                                                      nonlinear_functions=nl_functions,
                                                      filter_irs=found_filter_spec,

@@ -3,7 +3,7 @@ import sumpf
 import numpy
 
 def clipping_adaptive_identification(input_generator, outputs, branches=5, iterations=1, step_size=0.1,
-                                        filtertaps=2**9, algorithm=nlsp.miso_nlms_multichannel, init_coeffs=None,
+                                        filtertaps=2**11, algorithm=nlsp.miso_nlms_multichannel, init_coeffs=None,
                                         Plot_SERvsIteration = False, Print_SER = False,
                                         nonlinear_func = nlsp.function_factory.hardclip):
     clipping_thresholds = ([-1.1,1.1],[-1.0,1.0],[-0.9,0.9],[-0.8,0.8],[-0.7,0.7])

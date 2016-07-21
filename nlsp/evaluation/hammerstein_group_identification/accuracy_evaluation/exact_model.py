@@ -17,12 +17,14 @@ def hgmwithfilter_evaluation(input_generator,branches,nlfuntion,iden_method,Plot
     input_signal = input_generator.GetOutput()
     # filter_spec_tofind = nlsp.create_bpfilter([2000,8000,30000],input_signal)
     filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+    length_kernel = len(filter_spec_tofind[0])
     # filter_spec_tofind = nlsp.log_chebyfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlfuntion,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
     found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
+    found_filter_spec = nlsp.change_length_filterkernels(found_filter_spec,length=length_kernel)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
@@ -50,12 +52,14 @@ def hgmwithoverlapfilter_evaluation(input_generator,branches,nlfunction,iden_met
     frequencies = [500,3000,5000,7000,20000]
     input_signal = input_generator.GetOutput()
     filter_spec_tofind = nlsp.create_bpfilter(frequencies,input_signal)
+    length_kernel = len(filter_spec_tofind[0])
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlfunction,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
 
     found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
+    found_filter_spec = nlsp.change_length_filterkernels(found_filter_spec,length=length_kernel)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,
@@ -124,12 +128,14 @@ def hgmwithreversedfilter_evaluation(input_generator,branches,nlfunction,iden_me
     input_signal = input_generator.GetOutput()
     filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
     filter_spec_tofind = [i for i in reversed(filter_spec_tofind)]
+    length_kernel = len(filter_spec_tofind[0])
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nlsp.nl_branches(nlfunction,branches),
                                                  filter_irs=filter_spec_tofind,
                                                  max_harmonics=range(1,branches+1))
 
     found_filter_spec, nl_functions = iden_method(input_generator,ref_nlsystem.GetOutput(),branches)
+    found_filter_spec = nlsp.change_length_filterkernels(found_filter_spec,length=length_kernel)
     iden_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                  nonlinear_functions=nl_functions,
                                                  filter_irs=found_filter_spec,

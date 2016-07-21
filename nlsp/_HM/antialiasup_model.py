@@ -15,7 +15,7 @@ class AliasingCompensatedHM_upsampling(HammersteinModel):
     def __init__(self, input_signal=None, nonlin_func=nlsp.function_factory.power_series(1), max_harm=1,
                  filter_impulseresponse=None,
                  resampling_algorithm=sumpf.modules.ResampleSignal.SPECTRUM,
-                 downsampling_position=1):
+                 downsampling_position=2):
         """
         :param input_signal: the input signal
         :param nonlin_func: the nonlinear function
@@ -34,6 +34,7 @@ class AliasingCompensatedHM_upsampling(HammersteinModel):
         self._attenuator = sumpf.modules.AmplifySignal()
         self._downsampling_position = downsampling_position
         self._downnloutput = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
+        self._downoutput2 = sumpf.modules.ResampleSignal(algorithm=self._resampling_algorithm)
 
         self.SetNLFunction = self._nonlin_function.SetNonlinearFunction
 
@@ -49,14 +50,16 @@ class AliasingCompensatedHM_upsampling(HammersteinModel):
 
     def _Connect(self):
         sumpf.connect(self._ampsignal.GetOutput, self._prp.SetSignal)
-        sumpf.connect(self._GetSamplingRate, self._upsignal.SetSamplingRate)
-        sumpf.connect(self._GetSamplingRate, self._upfilter.SetSamplingRate)
+        sumpf.connect(self._GetSamplingRateSignal, self._upsignal.SetSamplingRate)
+        sumpf.connect(self._GetSamplingRateFilter, self._upfilter.SetSamplingRate)
         sumpf.connect(self._Getattenuation, self._attenuator.SetAmplificationFactor)
         sumpf.connect(self._ampsignal.GetOutput, self._upsignal.SetInput)
         sumpf.connect(self._ampfilter.GetOutput, self._upfilter.SetInput)
         sumpf.connect(self._upsignal.GetOutput,self._nonlin_function.SetInput)
         sumpf.connect(self._nonlin_function.GetOutput, self._attenuator.SetInput)
-        sumpf.connect(self._attenuator.GetOutput, self._merger.AddInput)
+        sumpf.connect(self._GetSamplingRateFilter, self._downoutput2.SetSamplingRate)
+        sumpf.connect(self._attenuator.GetOutput, self._downoutput2.SetInput)
+        sumpf.connect(self._downoutput2.GetOutput, self._merger.AddInput)
         sumpf.connect(self._upfilter.GetOutput,self._merger.AddInput)
         sumpf.connect(self._merger.GetOutput,self._transform.SetSignal)
         sumpf.connect(self._transform.GetSpectrum,self._split1ch.SetInput)
@@ -84,14 +87,23 @@ class AliasingCompensatedHM_upsampling(HammersteinModel):
         return self._nonlin_function.GetMaximumHarmonic()
 
     @sumpf.Output(float)
-    def _GetSamplingRate(self):
+    def _GetSamplingRateFilter(self):
+        if self._downsampling_position == 1:
+            # temp = self._prp.GetSamplingRate() * self._GetMaximumHarmonic() # Full resampling
+            temp = self._prp.GetSamplingRate()*math.ceil((self._GetMaximumHarmonic()+1.0)/2.0) # Reduced resampling
+        elif self._downsampling_position == 2:
+            temp = self._prp.GetSamplingRate()
+        return temp
+
+    @sumpf.Output(float)
+    def _GetSamplingRateSignal(self):
         # temp = self._prp.GetSamplingRate() * self._GetMaximumHarmonic() # Full resampling
         temp = self._prp.GetSamplingRate()*math.ceil((self._GetMaximumHarmonic()+1.0)/2.0) # Reduced resampling
         return temp
 
     @sumpf.Output(float)
     def _Getattenuation(self):
-        return self._prp.GetSamplingRate()/self._GetSamplingRate()
+        return self._prp.GetSamplingRate()/self._GetSamplingRateFilter()
         # return (1/float(self._GetMaximumHarmonic()))
 
     @sumpf.Output(sumpf.Signal)

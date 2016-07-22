@@ -51,14 +51,16 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot,refere
 
 def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot,reference=None):
 
-    excitation_signal_amp = [0.5,1.0]
+    excitation_signal_amp = [0.5,1.0,2.0]
     sample_signal_amp = [0.5,1.0,2.0]
     input = input_generator.GetOutput()
     for excitation_amp,sample_amp in itertools.product(excitation_signal_amp,sample_signal_amp):
         input_signal = sumpf.modules.AmplifySignal(input=input,factor=excitation_amp).GetOutput()
+        input_signal = nlsp.RemoveOutliers(thresholds=[-excitation_amp,excitation_amp],value=0.0,signal=input_signal)
+        input_signal = input_signal.GetOutput()
         sample_signal = nlsp.WhiteGaussianGenerator(sampling_rate=input_signal.GetSamplingRate(),length=len(input_signal),
                                                     distribution=sumpf.modules.NoiseGenerator.UniformDistribution(minimum=-sample_amp,maximum=sample_amp))
-        sample_signal = nlsp.RemoveOutliers(thresholds=[-sample_amp,sample_amp],value=0,signal=sample_signal.GetOutput())
+        sample_signal = nlsp.RemoveOutliers(thresholds=[-sample_amp,sample_amp],value=0.0,signal=sample_signal.GetOutput())
         sample_signal = sample_signal.GetOutput()
         filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
         filter_length = len(filter_spec_tofind[0])

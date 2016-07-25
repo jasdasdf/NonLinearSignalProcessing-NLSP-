@@ -5,7 +5,7 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
-length = 2**18
+length = 2**16
 fade_out = 0.02
 fade_in = 0.02
 branches = 5
@@ -54,29 +54,29 @@ nonlinear_function = [nlsp.function_factory.chebyshev1_polynomial,
 reference = nlsp.RemoveOutliers(thresholds=[-1.0,1.0],value=0,signal=wgn_laplace.GetOutput())
 reference = reference.GetOutput()
 
-
 for method,input_generator,nlfunction in zip(iden_method,excitation,nonlinear_function):
     print method,input_generator
-    try:
-        nlsp.hgmwithfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
-    except:
-        print "hgm with filter exception"
-    try:
-        nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
-    except:
-        print "hgm with overlap filter exception"
-    try:
-        nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
-    except:
-        print "hgm with reversed filter exception"
+    # try:
+    #     nlsp.hgmwithfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
+    # except:
+    #     print "hgm with filter exception"
+    # try:
+    #     nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
+    # except:
+    #     print "hgm with overlap filter exception"
+    # try:
+    #     nlsp.hgmwithreversedfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
+    # except:
+    #     print "hgm with reversed filter exception"
+    # nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
     try:
         nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
     except:
         print "robustness excitation exception"
-    try:
-        nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot,reference)
-    except:
-        print "robustness noise exception"
+    # try:
+    #     nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot,reference)
+    # except:
+    #     print "robustness noise exception"
 
 
     # try:

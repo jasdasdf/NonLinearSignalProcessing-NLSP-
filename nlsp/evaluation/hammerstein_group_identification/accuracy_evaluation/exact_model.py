@@ -87,7 +87,7 @@ def linearmodel_evaluation(input_generator,branches,nlfunction,iden_method,Plot,
     prp.SetSignal(input_signal)
     filter_ir = sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=10),
             frequency=10000.0,transform=False,resolution=prp.GetResolution(),length=prp.GetSpectrumLength()).GetSpectrum()
-    ref_nlsystem = nlsp.AliasCompensatingHammersteinModelUpandDown(filter_impulseresponse=sumpf.modules.InverseFourierTransform(filter_ir).GetSignal())
+    ref_nlsystem = nlsp.AliasingCompensatedHM_upsampling(filter_impulseresponse=sumpf.modules.InverseFourierTransform(filter_ir).GetSignal())
     ref_nlsystem.SetInput(input_signal)
 
     # nonlinear system identification

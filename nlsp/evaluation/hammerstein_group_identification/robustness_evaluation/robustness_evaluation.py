@@ -15,7 +15,8 @@ def robustness_noise_evaluation(input_generator,branches,iden_method,Plot,refere
     noise_sd = [0.5,0.7]
     for mean,sd in itertools.product(noise_mean,noise_sd):
         input_signal = input_generator.GetOutput()
-        filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
+        filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+        filter_spec_tofind = [i for i in reversed(filter_spec_tofind)]
         filter_length = len(filter_spec_tofind[0])
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),
@@ -53,16 +54,15 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot,r
 
     excitation_signal_amp = [0.5,1.0,2.0]
     sample_signal_amp = [0.5,1.0,2.0]
-    input = input_generator.GetOutput()
+    input_s = input_generator.GetOutput()
+    sample_signal = sumpf.modules.NoiseGenerator(distribution=sumpf.modules.NoiseGenerator.GaussianDistribution(),
+                                                 samplingrate=input_s.GetSamplingRate(),length=len(input_s)).GetSignal()
     for excitation_amp,sample_amp in itertools.product(excitation_signal_amp,sample_signal_amp):
-        input_signal = sumpf.modules.AmplifySignal(input=input,factor=excitation_amp).GetOutput()
-        input_signal = nlsp.RemoveOutliers(thresholds=[-excitation_amp,excitation_amp],value=0.0,signal=input_signal)
-        input_signal = input_signal.GetOutput()
-        sample_signal = nlsp.WhiteGaussianGenerator(sampling_rate=input_signal.GetSamplingRate(),length=len(input_signal),
-                                                    distribution=sumpf.modules.NoiseGenerator.UniformDistribution(minimum=-sample_amp,maximum=sample_amp))
-        sample_signal = nlsp.RemoveOutliers(thresholds=[-sample_amp,sample_amp],value=0.0,signal=sample_signal.GetOutput())
-        sample_signal = sample_signal.GetOutput()
-        filter_spec_tofind = nlsp.log_weightingfilter(branches=branches,input=input_signal)
+        input_generator.SetFactor(excitation_amp)
+        input_signal = input_generator.GetOutput()
+        sample_signal = sumpf.modules.AmplifySignal(input=sample_signal,factor=sample_amp).GetOutput()
+        filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+        filter_spec_tofind = [i for i in reversed(filter_spec_tofind)]
         filter_length = len(filter_spec_tofind[0])
         ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
                                                      nonlinear_functions=nlsp.nl_branches(nlsp.function_factory.power_series,branches),

@@ -3,12 +3,13 @@ import numpy
 
 class WhiteGaussianGenerator(object):
     def __init__(self, sampling_rate=48000.0, length=2**16, start_frequency=20.0,
-                 stop_frequency=20000.0, distribution=sumpf.modules.NoiseGenerator.GaussianDistribution()):
+                 stop_frequency=20000.0, distribution=sumpf.modules.NoiseGenerator.GaussianDistribution(),factor=1.0):
         self.__sampling_rate = float(sampling_rate)
         self.__length = float(length)
         self.__start_frequency = float(start_frequency)
         self.__stop_frequency = float(stop_frequency)
         self.__distribution = distribution
+        self.__excitation_factor = factor
         self._generate()
 
     def _generate(self):
@@ -30,10 +31,6 @@ class WhiteGaussianGenerator(object):
         self.__length = float(length)
         self._generate()
 
-    @sumpf.Output(sumpf.Signal)
-    def GetOutput(self):
-        return self.__output
-
     @sumpf.Output(float)
     def GetLength(self):
         return self.__length
@@ -46,4 +43,15 @@ class WhiteGaussianGenerator(object):
     def GetStopFrequency(self):
         return self.__stop_frequency
 
+    @sumpf.Output(float)
+    def GetFactor(self):
+        return self.__excitation_factor
+
+    @sumpf.Input(float,["GetFactor", "GetOutput"])
+    def SetFactor(self,factor=1.0):
+        self.__excitation_factor = factor
+
+    @sumpf.Output(sumpf.Signal)
+    def GetOutput(self):
+        return sumpf.modules.AmplifySignal(input=self.__output,factor=self.GetFactor()).GetOutput()
 

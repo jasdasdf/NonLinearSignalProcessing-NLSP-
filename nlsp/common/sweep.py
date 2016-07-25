@@ -86,7 +86,7 @@ class WindowedSweepGenerator(object):
 
 class NovakSweepGenerator_Sine(object):
     def __init__(self, sampling_rate=48000.0, length=2**16, start_frequency=20.0,
-                 stop_frequency=20000.0, fade_out=0.02, fade_in=0.02):
+                 stop_frequency=20000.0, fade_out=0.02, fade_in=0.02, factor=1.0):
 
         self.__sampling_rate = float(sampling_rate)
         self.__approx_length = float(length)
@@ -94,6 +94,7 @@ class NovakSweepGenerator_Sine(object):
         self.__stop_frequency = float(stop_frequency)
         self.__fade_out = float(fade_out*self.__sampling_rate)
         self.__fade_in = float(fade_in*self.__sampling_rate)
+        self.__excitation_factor = factor
 
     @sumpf.Input(float,"GetLength")
     def SetLength(self,length):
@@ -109,6 +110,7 @@ class NovakSweepGenerator_Sine(object):
         signal = sumpf.Signal(channels=(s,),samplingrate=self.__sampling_rate,labels=("Sweep signal",))
         if len(signal) % 2 != 0:
             signal = sumpf.modules.CutSignal(signal,start=0,stop=-1).GetOutput()
+        signal = sumpf.modules.AmplifySignal(input=signal,factor=self.GetFactor()).GetOutput()
         return signal
 
     def GetReversedOutput(self, length=None):
@@ -124,6 +126,7 @@ class NovakSweepGenerator_Sine(object):
         inverse_sweep[0] = 0j
         rev_sweep = numpy.fft.irfft(inverse_sweep)
         rev_sweep = sumpf.Signal(channels=(rev_sweep,),samplingrate=sampling_rate,labels=("Reversed Sweep signal",))
+        rev_sweep = sumpf.modules.AmplifySignal(input=rev_sweep,factor=self.GetFactor()).GetOutput()
         return rev_sweep
 
     def GetSweepParameter(self):
@@ -138,6 +141,14 @@ class NovakSweepGenerator_Sine(object):
         return length
 
     @sumpf.Output(float)
+    def GetFactor(self):
+        return self.__excitation_factor
+
+    @sumpf.Input(float,"GetFactor")
+    def SetFactor(self,factor=1.0):
+        self.__excitation_factor = factor
+
+    @sumpf.Output(float)
     def GetStartFrequency(self):
         return self.__start_frequency
 
@@ -147,7 +158,7 @@ class NovakSweepGenerator_Sine(object):
 
 class NovakSweepGenerator_Cosine(object):
     def __init__(self, sampling_rate=48000.0, length=2**16, start_frequency=20.0,
-                 stop_frequency=20000.0, fade_out=0.02, fade_in=0.02):
+                 stop_frequency=20000.0, fade_out=0.02, fade_in=0.02, factor=1.0):
 
         self.__sampling_rate = float(sampling_rate)
         self.__approx_length = float(length)
@@ -155,10 +166,19 @@ class NovakSweepGenerator_Cosine(object):
         self.__stop_frequency = float(stop_frequency)
         self.__fade_out = float(fade_out*self.__sampling_rate)
         self.__fade_in = float(fade_in*self.__sampling_rate)
+        self.__excitation_factor = factor
 
     @sumpf.Input(float,"GetLength")
     def SetLength(self,length):
         self.__approx_length = float(length)
+
+    @sumpf.Output(float)
+    def GetFactor(self):
+        return self.__excitation_factor
+
+    @sumpf.Input(float,"GetFactor")
+    def SetFactor(self,factor=1.0):
+        self.__excitation_factor = factor
 
     def GetOutput(self):
         t = numpy.arange(0,self.GetLength()/self.__sampling_rate,1/self.__sampling_rate)
@@ -170,6 +190,7 @@ class NovakSweepGenerator_Cosine(object):
         signal = sumpf.Signal(channels=(s,),samplingrate=self.__sampling_rate,labels=("Sweep signal",))
         if len(signal) % 2 != 0:
             signal = sumpf.modules.CutSignal(signal,start=0,stop=-1).GetOutput()
+        signal = sumpf.modules.AmplifySignal(input=signal,factor=self.GetFactor()).GetOutput()
         return signal
 
     def GetReversedOutput(self, length=None):
@@ -185,6 +206,7 @@ class NovakSweepGenerator_Cosine(object):
         inverse_sweep[0] = 0j
         rev_sweep = numpy.fft.irfft(inverse_sweep)
         rev_sweep = sumpf.Signal(channels=(rev_sweep,),samplingrate=sampling_rate,labels=("Reversed Sweep signal",))
+        rev_sweep = sumpf.modules.AmplifySignal(input=rev_sweep,factor=self.GetFactor()).GetOutput()
         return rev_sweep
 
     def GetSweepParameter(self):

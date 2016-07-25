@@ -191,7 +191,7 @@ def relabelandplotphase(input,label,show=True,save=False,name=None):
     plot_groupdelayandmagnitude(relabelled,show=show)
 
 
-def plot_array(input_array,label_array=None,save=False,name=None):
+def plot_array(input_array,label_array=None,save=False,name=None,Show=True):
     """
     Helper function to plot array
     :param input_array: the input array of signal or spectrum
@@ -202,7 +202,8 @@ def plot_array(input_array,label_array=None,save=False,name=None):
         label_array = [None,] * len(input_array)
     for input,label in zip(input_array,label_array):
         relabelandplot(input,label,False,save,name)
-    show()
+    if Show is True:
+        show()
 
 def plot_filterspec(input_array,show=True):
     for input in input_array:

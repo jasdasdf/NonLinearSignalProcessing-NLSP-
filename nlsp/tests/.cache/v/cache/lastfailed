@@ -1,1 +1,13 @@
-{}
+{
+  "hammerstein/antialiaslp_model_test.py::test_aliasingtest_comparewithupsampling": true, 
+  "hammerstein/antialiaslp_model_test.py::test_linearity_of_model": true, 
+  "hammerstein/antialiaslp_model_test.py::test_modelquality": true, 
+  "hammerstein/antialiasup_model_test.py::test_aliasingtest": true, 
+  "hammerstein/antialiasup_model_test.py::test_connectors": true, 
+  "hammerstein/antialiasup_model_test.py::test_modelquality": true, 
+  "hammerstein/antialiasup_model_test.py::test_reliability": true, 
+  "hammerstein/hammerstein_model_test.py::test_aliasingtest_comparewithupsampling": true, 
+  "hammerstein/hammerstein_model_test.py::test_modelquality": true, 
+  "hammerstein_group/hgm_lp_test.py::test_aliasing": true, 
+  "hammerstein_group/hgm_up_test.py::test_aliasing": true
+}

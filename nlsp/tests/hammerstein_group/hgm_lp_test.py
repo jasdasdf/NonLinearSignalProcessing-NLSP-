@@ -19,7 +19,7 @@ def test_puretone():
                                           length=length).GetSignal()
     h = []
     for harm in max_harm:
-        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sine_signal,
+        Test_Model_Hammerstein = nlsp.AliasingCompensatedHM_lowpass(input_signal=ip_sine_signal,
                                                        nonlin_func=nlsp.function_factory.power_series(harm),
                                                        max_harm=harm)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
@@ -54,7 +54,7 @@ def test_aliasing():
                                           length=length).GetSignal()
     h = []
     for harm in max_harm:
-        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sine_signal,
+        Test_Model_Hammerstein = nlsp.AliasingCompensatedHM_lowpass(input_signal=ip_sine_signal,
                                                        nonlin_func=nlsp.function_factory.power_series(harm),
                                                        max_harm=harm)
         Test_Model_outputsignal = Test_Model_Hammerstein.GetOutput()
@@ -91,7 +91,7 @@ def test_energy():
     imp = sumpf.modules.ImpulseGenerator(samplingrate=s_rate, length=length).GetSignal()
     e = []
     for harm in max_harm:
-        Test_Model_Hammerstein = nlsp.AliasCompensatingHammersteinModelLowpass(input_signal=ip_sine_signal,
+        Test_Model_Hammerstein = nlsp.AliasingCompensatedHM_lowpass(input_signal=ip_sine_signal,
                                                        nonlin_func=nlsp.function_factory.power_series(harm),
                                                        filter_impulseresponse=imp,
                                                        max_harm=harm)

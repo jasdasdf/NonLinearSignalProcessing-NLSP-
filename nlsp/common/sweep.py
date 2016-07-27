@@ -126,7 +126,7 @@ class NovakSweepGenerator_Sine(object):
         inverse_sweep[0] = 0j
         rev_sweep = numpy.fft.irfft(inverse_sweep)
         rev_sweep = sumpf.Signal(channels=(rev_sweep,),samplingrate=sampling_rate,labels=("Reversed Sweep signal",))
-        rev_sweep = sumpf.modules.AmplifySignal(input=rev_sweep,factor=self.GetFactor()).GetOutput()
+        rev_sweep = sumpf.modules.AmplifySignal(input=rev_sweep,factor=1.0/self.GetFactor()).GetOutput()
         return rev_sweep
 
     def GetSweepParameter(self):

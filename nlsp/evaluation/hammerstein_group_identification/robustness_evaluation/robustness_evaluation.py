@@ -55,8 +55,10 @@ def robustness_excitation_evaluation(input_generator,branches,iden_method,Plot,r
     excitation_signal_amp = [0.5,1.0,2.0]
     sample_signal_amp = [0.5,1.0,2.0]
     input_s = input_generator.GetOutput()
-    sample_signal = sumpf.modules.NoiseGenerator(distribution=sumpf.modules.NoiseGenerator.GaussianDistribution(),
+    sample_signal = sumpf.modules.NoiseGenerator(distribution=sumpf.modules.NoiseGenerator.UniformDistribution(),
                                                  samplingrate=input_s.GetSamplingRate(),length=len(input_s)).GetSignal()
+    sample_signal = nlsp.RemoveOutliers(thresholds=[-1.0,1.0],signal=sample_signal,value=0.0)
+    sample_signal = sample_signal.GetOutput()
     for excitation_amp,sample_amp in itertools.product(excitation_signal_amp,sample_signal_amp):
         input_generator.SetFactor(excitation_amp)
         input_signal = input_generator.GetOutput()

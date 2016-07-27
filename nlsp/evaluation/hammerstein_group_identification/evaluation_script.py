@@ -5,7 +5,7 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
-length = 2**16
+length = 2**18
 fade_out = 0.02
 fade_in = 0.02
 branches = 5

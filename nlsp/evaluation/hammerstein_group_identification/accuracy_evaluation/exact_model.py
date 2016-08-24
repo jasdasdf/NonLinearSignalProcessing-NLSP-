@@ -17,6 +17,7 @@ def hgmwithfilter_evaluation(input_generator,branches,nlfuntion,iden_method,Plot
     input_signal = input_generator.GetOutput()
     # filter_spec_tofind = nlsp.create_bpfilter([2000,8000,30000],input_signal)
     filter_spec_tofind = nlsp.log_bpfilter(branches=branches,input=input_signal)
+    # filter_spec_tofind = [i for i in reversed(filter_spec_tofind)]
     length_kernel = len(filter_spec_tofind[0])
     # filter_spec_tofind = nlsp.log_chebyfilter(branches=branches,input=input_signal)
     ref_nlsystem = nlsp.HammersteinGroupModel_up(input_signal=input_signal,
@@ -36,10 +37,15 @@ def hgmwithfilter_evaluation(input_generator,branches,nlfuntion,iden_method,Plot
         ref_nlsystem.SetInput(reference)
         iden_nlsystem.SetInput(reference)
     if Plot is True:
-        plot.relabelandplot(sumpf.modules.FourierTransform(ref_nlsystem.GetOutput()).GetSpectrum(),"Reference Output",show=False)
-        plot.relabelandplot(sumpf.modules.FourierTransform(iden_nlsystem.GetOutput()).GetSpectrum(),"Identified Output",show=True)
+        plot.relabelandplot(ref_nlsystem.GetOutput(),"Reference Output",show=False)
+        plot.relabelandplot(iden_nlsystem.GetOutput(),"Identified Output",show=True)
+    # nlsp.plot_array([sumpf.modules.FourierTransform(s).GetSpectrum() for s in filter_spec_tofind],label_array=["reference%d" %i for i in range(len(filter_spec_tofind))],Show=False)
+    # nlsp.plot_array([sumpf.modules.FourierTransform(s).GetSpectrum() for s in found_filter_spec],label_array=["identified%d" %i for i in range(len(found_filter_spec))],Show=True)
     print "SNR between Reference and Identified output without overlapping filters: %r" %nlsp.snr(ref_nlsystem.GetOutput(),
                                                                                              iden_nlsystem.GetOutput())
+    sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/linearHGM_explannation/cheby/noise/input", signal=reference,format=sumpf.modules.SignalFile.WAV_FLOAT)
+    sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/linearHGM_explannation/cheby/noise/%s" %iden_method.__name__,signal=iden_nlsystem.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
+    sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/linearHGM_explannation/cheby/noise/reference",signal=ref_nlsystem.GetOutput(),format=sumpf.modules.SignalFile.WAV_FLOAT)
 
 def hgmwithoverlapfilter_evaluation(input_generator,branches,nlfunction,iden_method,Plot,reference=None):
     """

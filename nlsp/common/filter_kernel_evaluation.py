@@ -6,7 +6,7 @@ import nlsp
 # Applicable to only virtual nonlinear system
 # Find Uniqueness between reference and identified nonlinear system
 
-def filterkernel_evaluation_plot(reference_kernels, identified_kernels, Plot="individual"):
+def filterkernel_evaluation_plot(reference_kernels, identified_kernels, Plot="total"):
     """
     plot the difference between te reference and identified filter kernels
     :param reference_kernels: the array of reference filter kernels

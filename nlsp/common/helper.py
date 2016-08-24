@@ -132,11 +132,11 @@ def log_bpfilter(start_freq=20.0,stop_freq=20000.0,branches=5,input=sumpf.Signal
         frequencies.append(100 * (dummy**i))
     filter_spec = []
     for freq in frequencies:
-        spec =  (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+        spec =  (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=16),
                                             frequency=freq,
                                             resolution=ip_prp.GetResolution(),
                                             length=ip_prp.GetSpectrumLength()).GetSpectrum())*\
-                (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=100),
+                (sumpf.modules.FilterGenerator(filterfunction=sumpf.modules.FilterGenerator.BUTTERWORTH(order=16),
                                             frequency=freq/2,transform=True,
                                             resolution=ip_prp.GetResolution(),
                                             length=ip_prp.GetSpectrumLength()).GetSpectrum())

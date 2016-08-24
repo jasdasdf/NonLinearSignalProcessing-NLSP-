@@ -22,7 +22,7 @@ def wiener_g_identification(input_gen, output, branches):
     for branch in range(1, branches + 1):
         k = []
         for i in range(0, kernel_length):
-            shifted = sumpf.modules.ShiftSignal(signal=excitation,shift=-i,circular=False).GetOutput()
+            shifted = sumpf.modules.ShiftSignal(signal=excitation, shift=-i,circular=False).GetOutput()
             power = nlsp.NonlinearFunction(signal=shifted,nonlin_func=nlsp.function_factory.hermite_polynomial(branch))
             product = response * power.GetOutput()
             mean = sumpf.modules.SignalMean(signal=product).GetMean()[0]

@@ -5,10 +5,10 @@ import nlsp.common.plots as plot
 sampling_rate = 48000.0
 start_freq = 20.0
 stop_freq = 20000.0
-length = 2**18
-fade_out = 0.02
-fade_in = 0.02
-branches = 5
+length = 2**16
+fade_out = 0.00
+fade_in = 0.00
+branches = 3
 normal = sumpf.modules.NoiseGenerator.GaussianDistribution(mean=0.0,standard_deviation=1.0)
 uniform = sumpf.modules.NoiseGenerator.UniformDistribution()
 pink = sumpf.modules.NoiseGenerator.PinkNoise()
@@ -46,20 +46,25 @@ iden_method = [nlsp.linear_identification,
                nlsp.wiener_g_identification]
 nonlinear_function = [nlsp.function_factory.chebyshev1_polynomial,
                       nlsp.function_factory.chebyshev1_polynomial,
-                      nlsp.function_factory.power_series,
                       nlsp.function_factory.chebyshev1_polynomial,
-                      nlsp.function_factory.legrendre_polynomial,
-                      nlsp.function_factory.power_series,
-                      nlsp.function_factory.hermite_polynomial]
-reference = nlsp.RemoveOutliers(thresholds=[-1.0,1.0],value=0,signal=wgn_laplace.GetOutput())
+                      nlsp.function_factory.chebyshev1_polynomial,
+                      nlsp.function_factory.chebyshev1_polynomial,
+                      nlsp.function_factory.chebyshev1_polynomial,
+                      nlsp.function_factory.chebyshev1_polynomial]
+reference = sumpf.modules.NoiseGenerator(distribution=sumpf.modules.NoiseGenerator.LaplaceDistribution(mean=0.0,scale=0.2),seed="signal",samplingrate=sampling_rate,length=length).GetSignal()
+# reference = sumpf.modules.SweepGenerator(samplingrate=sampling_rate, length=length).GetSignal()
+# reference = sumpf.modules.SignalFile(filename="C:/Users/diplomand.8/Desktop/linearHGM_explannation/input_speech",format=sumpf.modules.SignalFile.WAV_FLOAT).GetSignal()
+# reference = sumpf.modules.SplitSignal(data=reference, channels=[0]).GetOutput()
+reference = nlsp.RemoveOutliers(thresholds=[-1.0,1.0],value=0,signal=reference)
 reference = reference.GetOutput()
 
 for method,input_generator,nlfunction in zip(iden_method,excitation,nonlinear_function):
     print method,input_generator
-    # try:
-    #     nlsp.hgmwithfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
-    # except:
-    #     print "hgm with filter exception"
+    try:
+        nlsp.hgmwithfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
+    except:
+        print "hgm with filter exception"
+nlsp.common.plots.show()
     # try:
     #     nlsp.hgmwithoverlapfilter_evaluation(input_generator,branches,nlfunction,method,Plot,reference)
     # except:
@@ -69,10 +74,10 @@ for method,input_generator,nlfunction in zip(iden_method,excitation,nonlinear_fu
     # except:
     #     print "hgm with reversed filter exception"
     # nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
-    try:
-        nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
-    except:
-        print "robustness excitation exception"
+    # try:
+    #     nlsp.robustness_excitation_evaluation(input_generator,branches,method,Plot,reference)
+    # except:
+    #     print "robustness excitation exception"
     # try:
     #     nlsp.robustness_noise_evaluation(input_generator,branches,method,Plot,reference)
     # except:
@@ -119,7 +124,7 @@ for method,input_generator,nlfunction in zip(iden_method,excitation,nonlinear_fu
     #
     #
 
-
+# nlsp.adaptive_identification()
 
 # for method,input_generator in zip(iden_method,excitation):
 #     print method,input_generator

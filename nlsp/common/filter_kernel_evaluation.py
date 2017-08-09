@@ -56,3 +56,5 @@ def filterkernel_evaluation_sum(reference_kernels, identified_kernels, Plot=Fals
         nlsp.common.plots.relabelandplot(temp_reference,"reference sum",show=True)
     print "SNR between summed reference and identified kernels %r" %nlsp.snr(temp_reference,temp_identified)
     print "Mean SNR between reference and identified kernels %r,Individual SNR: %r" %(numpy.mean(snr_diff),snr_diff)
+
+nlsp.NonlinearFunction.hermite_polynomial()

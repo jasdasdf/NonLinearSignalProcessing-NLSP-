@@ -100,10 +100,10 @@ nlsp.common.plots.show()
     #     nlsp.clippingHGMevaluation(input_generator,branches,method,Plot,reference)
     # except:
     #     print "symmetric clipping HGM exception"
-    # try:
-    #     nlsp.softclippingHGMevaluation(input_generator,branches,method,Plot,reference)
-    # except:
-    #     print "symmetric soft clipping HGM exception"
+    try:
+        nlsp.softclippingHGMevaluation(input_generator,branches,method,Plot,reference)
+    except:
+        print "symmetric soft clipping HGM exception"
     # try:
     #     nlsp.doublehgm_same_evaluation(input_generator,branches,method,Plot,reference)
     # except:
@@ -126,16 +126,17 @@ nlsp.common.plots.show()
 
 # nlsp.adaptive_identification()
 
-# for method,input_generator in zip(iden_method,excitation):
-#     print method,input_generator
-#     try:
-#         nlsp.computationtime_evaluation(input_generator,branches,method,Plot,rangevalue=5,save=False)
-#     except:
-#         print "computation time evaluation exception"
+for method,input_generator in zip(iden_method,excitation):
+    print method,input_generator
+    try:
+        nlsp.computationtime_evaluation(input_generator,branches,method,Plot,rangevalue=5,save=False)
+    except:
+        print "computation time evaluation exception"
 # try:
 #     nlsp.computationtime_adaptive_evaluation(wgn_uniform,branches)
 # except:
 #     print "adaptive identification computation time evaluation exception"
 
+nlsp.save_systemidentification()
 
 

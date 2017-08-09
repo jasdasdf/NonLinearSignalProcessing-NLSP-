@@ -2,428 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8e0a4a5c-8e8e-444c-9d5f-bacb641de7e1" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/.name" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/Loudspeakermodel.iml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/dictionaries/diplomand_8.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/workspace-Logesh-notebook.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/common/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/common/carinabox.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/common/clip_signal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/common/clipping_hgm.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/common/generic_model.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/common/helper.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/common/plot.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/common/poly_signal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/common/spectrogram.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/auralization/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/auralization/loadfile.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/auralization/parameters.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/filterbank/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/filterbank/pathfunctions.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/general/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/general/frequencies.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/general/measurement.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Common/head_specific/general/pathfunctions.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Messsignale/convert_to_sumpf.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Messsignale/generate.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Messsignale/generate2.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Messsignale/generateLehrgang.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Messsignale/seeds.npz" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Messsignale/test.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/.gitignore" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/LICENSE.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/Makefile" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/README.md" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/README.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/config.htm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/connectors.htm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/developers.htm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/documentation.htm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/gui.htm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/header.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/CodeFormatter.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/Config.odg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/Config.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/Connectors.odg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/Connectors.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/LookAheadSimple.odg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/LookAheadSimple.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/Modules.odg" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/Modules.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/images/RecordTransferFunction.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/index.htm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/installation.htm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/style.css" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/documentation/todo.htm" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_collectgarbage/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_collectgarbage/functions.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_collectgarbage/objects.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_config/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_config/config.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_config/functions.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_config/interface.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_config/objects.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_config/parent.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/_progressindicators/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/_progressindicators/progressindicator_base.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/_progressindicators/progressindicator_nop.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/_progressindicators/progressindicators.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/baseconnectors.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/basedecorators.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/baseinputconnectors.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/connectorproxy.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/decorators.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/functions.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/multiinputconnector.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/outputconnectors.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/progressindicators.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/singleinputconnector.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/_connectors/triggerinputconnector.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/collectgarbage.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/config.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/connectors.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_base/license.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_data/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_data/channeldata.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_data/signal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_data/spectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_data/thielesmallparameters.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_examples/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_examples/convertfile/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_examples/convertfile/convertfile.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_examples/recordtransferfunction/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_examples/recordtransferfunction/config.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_examples/recordtransferfunction/guiwindow.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_examples/recordtransferfunction/main.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_examples/recordtransferfunction/signalchain.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_gui/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_gui/functions.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_gui/gauge.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_gui/mainloopthread.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_gui/progressdialog.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_gui/window.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/_average/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/_average/base.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/_average/sortedsum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/_average/sumdirectly.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/_average/sumlist.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/_numpydummy.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/average.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/multiinputdata.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/normalizepath.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/numpydummy.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/stringfunctions.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/sumpfmath.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_helper/walkmodule.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_channels/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_channels/concatenatesignals.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_channels/copychannels.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_channels/cutsignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_channels/merge.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_channels/reversesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_channels/select.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_channels/shiftsignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_channels/split.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/arbitrarysignalgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/constantsignalgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/impulsegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/laguerrefunctiongenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/noisegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/signalgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/silencegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/sinewavegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/squarewavegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/sweepgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/trianglewavegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/wavegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_signal/windowgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/constantspectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/delayfilter.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/derivativespectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/filtergenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/filterwithcoefficients.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/laguerrefilter.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/rectanglefilter.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/slopespectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/spectrumgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/_spectrum/weightingfilter.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/signal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_generators/spectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/energydecaycurvefromimpulseresponse.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/findharmonicimpulseresponse.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/regularizedspectruminversion.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_interpretations/signalenvelope.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_audioio/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_audioio/baseio.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_audioio/dummyio.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_audioio/factory.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_audioio/jackio.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_audioio/modules.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/channeldatafile.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/fileformat.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/read_ita_file.m" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/read_mat_file.m" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/signalfile.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/signalformats.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/spectrumfile.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/spectrumformats.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/_fileio/write_mat_file.m" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/audioio.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_io/fileio.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/_algebra/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/_algebra/signalalgebra.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/_algebra/signalalgebrabase.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/_algebra/spectrumalgebra.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/_algebra/spectrumalgebrabase.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/_statistics/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/_statistics/mean.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/_statistics/signalvariance.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/_statistics/spectrumvariance.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/algebra.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/amplify.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/average.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/conjugatespectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/convolvesignals.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/correlatesignals.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/differentiatesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/fouriertransform.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/integratesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/logarithmsignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/rectifysignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/resamplesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/rootmeansquare.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/shortfouriertransform.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_math/statistics.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_metadata/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_metadata/channeldataproperties.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_metadata/copylabels.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_metadata/durationtolength.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_metadata/relabel.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_models/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_models/_thielesmallparameters/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_models/_thielesmallparameters/auralization_base.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_models/_thielesmallparameters/auralization_linear.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_models/_thielesmallparameters/auralization_nonlinear.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_models/_thielesmallparameters/auralization_nonlinear_cython.pyx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_models/_thielesmallparameters/interpretation.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_models/thielesmallparameters.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_normalize/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_normalize/clipsignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_normalize/normalizesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_normalize/normalizespectrumtoaverage.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_normalize/normalizespectrumtofrequency.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/linemanagers.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/lineplotpanel.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/observablefigurecanvas.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/plotlayouts.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/plotwindow.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/sequenceplotpanel.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/sequenceplotwindow.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/signalplotpanel.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/signalplotwindow.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/spectrumplotpanel.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/spectrumplotwindow.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/_plotting/toolbar.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/channels.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/generators.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/interpretations.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/io.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/math.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/metadata.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/models.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/normalize.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/_modules/plotting.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/base.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/data.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/examples.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/gui.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/helper.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/internal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/_sumpf/modules.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/setup.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/source/sumpf.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/compare.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/connectiontester.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/libutils.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/testquestionnaire.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/unavailable_libs/jack/jack.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/unavailable_libs/matplotlib/matplotlib.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/unavailable_libs/numpy/numpy.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/unavailable_libs/scikits/scikits.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/_common/unavailable_libs/soundfile/soundfile.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/base/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/base/config.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/base/connectors/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/base/connectors/connectors.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/base/connectors/exampleclasses.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/base/connectors/progressindicators.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/data/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/data/signal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/data/spectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/data/thielesmallparameters.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/examples/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/examples/convertfile.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/gui/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/gui/progressdialog.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/helper/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/helper/average.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/helper/multiinputdata.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/helper/normalizepath.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/helper/numpydummy.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/helper/stringfunctions.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/helper/sumpfmath.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/concatenatesignals.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/copychannels.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/cutsignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/merge/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/merge/connectiontester.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/merge/mergesignals.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/merge/mergespectrums.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/reversesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/select.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/shiftsignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/split/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/split/splitsignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/channels/split/splitspectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/arbitrarysignalgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/constantsignalgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/impulsegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/laguerrefunctiongenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/noisegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/signalgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/silencegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/sinewavegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/squarewavegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/sweepgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/trianglewavegenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/signal/windowgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/constantspectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/delayfilter.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/derivativespectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/filtergenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/laguerrefilter.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/rectanglefilter.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/slopespectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/spectrumgenerator.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/generators/spectrum/weightingfilter.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/interpretations/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/interpretations/energydecaycurvefromimpulseresponse.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/interpretations/findharmonicimpulseresponse.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/interpretations/regularizedspectruminversion.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/interpretations/signalenvelope.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/io/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/io/audioio.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/io/data/freq.ita" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/io/data/time.ita" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/io/fileio.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/algebra/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/algebra/signalalgebra.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/algebra/spectrumalgebra.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/amplify/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/amplify/amplifysignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/amplify/amplifyspectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/amplify/connectiontester.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/average/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/average/averagesignals.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/average/averagespectrums.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/average/connectiontester.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/conjugatespectrum.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/convolvesignals.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/correlatesignals.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/differentiatesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/fouriertransform.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/integratesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/logarithmsignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/rectifysignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/resamplesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/rootmeansquare.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/shortfouriertransform.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/statistics/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/statistics/mean.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/math/statistics/variance.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/metadata/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/metadata/channeldataproperties.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/metadata/copylabels.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/metadata/durationtolength.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/metadata/relabel.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/models/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/models/thielesmallparameters/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/models/thielesmallparameters/auralization.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/models/thielesmallparameters/interpretation.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/normalize/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/normalize/clipsignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/normalize/normalizesignal.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/normalize/normalizespectrumtoaverage.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/normalize/normalizespectrumtofrequency.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/plotting/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/plotting/basetestcase.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/plotting/lineplotting.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/plotting/sequenceplotpanel.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/plotting/signalplotpanel.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/modules/plotting/spectrumplotpanel.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/attributes.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/basetestcase.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/checks.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/codingstyle.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/helper.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testcodingstyle.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/beginning_of_file.fail" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/beginning_of_file.pass" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/class_before_class.fail" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/function_before_class.fail" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/function_before_class.pass" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/multiple_blocks_of_imports.fail" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/multiple_blocks_of_imports.pass" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/multiple_blocks_of_imports2.fail" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/one_block_of_imports.fail" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/one_block_of_imports.pass" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/one_line_of_imports.fail" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/codingstyle/testfiles/CheckNewlinesBeforeClasses/one_line_of_imports.pass" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/missinglibs/__init__.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/missinglibs/missinglibs.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/missinglibs/process.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/other/pythonassumptions.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tests/run_tests.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tools/Doxyfile" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tools/installexamples.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tools/moduledoc.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tools/statistics.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/SuMPF/tools/update_license_header.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Thomas_arbeit.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Thomas_measurements_carmodeling.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/convert_audio.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/plots_for_presentation.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/simple_comparison.py" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/common/filter_kernel_evaluation.py" afterPath="$PROJECT_DIR$/nlsp/common/filter_kernel_evaluation.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/evaluation_script.py" afterPath="$PROJECT_DIR$/nlsp/evaluation/hammerstein_group_identification/evaluation_script.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -436,8 +15,41 @@
     <option name="PATCH_PATH" value="" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sa-nl-aec.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/nlsp/nlaec/sa-nl-aec.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="443">
+              <caret line="83" column="0" lean-forward="true" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/.gitignore" />
+      </list>
+    </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
@@ -725,13 +337,21 @@
       <option name="presentableId" value="Default" />
       <updated>1502270819491</updated>
     </task>
+    <task id="LOCAL-00001" summary="del unwanted files">
+      <created>1502270853724</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1502270853724</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="1919" y="25" width="1922" height="1056" extended-state="6" />
     <editor active="false" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2497332" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2497332" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -757,8 +377,42 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="del unwanted files" />
+    <option name="LAST_COMMIT_MESSAGE" value="del unwanted files" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/nlsp/tests/hammerstein/antialiaslp_model_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2153">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/nlsp/nlaec/sa-nl-aec.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="443">
+          <caret line="83" column="0" lean-forward="true" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
   </component>
 </project>

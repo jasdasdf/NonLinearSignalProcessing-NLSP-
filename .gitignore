@@ -20,3 +20,6 @@ nlsp/tests/.cache/
 Common/common/plot.py
 
 /.idea/workspace.xml
+.idea/SourceCode.iml
+.idea/inspectionProfiles/
+nlsp/evaluation/common/
